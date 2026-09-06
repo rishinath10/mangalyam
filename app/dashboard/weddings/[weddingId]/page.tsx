@@ -9,11 +9,23 @@ import { formatShortDate, formatTimeRange } from "@/lib/format";
 import { resolveAccentColor } from "@/lib/templates/registry";
 import { withFigures } from "@/lib/typography";
 import { AddInvitationForm } from "@/components/dashboard/AddInvitationForm";
+import { PurchasePanel } from "@/components/dashboard/PurchasePanel";
+import { PACKAGE_ENTITLEMENTS, PACKAGE_NAMES, isPurchasable } from "@/lib/packages";
 
-type Params = { params: Promise<{ weddingId: string }> };
+type Params = {
+  params: Promise<{ weddingId: string }>;
+  searchParams: Promise<{ paid?: string; cancelled?: string }>;
+};
 
-export default async function WeddingPage({ params }: Params) {
+const TIER_COPY = {
+  essential: ["Standard designs", "Unlimited RSVPs", "Gallery, timeline and countdown", "WhatsApp sharing"],
+  signature: ["Everything in Essential", "All designs, premium included", "Background music", "Meal preferences for your caterer"],
+  bespoke: ["Everything in Signature", "A card drawn for you by hand", "Mangalyam branding removed", "Priority support"],
+} as const;
+
+export default async function WeddingPage({ params, searchParams }: Params) {
   const { weddingId } = await params;
+  const query = await searchParams;
 
   // requireWedding throws a 404 ApiError for a wedding the caller does not
   // own; in a page that has to become Next's notFound(), not a JSON body.
@@ -53,6 +65,45 @@ export default async function WeddingPage({ params }: Params) {
           </p>
         </div>
       </div>
+
+      {query.paid && !wedding.entitlement && (
+        <p className="notice notice-good" style={{ marginBottom: "1.5rem" }}>
+          Payment received. Bank transfers can take a few minutes to confirm — this page
+          will show your package as soon as it clears.
+        </p>
+      )}
+      {query.cancelled && (
+        <p className="notice notice-bad" style={{ marginBottom: "1.5rem" }}>
+          Checkout was cancelled. Nothing has been charged.
+        </p>
+      )}
+
+      {!wedding.entitlement && (
+        <section style={{ marginBottom: "2.6rem" }}>
+          <h2 style={{ fontSize: "var(--t-md)", marginBottom: "1rem" }}>Choose a package</h2>
+          <p className="muted" style={{ fontSize: "var(--t-sm)", marginBottom: "1.2rem", maxWidth: "56ch" }}>
+            You can build and preview without paying. A package is what lets you publish
+            and share — one payment for this wedding, no subscription.
+          </p>
+          <PurchasePanel
+            weddingId={wedding.id}
+            tiers={(["essential", "signature", "bespoke"] as const).map((pkg) => {
+              const limit = PACKAGE_ENTITLEMENTS[pkg].invitationLimit;
+              return {
+                pkg,
+                name: PACKAGE_NAMES[pkg],
+                inc:
+                  limit === null
+                    ? "Unlimited ceremony invitations"
+                    : `${limit} ceremony invitation${limit === 1 ? "" : "s"}`,
+                items: [...TIER_COPY[pkg]],
+                feature: pkg === "signature",
+                purchasable: isPurchasable(pkg),
+              };
+            })}
+          />
+        </section>
+      )}
 
       <h2 style={{ fontSize: "var(--t-md)", marginBottom: "1rem" }}>Ceremonies</h2>
 
