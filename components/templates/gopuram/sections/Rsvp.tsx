@@ -20,7 +20,7 @@ export function Rsvp({
     rsvp.closeDate !== null && new Date(`${rsvp.closeDate}T23:59:59Z`).getTime() < Date.now();
 
   return (
-    <section className="px-6 py-16" aria-labelledby="rsvp-heading">
+    <section id="rsvp" className="px-6 py-16" aria-labelledby="rsvp-heading">
       <ScrollReveal className="mx-auto max-w-md text-center">
         <Peacock className="mx-auto h-14 w-14 text-[var(--ds-accent)] opacity-80" />
         <h2

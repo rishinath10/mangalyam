@@ -1,6 +1,7 @@
 "use client";
 
 import { GopuramTemplate } from "@/components/templates/gopuram";
+import { InvitationShell } from "@/components/templates/shared/InvitationShell";
 import { designSystemStyle } from "@/lib/templates/design-systems";
 import { getManifest } from "@/lib/templates/registry";
 import type { InvitationJson } from "@/lib/invitation/types";
@@ -17,8 +18,9 @@ const TEMPLATES: Record<string, (props: TemplateProps) => React.ReactNode> = {
  * component with the same invitation JSON. There is deliberately no second
  * rendering path — if you find yourself wanting one, change this instead.
  *
- * `preview` only gates side effects (audio autoplay), never layout or content:
- * what the customer sees while editing is what the guest gets.
+ * `preview` only gates side effects (audio autoplay, the page drifting under
+ * the editor), never layout or content: what the customer sees while editing
+ * is what the guest gets — the opening sequence included.
  */
 export function InvitationRenderer({ invitation, preview = false }: TemplateProps) {
   const manifest = getManifest(invitation.templateId);
@@ -26,7 +28,9 @@ export function InvitationRenderer({ invitation, preview = false }: TemplateProp
 
   return (
     <div style={designSystemStyle(manifest.designSystem, invitation.accentColor)}>
-      <Template invitation={invitation} preview={preview} />
+      <InvitationShell invitation={invitation} preview={preview}>
+        <Template invitation={invitation} preview={preview} />
+      </InvitationShell>
     </div>
   );
 }

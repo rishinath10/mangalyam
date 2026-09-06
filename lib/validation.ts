@@ -50,6 +50,20 @@ export const invitationUpdateSchema = z.object({
   coverPhotoUrl: httpUrl.nullish(),
 });
 
+export const OPENING_STYLES = ["doors", "envelope", "veil"] as const;
+
+/**
+ * A phone number is only ever rendered inside `tel:` and displayed as typed,
+ * so the guard is on shape, not on Malaysian numbering: no spaces-only
+ * strings, nothing that could carry a scheme or markup into the href.
+ */
+const phone = z
+  .string()
+  .trim()
+  .min(6, "That number looks too short")
+  .max(24)
+  .regex(/^\+?[0-9][0-9 ()-]*$/, "Use digits, spaces, brackets and dashes only");
+
 export const settingsUpdateSchema = z.object({
   musicEnabled: z.boolean().optional(),
   musicUrl: httpUrl.nullish(),
@@ -58,6 +72,11 @@ export const settingsUpdateSchema = z.object({
   rsvpEnabled: z.boolean().optional(),
   askMealPreference: z.boolean().optional(),
   rsvpCloseDate: isoDate.nullish(),
+  openingStyle: z.enum(OPENING_STYLES).optional(),
+  openingText: z.string().trim().max(24).nullish(),
+  autoScroll: z.boolean().optional(),
+  contactName: z.string().trim().max(60).nullish(),
+  contactPhone: phone.nullish(),
 });
 
 export const scheduleItemSchema = z.object({

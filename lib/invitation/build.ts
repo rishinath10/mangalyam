@@ -72,6 +72,11 @@ export function toInvitationSource(row: InvitationWithRelations): InvitationSour
       rsvpEnabled: s?.rsvpEnabled ?? true,
       askMealPreference: s?.askMealPreference ?? false,
       rsvpCloseDate: isoDate(s?.rsvpCloseDate),
+      openingStyle: s?.openingStyle ?? "doors",
+      openingText: s?.openingText ?? null,
+      autoScroll: s?.autoScroll ?? true,
+      contactName: s?.contactName ?? null,
+      contactPhone: s?.contactPhone ?? null,
     },
   };
 }

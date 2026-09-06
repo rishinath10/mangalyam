@@ -1,7 +1,6 @@
 "use client";
 
 import { Garland } from "@/components/decor";
-import { MusicToggle } from "@/components/templates/shared/MusicToggle";
 import { getManifest } from "@/lib/templates/registry";
 import type { TemplateProps } from "@/lib/templates/types";
 import { Cover } from "./sections/Cover";
@@ -30,9 +29,6 @@ export function GopuramTemplate({ invitation, preview = false }: TemplateProps) 
     rsvp: <Rsvp invitation={invitation} preview={preview} />,
   } as const;
 
-  const musicOn =
-    manifest.features.music && invitation.music.enabled && invitation.music.url;
-
   return (
     <div className="min-h-full bg-[var(--ds-surface)] font-[family-name:var(--font-body)] text-[var(--ds-ink)] antialiased">
       {manifest.sections.map((key) => (
@@ -46,9 +42,6 @@ export function GopuramTemplate({ invitation, preview = false }: TemplateProps) 
         </p>
       </footer>
 
-      {/* Never mount the audio element in the builder: editing a page should
-          not be able to start playing music at the customer. */}
-      {musicOn && !preview && <MusicToggle url={invitation.music.url!} />}
     </div>
   );
 }

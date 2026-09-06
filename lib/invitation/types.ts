@@ -1,4 +1,4 @@
-import type { CeremonyType } from "@prisma/client";
+import type { CeremonyType, OpeningStyle } from "@prisma/client";
 
 /**
  * The content contract (CLAUDE.md Section 4.3).
@@ -35,6 +35,10 @@ export interface InvitationJson {
   rsvp: { enabled: boolean; askMealPreference: boolean; closeDate: string | null };
   music: { enabled: boolean; url: string | null };
   countdown: { enabled: boolean };
+  /** The cover a guest taps before the invitation is revealed. */
+  opening: { style: OpeningStyle; text: string | null; autoScroll: boolean };
+  /** The person guests ring about this ceremony. */
+  contact: { name: string | null; phone: string | null };
 }
 
 export interface ScheduleEntry {

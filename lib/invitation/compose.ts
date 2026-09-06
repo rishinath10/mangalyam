@@ -1,4 +1,4 @@
-import type { CeremonyType } from "@prisma/client";
+import type { CeremonyType, OpeningStyle } from "@prisma/client";
 import { ceremonyLabel } from "@/lib/ceremonies";
 import { resolveAccentColor } from "@/lib/templates/registry";
 import type { InvitationJson } from "@/lib/invitation/types";
@@ -42,6 +42,11 @@ export interface InvitationSource {
     rsvpEnabled: boolean;
     askMealPreference: boolean;
     rsvpCloseDate: string | null;
+    openingStyle: OpeningStyle;
+    openingText: string | null;
+    autoScroll: boolean;
+    contactName: string | null;
+    contactPhone: string | null;
   };
 }
 
@@ -94,5 +99,14 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
       url: source.settings.musicUrl,
     },
     countdown: { enabled: source.settings.countdownEnabled },
+    opening: {
+      style: source.settings.openingStyle,
+      text: source.settings.openingText,
+      autoScroll: source.settings.autoScroll,
+    },
+    contact: {
+      name: source.settings.contactName,
+      phone: source.settings.contactPhone,
+    },
   };
 }

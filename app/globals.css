@@ -459,7 +459,7 @@ section[id],header[id]{scroll-margin-top:112px}
   border-radius:26px;overflow:hidden;border:8px solid #140409;background:#fff;
   box-shadow:0 24px 60px -26px rgba(0,0,0,.85);
 }
-.phone-scroll{height:min(70svh,640px);overflow-y:auto;overscroll-behavior:contain;background:#fff}
+.phone-scroll{--frame-h:min(70svh,640px);height:var(--frame-h);overflow-y:auto;overscroll-behavior:contain;background:#fff}
 .phone-cap{text-align:center;font-size:var(--t-xs);color:var(--ink-3);margin-top:.7rem;word-break:break-all}
 
 /* ==========================================================
@@ -519,3 +519,191 @@ section[id],header[id]{scroll-margin-top:112px}
 .rsvp-table .num{font-variant-numeric:tabular-nums}
 
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ==========================================================
+   THE OPENING — the cover a guest taps before the invitation
+   is revealed, and the bar that follows it.
+
+   Every transition for the three openings lives here; the
+   components only flip `data-open`. Colours come from the
+   design system's tokens, so an opening inherits whichever
+   template it is covering.
+   ========================================================== */
+.inv-shell{position:relative;isolation:isolate}
+
+/* Until the cover is gone the invitation is clamped to one screen: the page
+   cannot be scrolled out from under the cover, and the cover — which is sized
+   against the shell — stays exactly one screen tall while it animates. In the
+   builder the frame supplies the height; on the published page the viewport
+   does. */
+.inv-shell:not([data-revealed]) .inv-stage{height:100dvh;overflow:hidden}
+/* Inside the builder the frame's own height is the clamp; --frame-h comes
+   from .phone-scroll and falls back to the viewport anywhere else. */
+.inv-shell[data-preview]:not([data-revealed]) .inv-stage{height:var(--frame-h,100dvh)}
+
+.inv-cover{position:absolute;inset:0;z-index:50;display:grid;place-items:center;overflow:hidden}
+.inv-cover[data-open]{pointer-events:none}
+
+/* ---------- the seal ---------- */
+.inv-seal{
+  position:relative;z-index:2;width:min(62vw,200px);aspect-ratio:1;padding:0;
+  display:grid;place-items:center;cursor:pointer;border-radius:50%;
+  border:1px solid color-mix(in srgb,var(--ds-gold) 70%,transparent);
+  background:color-mix(in srgb,var(--ds-surface) 93%,transparent);
+  color:var(--ds-brand-deep);
+  box-shadow:0 18px 40px -18px rgba(0,0,0,.55),
+             inset 0 0 0 5px color-mix(in srgb,var(--ds-surface) 55%,transparent);
+  transition:opacity .3s ease,transform .3s ease;
+}
+.inv-seal[data-open]{opacity:0;transform:scale(.9)}
+.inv-seal:focus-visible{outline:2px solid var(--ds-accent);outline-offset:6px}
+.inv-seal-pulse{
+  position:absolute;inset:-1px;border-radius:50%;pointer-events:none;
+  border:1px solid var(--ds-gold);animation:inv-pulse 2.6s ease-out infinite;
+}
+@keyframes inv-pulse{
+  0%{transform:scale(1);opacity:.6}
+  70%,100%{transform:scale(1.3);opacity:0}
+}
+.inv-seal-face{display:grid;justify-items:center;gap:.6rem;padding:0 1.1rem}
+.inv-seal-names{
+  display:grid;justify-items:center;
+  font-family:var(--font-display),serif;font-weight:400;
+  font-size:clamp(1.1rem,5.2vw,1.55rem);line-height:1.08;text-wrap:balance;
+}
+.inv-seal-names i{font-style:italic;color:var(--ds-accent);font-size:.7em;margin:.1em 0}
+.inv-seal-cta{
+  font-size:.56rem;letter-spacing:.34em;text-transform:uppercase;color:var(--ds-ink-muted);
+}
+
+/* ---------- 1. temple doors ---------- */
+.inv-doors{perspective:1500px;perspective-origin:50% 44%}
+.inv-door{
+  position:absolute;top:0;bottom:0;width:50%;
+  background-color:var(--ds-brand-deep);
+  background-image:linear-gradient(158deg,var(--ds-brand),var(--ds-brand-deep));
+  background-size:200% 100%;background-repeat:no-repeat;
+  transform-style:preserve-3d;backface-visibility:hidden;will-change:transform;
+  transition:transform 1.2s cubic-bezier(.62,.02,.28,1),opacity .8s ease .4s;
+}
+.inv-door-l{
+  left:0;transform-origin:left center;background-position:left center;
+  border-right:1px solid color-mix(in srgb,var(--ds-gold) 60%,transparent);
+}
+.inv-door-r{right:0;transform-origin:right center;background-position:right center}
+/* A zari edge down the seam, so the join reads as two door leaves. */
+.inv-door-scrim{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.05) 40%,rgba(0,0,0,.34));
+}
+.inv-door-l .inv-door-scrim{
+  box-shadow:inset -7px 0 0 -6px color-mix(in srgb,var(--ds-gold) 80%,transparent);
+}
+.inv-door-r .inv-door-scrim{
+  box-shadow:inset 7px 0 0 -6px color-mix(in srgb,var(--ds-gold) 80%,transparent);
+}
+/* A kolam dot grid: ornament that stays abstract, so it reads as texture
+   rather than as clip art when there is no cover photo behind it. */
+.inv-door::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,
+    color-mix(in srgb,var(--ds-gold) 26%,transparent) 1px,transparent 1.5px);
+  background-size:26px 26px;opacity:.55;
+}
+.inv-doors[data-open] .inv-door{opacity:0}
+.inv-doors[data-open] .inv-door-l{transform:rotateY(-108deg)}
+.inv-doors[data-open] .inv-door-r{transform:rotateY(108deg)}
+
+/* ---------- 2. envelope ---------- */
+.inv-envelope{
+  background:var(--ds-surface-alt);perspective:1100px;
+  transition:opacity .6s ease .85s;
+}
+.inv-envelope[data-open]{opacity:0}
+.inv-env-shell{
+  position:absolute;left:50%;top:50%;width:min(84vw,330px);aspect-ratio:1.37;
+  transform:translate(-50%,-50%);
+  transition:transform .8s cubic-bezier(.5,0,.3,1) .45s;
+  filter:drop-shadow(0 22px 30px rgba(0,0,0,.28));
+}
+.inv-envelope[data-open] .inv-env-shell{transform:translate(-50%,62%) scale(.94)}
+.inv-env-pocket{
+  position:absolute;inset:0;border-radius:8px;
+  background-color:var(--ds-brand-deep);
+  background-image:linear-gradient(158deg,var(--ds-brand),var(--ds-brand-deep));
+}
+/* The two folded flaps of the pocket, drawn as shading rather than shapes. */
+.inv-env-pocket::after{
+  content:"";position:absolute;inset:0;border-radius:8px;
+  background:
+    linear-gradient(to bottom right,transparent 49.5%,rgba(0,0,0,.16) 50%) left/50% 100% no-repeat,
+    linear-gradient(to bottom left,transparent 49.5%,rgba(0,0,0,.16) 50%) right/50% 100% no-repeat;
+}
+.inv-env-flap{
+  position:absolute;left:0;right:0;top:0;height:62%;
+  transform-origin:top center;transform:rotateX(0deg);
+  transition:transform .55s cubic-bezier(.5,0,.3,1);
+  background-color:var(--ds-brand);
+  background-image:linear-gradient(170deg,
+    color-mix(in srgb,var(--ds-gold) 24%,var(--ds-brand)),var(--ds-brand-deep));
+  clip-path:polygon(0 0,100% 0,50% 100%);
+  border-radius:8px 8px 0 0;
+}
+.inv-envelope[data-open] .inv-env-flap{transform:rotateX(-170deg)}
+
+/* ---------- 3. veil ---------- */
+.inv-veil{
+  background:color-mix(in srgb,var(--ds-surface) 74%,transparent);
+  -webkit-backdrop-filter:blur(16px) saturate(1.1);backdrop-filter:blur(16px) saturate(1.1);
+  transition:opacity .95s ease,transform 1.05s cubic-bezier(.4,0,.2,1);
+}
+.inv-veil[data-open]{opacity:0;transform:scale(1.06)}
+.inv-veil-sheet{
+  position:absolute;inset:0;
+  background:radial-gradient(120% 70% at 50% 42%,
+    color-mix(in srgb,var(--ds-gold) 20%,transparent),transparent 62%);
+}
+
+/* ---------- the action bar ---------- */
+.inv-bar{position:sticky;bottom:0;z-index:40;padding:0 .6rem .6rem;animation:inv-bar-in .5s ease both}
+@keyframes inv-bar-in{from{opacity:0;transform:translateY(60%)}to{opacity:1;transform:none}}
+.inv-bar-inner{
+  display:flex;gap:.25rem;padding:.5rem .35rem;border-radius:16px;
+  background:color-mix(in srgb,var(--ds-surface) 88%,transparent);
+  -webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);
+  border:1px solid var(--ds-rule);
+  box-shadow:0 16px 34px -22px rgba(0,0,0,.6);
+}
+.inv-bar-btn{
+  flex:1;display:grid;justify-items:center;gap:.3rem;padding:.35rem .2rem;
+  border:0;background:none;border-radius:10px;cursor:pointer;
+  font:inherit;font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ds-ink);text-decoration:none;text-align:center;
+}
+.inv-bar-btn svg{width:20px;height:20px;color:var(--ds-accent)}
+.inv-bar-btn:hover{background:var(--ds-accent-soft)}
+.inv-bar-btn:focus-visible{outline:2px solid var(--ds-accent);outline-offset:2px}
+
+@media (prefers-reduced-motion: reduce){
+  .inv-door,.inv-envelope,.inv-env-flap,.inv-veil,.inv-seal{transition-duration:.01ms !important}
+  .inv-seal-pulse,.inv-bar{animation:none}
+}
+
+/* ---------- builder: choosing an opening ---------- */
+.opening-pick{border:0;padding:0;margin:0}
+.opening-pick legend{
+  font-size:var(--t-xs);letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:.6rem;padding:0;
+}
+.opening-pick > div{display:grid;gap:.5rem}
+.opening-pick label{
+  display:grid;grid-template-columns:auto 1fr;column-gap:.7rem;align-items:baseline;
+  border:1px solid var(--edge);border-radius:12px;padding:.75rem .9rem;cursor:pointer;
+  background:var(--glass);transition:border-color .2s,background .2s;
+}
+.opening-pick label[data-on]{border-color:var(--accent);background:var(--glass-2)}
+.opening-pick label:hover{border-color:var(--edge-hi)}
+.opening-pick input{accent-color:var(--accent);grid-row:span 2;align-self:center}
+.opening-pick b{font-weight:400;color:var(--ink-1);font-size:var(--t-sm)}
+.opening-pick span{grid-column:2;font-size:var(--t-xs);color:var(--ink-3);margin-top:.15rem}
+.opening-pick label:focus-within{outline:2px solid var(--accent);outline-offset:2px}

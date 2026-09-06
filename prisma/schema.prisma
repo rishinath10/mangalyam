@@ -47,6 +47,19 @@ enum InvitationStatus {
   published
 }
 
+/**
+ * How the cover opens before the invitation is revealed.
+ *
+ * `doors` is the temple-door swing, `envelope` folds a flap back, `veil`
+ * lifts a soft blur. The renderer maps each to one animation; adding a value
+ * here without a case there falls back to `doors` rather than showing nothing.
+ */
+enum OpeningStyle {
+  doors
+  envelope
+  veil
+}
+
 enum DesignSystem {
   temple_heritage
   kolam_classic
@@ -182,6 +195,17 @@ model InvitationSettings {
   askMealPreference Boolean   @default(false) @map("ask_meal_preference")
   rsvpCloseDate    DateTime?  @map("rsvp_close_date") @db.Date
   language         String     @default("en")
+
+  // The opening sequence: a tap on the seal reveals the invitation.
+  openingStyle     OpeningStyle @default(doors) @map("opening_style")
+  /** Caption under the couple's names on the seal. Null uses "Open". */
+  openingText      String?      @map("opening_text")
+  /** Drifts the page down after the opening; a guest touch cancels it. */
+  autoScroll       Boolean      @default(true) @map("auto_scroll")
+
+  // The person guests call about the ceremony, shown in the action bar.
+  contactName      String?      @map("contact_name")
+  contactPhone     String?      @map("contact_phone")
 
   invitation       Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 

@@ -65,12 +65,27 @@ contains a couple's data.
 rate-limited in-process, and refuses drafts and closed invitations. The
 in-process limiter is only sufficient while this runs as a single container.
 
+**The opening is the renderer's, not a template's.** `InvitationShell` wraps
+every template with the cover a guest taps, the drift down the page, the
+action bar and the audio element. Templates know nothing about it, so all six
+designs get the same behaviour and the preview cannot drift from the published
+page. Adding a fourth opening means one component in `Openings.tsx`, one
+transition block in `globals.css`, and one enum value.
+
+**The cover is sized against the shell, so the invitation stays clamped to one
+screen until the cover is removed** (`data-revealed`, not `data-open`).
+Releasing the clamp when the animation starts stretches the cover down the
+whole page and the opening plays somewhere below the fold. In the builder the
+clamp comes from `--frame-h` on `.phone-scroll`; on the published page it is
+the viewport.
+
 **Payments go through `lib/payments`.** The app depends on the
 `PaymentGateway` interface, not on Stripe. Swapping to Billplz or ToyyibPay
 means a new adapter and one changed line in `lib/payments/index.ts`.
 
 ## Build order
 
-Phases 1–7 of `CLAUDE.md` Section 11 are done. Phase 8 is the remaining five
+Phases 1–7 of `CLAUDE.md` Section 11 are done, plus the opening sequence and
+action bar. Phase 8 is the remaining five
 designs — the registry already carries their tokens and manifests, with
 `built: false` so the picker never offers a design that has no renderer.
