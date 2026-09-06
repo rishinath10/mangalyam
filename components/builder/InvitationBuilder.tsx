@@ -9,9 +9,10 @@ import { DetailsPanel } from "./DetailsPanel";
 import { SchedulePanel } from "./SchedulePanel";
 import { GalleryPanel, type GalleryPhoto } from "./GalleryPanel";
 import { SettingsPanel } from "./SettingsPanel";
+import { RsvpPanel } from "./RsvpPanel";
 import { PreviewPane } from "./PreviewPane";
 
-const TABS = ["Details", "Timeline", "Gallery", "Settings"] as const;
+const TABS = ["Details", "Timeline", "Gallery", "Settings", "Replies"] as const;
 type Tab = (typeof TABS)[number];
 
 export function InvitationBuilder({
@@ -199,6 +200,13 @@ export function InvitationBuilder({
                 onChange={(next) =>
                   patch({ settings: { ...source.settings, ...next } })
                 }
+              />
+            )}
+            {tab === "Replies" && (
+              <RsvpPanel
+                invitationId={source.invitationId}
+                enabled={source.settings.rsvpEnabled}
+                published={status === "published"}
               />
             )}
           </div>

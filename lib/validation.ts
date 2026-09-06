@@ -80,3 +80,11 @@ export const photoUpdateSchema = z.object({
 export const photoReorderSchema = z.object({
   ids: z.array(z.string().uuid()).max(60),
 });
+
+export const rsvpCreateSchema = z.object({
+  guestName: z.string().trim().min(1, "Please tell us your name").max(80),
+  attending: z.boolean(),
+  guestCount: z.number().int().min(0).max(30).optional(),
+  mealPreference: z.string().trim().max(40).nullish(),
+  message: z.string().trim().max(500).nullish(),
+});

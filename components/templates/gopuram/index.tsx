@@ -27,7 +27,7 @@ export function GopuramTemplate({ invitation, preview = false }: TemplateProps) 
     event: <Event invitation={invitation} />,
     schedule: <Schedule invitation={invitation} />,
     gallery: <Gallery invitation={invitation} />,
-    rsvp: <Rsvp invitation={invitation} />,
+    rsvp: <Rsvp invitation={invitation} preview={preview} />,
   } as const;
 
   const musicOn =
