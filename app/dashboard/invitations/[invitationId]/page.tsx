@@ -1,0 +1,52 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { db } from "@/lib/db";
+import { ApiError } from "@/lib/api";
+import { requireInvitation } from "@/lib/auth/ownership";
+import { invitationInclude, toInvitationSource } from "@/lib/invitation/build";
+import { InvitationBuilder } from "@/components/builder/InvitationBuilder";
+
+type Params = { params: Promise<{ invitationId: string }> };
+
+export default async function InvitationBuilderPage({ params }: Params) {
+  const { invitationId } = await params;
+
+  let owned;
+  try {
+    ({ invitation: owned } = await requireInvitation(invitationId));
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
+
+  const row = await db.invitation.findUniqueOrThrow({
+    where: { id: owned.id },
+    include: invitationInclude,
+  });
+
+  return (
+    <main className="mx-auto max-w-6xl px-5 py-8">
+      <Link
+        href={`/dashboard/weddings/${row.weddingId}`}
+        className="text-sm text-neutral-500 transition hover:text-neutral-900"
+      >
+        ← {row.wedding.coupleName1} &amp; {row.wedding.coupleName2}
+      </Link>
+
+      {/* The server hands over a plain source object; every edit from here on
+          is local state composed into the same JSON the published page uses. */}
+      <InvitationBuilder
+        initialSource={toInvitationSource(row)}
+        // Photo ids are not part of the content contract, but the gallery
+        // editor needs them to patch and delete individual photos.
+        initialPhotos={row.photos.map((photo) => ({
+          id: photo.id,
+          url: photo.url,
+          caption: photo.caption,
+          sortOrder: photo.sortOrder,
+        }))}
+        status={row.status}
+      />
+    </main>
+  );
+}

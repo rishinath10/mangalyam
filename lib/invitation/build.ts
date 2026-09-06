@@ -5,8 +5,10 @@ import type {
   InvitationSettings,
   Wedding,
 } from "@prisma/client";
-import { ceremonyLabel } from "@/lib/ceremonies";
-import { resolveAccentColor } from "@/lib/templates/registry";
+import {
+  composeInvitationJson,
+  type InvitationSource,
+} from "@/lib/invitation/compose";
 import type { InvitationJson } from "@/lib/invitation/types";
 
 export type InvitationWithRelations = Invitation & {
@@ -24,65 +26,56 @@ export const invitationInclude = {
   settings: true,
 } as const;
 
-const isoDate = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : null);
+const isoDate = (d: Date | null | undefined) =>
+  d ? d.toISOString().slice(0, 10) : null;
 
 /**
- * The single place database rows become the content contract (Section 4.3).
- * Both the builder's live preview and the published page call this, which is
- * what makes rule #3 (one renderer) hold end to end rather than just at the
- * component boundary.
+ * Database rows -> the plain source shape. Settings may legitimately be absent
+ * on a freshly imported row, so the defaults here are the same ones the schema
+ * declares.
  */
-export function buildInvitationJson(row: InvitationWithRelations): InvitationJson {
-  const settings = row.settings;
-
+export function toInvitationSource(row: InvitationWithRelations): InvitationSource {
+  const s = row.settings;
   return {
     invitationId: row.id,
     weddingId: row.weddingId,
     slug: row.slug,
     ceremonyType: row.ceremonyType,
-    ceremonyLabel: ceremonyLabel(row.ceremonyType, row.customCeremonyName),
+    customCeremonyName: row.customCeremonyName,
     templateId: row.templateId,
-    accentColor: resolveAccentColor(
-      row.templateId,
-      row.ceremonyType,
-      row.accentColorOverride,
-    ),
-    couple: {
-      name1: row.wedding.coupleName1,
-      name2: row.wedding.coupleName2,
-      coverPhoto: row.coverPhotoUrl,
-      message: row.description,
-    },
-    event: {
-      date: isoDate(row.date),
-      startTime: row.startTime,
-      endTime: row.endTime,
-      venueName: row.venueName,
-      address: row.address,
-      mapLink: row.mapLink,
-    },
+    accentColorOverride: row.accentColorOverride,
+    coupleName1: row.wedding.coupleName1,
+    coupleName2: row.wedding.coupleName2,
+    coverPhotoUrl: row.coverPhotoUrl,
+    description: row.description,
+    date: isoDate(row.date),
+    startTime: row.startTime,
+    endTime: row.endTime,
+    venueName: row.venueName,
+    address: row.address,
+    mapLink: row.mapLink,
     schedule: row.scheduleItems.map((item) => ({
       time: item.time,
       title: item.title,
-      description: item.description ?? "",
+      description: item.description,
     })),
-    gallery:
-      settings?.galleryEnabled === false
-        ? []
-        : row.photos.map((photo) => ({
-            url: photo.url,
-            caption: photo.caption ?? "",
-            order: photo.sortOrder,
-          })),
-    rsvp: {
-      enabled: settings?.rsvpEnabled ?? true,
-      askMealPreference: settings?.askMealPreference ?? false,
-      closeDate: isoDate(settings?.rsvpCloseDate ?? null),
+    photos: row.photos.map((photo) => ({
+      url: photo.url,
+      caption: photo.caption,
+      sortOrder: photo.sortOrder,
+    })),
+    settings: {
+      musicEnabled: s?.musicEnabled ?? false,
+      musicUrl: s?.musicUrl ?? null,
+      countdownEnabled: s?.countdownEnabled ?? true,
+      galleryEnabled: s?.galleryEnabled ?? true,
+      rsvpEnabled: s?.rsvpEnabled ?? true,
+      askMealPreference: s?.askMealPreference ?? false,
+      rsvpCloseDate: isoDate(s?.rsvpCloseDate),
     },
-    music: {
-      enabled: settings?.musicEnabled ?? false,
-      url: settings?.musicUrl ?? null,
-    },
-    countdown: { enabled: settings?.countdownEnabled ?? true },
   };
+}
+
+export function buildInvitationJson(row: InvitationWithRelations): InvitationJson {
+  return composeInvitationJson(toInvitationSource(row));
 }
