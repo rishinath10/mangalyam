@@ -1,0 +1,214 @@
+// Mangalyam — PostgreSQL schema (CLAUDE.md Section 4.2)
+//
+// Structural rule #1: `weddings` is the top-level owned/billed entity.
+// `invitations` (one per ceremony) hang off a wedding, never the reverse.
+//
+// There is no RLS here. Every route touching a wedding-owned row must call the
+// ownership guards in lib/auth/ownership.ts explicitly.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Package {
+  essential
+  signature
+  bespoke
+}
+
+enum PurchaseStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
+enum CeremonyType {
+  mehendi
+  sangeet
+  haldi
+  baraat
+  reception
+  engagement
+  custom
+}
+
+enum InvitationStatus {
+  draft
+  published
+}
+
+enum DesignSystem {
+  temple_heritage
+  kolam_classic
+  kalash_royal
+}
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  weddings     Wedding[]
+
+  @@map("users")
+}
+
+model Wedding {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  coupleName1 String   @map("couple_name1")
+  coupleName2 String   @map("couple_name2")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purchases   Purchase[]
+  entitlement Entitlement?
+  invitations Invitation[]
+
+  @@index([userId])
+  @@map("weddings")
+}
+
+model Purchase {
+  id                String         @id @default(uuid()) @db.Uuid
+  weddingId         String         @map("wedding_id") @db.Uuid
+  package           Package
+  // Amounts are stored in sen (MYR minor units) to avoid float rounding.
+  // Actual per-tier pricing is still an open decision (CLAUDE.md Section 14) —
+  // nothing in this codebase may hardcode a price.
+  amountSen         Int            @map("amount_sen")
+  paymentGatewayRef String?        @map("payment_gateway_ref")
+  status            PurchaseStatus @default(pending)
+  createdAt         DateTime       @default(now()) @map("created_at")
+
+  wedding           Wedding        @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+  @@map("purchases")
+}
+
+model Entitlement {
+  id               String  @id @default(uuid()) @db.Uuid
+  weddingId        String  @unique @map("wedding_id") @db.Uuid
+  // null = unlimited (bespoke tier). A number caps published ceremony invitations.
+  invitationLimit  Int?    @map("invitation_limit")
+  premiumTemplates Boolean @default(false) @map("premium_templates")
+  giftRegistry     Boolean @default(false) @map("gift_registry")
+  customDomain     Boolean @default(false) @map("custom_domain")
+  removeBranding   Boolean @default(false) @map("remove_branding")
+
+  wedding          Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@map("entitlements")
+}
+
+model Invitation {
+  id                  String           @id @default(uuid()) @db.Uuid
+  weddingId           String           @map("wedding_id") @db.Uuid
+  slug                String           @unique
+  ceremonyType        CeremonyType     @map("ceremony_type")
+  customCeremonyName  String?          @map("custom_ceremony_name")
+  templateId          String           @map("template_id")
+  accentColorOverride String?          @map("accent_color_override")
+  status              InvitationStatus @default(draft)
+  date                DateTime?        @db.Date
+  startTime           String?          @map("start_time")
+  endTime             String?          @map("end_time")
+  venueName           String?          @map("venue_name")
+  address             String?
+  mapLink             String?          @map("map_link")
+  description         String?
+  coverPhotoUrl       String?          @map("cover_photo_url")
+  publishedAt         DateTime?        @map("published_at")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+
+  wedding             Wedding                  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  scheduleItems       InvitationScheduleItem[]
+  photos              InvitationPhoto[]
+  settings            InvitationSettings?
+  rsvps               Rsvp[]
+
+  @@index([weddingId])
+  @@map("invitations")
+}
+
+model InvitationScheduleItem {
+  id           String     @id @default(uuid()) @db.Uuid
+  invitationId String     @map("invitation_id") @db.Uuid
+  time         String
+  title        String
+  description  String?
+  sortOrder    Int        @default(0) @map("sort_order")
+
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@index([invitationId])
+  @@map("invitation_schedule_items")
+}
+
+model InvitationPhoto {
+  id           String     @id @default(uuid()) @db.Uuid
+  invitationId String     @map("invitation_id") @db.Uuid
+  url          String
+  caption      String?
+  sortOrder    Int        @default(0) @map("sort_order")
+
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@index([invitationId])
+  @@map("invitation_photos")
+}
+
+model InvitationSettings {
+  invitationId     String     @id @map("invitation_id") @db.Uuid
+  musicEnabled     Boolean    @default(false) @map("music_enabled")
+  musicUrl         String?    @map("music_url")
+  countdownEnabled Boolean    @default(true) @map("countdown_enabled")
+  galleryEnabled   Boolean    @default(true) @map("gallery_enabled")
+  rsvpEnabled      Boolean    @default(true) @map("rsvp_enabled")
+  askMealPreference Boolean   @default(false) @map("ask_meal_preference")
+  rsvpCloseDate    DateTime?  @map("rsvp_close_date") @db.Date
+  language         String     @default("en")
+
+  invitation       Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@map("invitation_settings")
+}
+
+// Public-insert, owner-only-read (CLAUDE.md rule #4). Reads must go through an
+// ownership guard; the public submit route must be rate-limited.
+model Rsvp {
+  id             String     @id @default(uuid()) @db.Uuid
+  invitationId   String     @map("invitation_id") @db.Uuid
+  guestName      String     @map("guest_name")
+  attending      Boolean
+  guestCount     Int        @default(1) @map("guest_count")
+  mealPreference String?    @map("meal_preference")
+  message        String?
+  createdAt      DateTime   @default(now()) @map("created_at")
+
+  invitation     Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@index([invitationId])
+  @@map("rsvps")
+}
+
+model Template {
+  id           String       @id
+  name         String
+  designSystem DesignSystem @map("design_system")
+  manifestJson Json         @map("manifest_json")
+  previewImage String?      @map("preview_image")
+  isActive     Boolean      @default(true) @map("is_active")
+
+  @@map("templates")
+}
