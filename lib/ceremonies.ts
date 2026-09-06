@@ -7,8 +7,10 @@ import type { CeremonyType } from "@prisma/client";
  */
 export const CEREMONY_TYPES = [
   "mehendi",
-  "sangeet",
   "haldi",
+  "sangeet",
+  "muhurtham",
+  "nalangu",
   "baraat",
   "reception",
   "engagement",
@@ -16,13 +18,28 @@ export const CEREMONY_TYPES = [
 ] as const satisfies readonly CeremonyType[];
 
 export const CEREMONY_LABELS: Record<CeremonyType, string> = {
-  mehendi: "Mehendi Ceremony",
+  mehendi: "Mehendi",
+  haldi: "Haldi",
   sangeet: "Sangeet",
-  haldi: "Haldi Ceremony",
-  baraat: "Baraat & Pheras",
+  muhurtham: "Muhurtham",
+  nalangu: "Nalangu",
+  baraat: "Baraat",
   reception: "Reception",
   engagement: "Engagement",
   custom: "Ceremony",
+};
+
+/** The line under each ceremony in the picker — what the day actually is. */
+export const CEREMONY_BLURBS: Record<CeremonyType, string> = {
+  mehendi: "Henna night",
+  haldi: "Turmeric",
+  sangeet: "Music night",
+  muhurtham: "The ceremony",
+  nalangu: "Games & blessing",
+  baraat: "The procession",
+  reception: "The party",
+  engagement: "The promise",
+  custom: "Yours to name",
 };
 
 /**
@@ -30,11 +47,13 @@ export const CEREMONY_LABELS: Record<CeremonyType, string> = {
  * and falls back to the selected template's default accent (Section 7).
  */
 export const CEREMONY_ACCENT_DEFAULTS: Partial<Record<CeremonyType, string>> = {
-  haldi: "#F4B400",
-  mehendi: "#4C7A3D",
+  haldi: "#F2A916",
+  mehendi: "#2F7D32",
   sangeet: "#7B2D8E",
+  muhurtham: "#B01B2E",
+  nalangu: "#C8622C",
   baraat: "#8A1C1C",
-  reception: "#8A1C1C",
+  reception: "#0E6E8C",
   engagement: "#B8860B",
 };
 

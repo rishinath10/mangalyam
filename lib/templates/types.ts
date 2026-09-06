@@ -10,14 +10,27 @@ export type SectionKey =
   | "rsvp";
 
 export type DesignSystemKey =
-  | "temple-heritage"
-  | "kolam-classic"
-  | "kalash-royal";
+  | "kanjivaram"
+  | "gopuram"
+  | "mahal"
+  | "jali"
+  | "mayil"
+  | "kolam";
+
+/** How a design shows itself as a card: a silk field plus one flat ornament. */
+export type DecoVariant = "weave" | "korvai" | "frame" | "lattice" | "rule" | "dots";
+
+export interface SilkPreset {
+  field: string;
+  gradient: string;
+  deco: DecoVariant;
+}
 
 /** What a template declares it supports (CLAUDE.md Section 4.4). */
 export interface TemplateManifest {
   templateId: string;
   name: string;
+  tagline: string;
   designSystem: DesignSystemKey;
   sections: SectionKey[];
   features: { music: boolean; countdown: boolean };
@@ -25,8 +38,12 @@ export interface TemplateManifest {
   ceremonyAccentDefaults: Partial<Record<CeremonyType, string>>;
   /** Used when a ceremony has no preset (e.g. `custom`). */
   defaultAccent: string;
-  /** Signature/Bespoke templates are gated by the `premium_templates` entitlement. */
+  /** How the design presents itself in the gallery and the picker. */
+  silk: SilkPreset;
+  /** Signature/Bespoke designs are gated by the `premium_templates` entitlement. */
   premium: boolean;
+  /** False until a renderer exists — the picker must never offer a blank page. */
+  built: boolean;
 }
 
 /**

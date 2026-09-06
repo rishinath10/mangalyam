@@ -4,7 +4,7 @@ import { requireWedding } from "@/lib/auth/ownership";
 import { assertCanAddInvitation } from "@/lib/entitlements";
 import { ceremonyLabel } from "@/lib/ceremonies";
 import { uniqueInvitationSlug } from "@/lib/slug";
-import { DEFAULT_TEMPLATE_ID, isKnownTemplate } from "@/lib/templates/registry";
+import { DEFAULT_TEMPLATE_ID, isSelectableTemplate } from "@/lib/templates/registry";
 import { badRequest } from "@/lib/api";
 import { invitationCreateSchema } from "@/lib/validation";
 
@@ -32,8 +32,8 @@ export async function POST(req: Request, { params }: Params) {
     await assertCanAddInvitation(wedding.id, wedding.entitlement);
 
     const templateId = input.templateId ?? DEFAULT_TEMPLATE_ID;
-    if (!isKnownTemplate(templateId)) {
-      throw badRequest("Unknown template");
+    if (!isSelectableTemplate(templateId)) {
+      throw badRequest("That design is not available yet");
     }
     if (input.ceremonyType === "custom" && !input.customCeremonyName) {
       throw badRequest("Name your custom ceremony");

@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { badRequest, handle, parseBody } from "@/lib/api";
 import { requireInvitation } from "@/lib/auth/ownership";
 import { buildInvitationJson, invitationInclude } from "@/lib/invitation/build";
-import { isKnownTemplate } from "@/lib/templates/registry";
+import { isSelectableTemplate } from "@/lib/templates/registry";
 import { invitationUpdateSchema } from "@/lib/validation";
 
 type Params = { params: Promise<{ invitationId: string }> };
@@ -27,8 +27,8 @@ export async function PATCH(req: Request, { params }: Params) {
     const { invitation } = await requireInvitation(invitationId);
     const input = await parseBody(req, invitationUpdateSchema);
 
-    if (input.templateId && !isKnownTemplate(input.templateId)) {
-      throw badRequest("Unknown template");
+    if (input.templateId && !isSelectableTemplate(input.templateId)) {
+      throw badRequest("That design is not available yet");
     }
 
     const ceremonyType = input.ceremonyType ?? invitation.ceremonyType;

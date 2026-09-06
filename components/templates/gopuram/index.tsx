@@ -12,13 +12,13 @@ import { Gallery } from "./sections/Gallery";
 import { Rsvp } from "./sections/Rsvp";
 
 /**
- * Temple Heritage — the Phase 3 launch template.
+ * Gopuram — the Phase 3 launch design.
  *
  * It takes the invitation JSON and nothing else (rule #2): no fetching, no
  * writes, no hardcoded couple. Section order comes from the manifest so a
  * template variant can reorder or drop sections without touching this file.
  */
-export function TempleHeritageTemplate({ invitation, preview = false }: TemplateProps) {
+export function GopuramTemplate({ invitation, preview = false }: TemplateProps) {
   const manifest = getManifest(invitation.templateId);
 
   const sections = {

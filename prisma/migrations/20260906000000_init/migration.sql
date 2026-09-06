@@ -8,7 +8,7 @@ CREATE TYPE "Package" AS ENUM ('essential', 'signature', 'bespoke');
 CREATE TYPE "PurchaseStatus" AS ENUM ('pending', 'paid', 'failed', 'refunded');
 
 -- CreateEnum
-CREATE TYPE "CeremonyType" AS ENUM ('mehendi', 'sangeet', 'haldi', 'baraat', 'reception', 'engagement', 'custom');
+CREATE TYPE "CeremonyType" AS ENUM ('mehendi', 'haldi', 'sangeet', 'muhurtham', 'nalangu', 'baraat', 'reception', 'engagement', 'custom');
 
 -- CreateEnum
 CREATE TYPE "InvitationStatus" AS ENUM ('draft', 'published');

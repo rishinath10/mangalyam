@@ -1,13 +1,13 @@
 "use client";
 
-import { TempleHeritageTemplate } from "@/components/templates/temple-heritage";
+import { GopuramTemplate } from "@/components/templates/gopuram";
 import { designSystemStyle } from "@/lib/templates/design-systems";
 import { getManifest } from "@/lib/templates/registry";
 import type { InvitationJson } from "@/lib/invitation/types";
 import type { TemplateProps } from "@/lib/templates/types";
 
 const TEMPLATES: Record<string, (props: TemplateProps) => React.ReactNode> = {
-  "temple-heritage-01": TempleHeritageTemplate,
+  "gopuram-01": GopuramTemplate,
 };
 
 /**
@@ -22,7 +22,7 @@ const TEMPLATES: Record<string, (props: TemplateProps) => React.ReactNode> = {
  */
 export function InvitationRenderer({ invitation, preview = false }: TemplateProps) {
   const manifest = getManifest(invitation.templateId);
-  const Template = TEMPLATES[manifest.templateId] ?? TempleHeritageTemplate;
+  const Template = TEMPLATES[manifest.templateId] ?? GopuramTemplate;
 
   return (
     <div style={designSystemStyle(manifest.designSystem, invitation.accentColor)}>

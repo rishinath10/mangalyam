@@ -30,8 +30,12 @@ enum PurchaseStatus {
 
 enum CeremonyType {
   mehendi
-  sangeet
   haldi
+  sangeet
+  // Muhurtham is the main ceremony for Tamil families and Nalangu is a
+  // fixture; baraat is kept for families who hold one.
+  muhurtham
+  nalangu
   baraat
   reception
   engagement
