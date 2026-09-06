@@ -33,12 +33,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title,
     description: description || json.couple.message || undefined,
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      images: json.couple.coverPhoto ? [json.couple.coverPhoto] : undefined,
-    },
+    // opengraph-image.tsx generates the card; leaving images unset here lets
+    // Next attach it automatically at the right size for every scraper
+    openGraph: { title, description, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

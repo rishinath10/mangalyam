@@ -10,20 +10,22 @@ import { SchedulePanel } from "./SchedulePanel";
 import { GalleryPanel, type GalleryPhoto } from "./GalleryPanel";
 import { SettingsPanel } from "./SettingsPanel";
 import { RsvpPanel } from "./RsvpPanel";
+import { SharePanel } from "./SharePanel";
 import { PreviewPane } from "./PreviewPane";
 
-const TABS = ["Details", "Timeline", "Gallery", "Settings", "Replies"] as const;
+const TABS = ["Details", "Timeline", "Gallery", "Settings", "Share", "Replies"] as const;
 type Tab = (typeof TABS)[number];
 
 export function InvitationBuilder({
   initialSource,
   initialPhotos,
-  status,
+  status: initialStatus,
 }: {
   initialSource: InvitationSource;
   initialPhotos: GalleryPhoto[];
   status: InvitationStatus;
 }) {
+  const [status, setStatus] = useState(initialStatus);
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("Details");
   const [source, setSource] = useState(initialSource);
@@ -200,6 +202,20 @@ export function InvitationBuilder({
                 onChange={(next) =>
                   patch({ settings: { ...source.settings, ...next } })
                 }
+              />
+            )}
+            {tab === "Share" && (
+              <SharePanel
+                invitationId={source.invitationId}
+                slug={source.slug}
+                status={status}
+                coupleLine={`${source.coupleName1} & ${source.coupleName2}`}
+                ceremonyLabel={previewJson.ceremonyLabel}
+                onSlugChange={(slug) => setSource((s) => ({ ...s, slug }))}
+                onStatusChange={(next) => {
+                  setStatus(next);
+                  router.refresh();
+                }}
               />
             )}
             {tab === "Replies" && (
