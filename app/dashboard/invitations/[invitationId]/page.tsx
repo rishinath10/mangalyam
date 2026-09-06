@@ -25,11 +25,8 @@ export default async function InvitationBuilderPage({ params }: Params) {
   });
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-8">
-      <Link
-        href={`/dashboard/weddings/${row.weddingId}`}
-        className="text-sm text-neutral-500 transition hover:text-neutral-900"
-      >
+    <>
+      <Link href={`/dashboard/weddings/${row.weddingId}`} className="crumb">
         ← {row.wedding.coupleName1} &amp; {row.wedding.coupleName2}
       </Link>
 
@@ -47,6 +44,6 @@ export default async function InvitationBuilderPage({ params }: Params) {
         }))}
         status={row.status}
       />
-    </main>
+    </>
   );
 }

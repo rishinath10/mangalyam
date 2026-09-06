@@ -22,12 +22,8 @@ export function LoginForm() {
     setError(null);
 
     // redirect:false so a wrong password re-renders this form with an error
-    // instead of bouncing to Auth.js's own error page.
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    // rather than bouncing to Auth.js's own error page
+    const result = await signIn("credentials", { email, password, redirect: false });
 
     if (result?.error) {
       setError("That email and password don't match an account.");
@@ -40,7 +36,7 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 space-y-4">
+    <form onSubmit={onSubmit} className="auth-form">
       <Input
         id="email"
         label="Email"
@@ -61,12 +57,12 @@ export function LoginForm() {
       />
 
       {error && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="notice notice-bad">
           {error}
         </p>
       )}
 
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" disabled={pending}>
         {pending ? "Signing in…" : "Sign in"}
       </Button>
     </form>

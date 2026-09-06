@@ -35,8 +35,8 @@ export function CreateWeddingForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3">
-      <div className="grid gap-3 sm:grid-cols-2">
+    <form onSubmit={onSubmit} style={{ display: "grid", gap: "1rem" }}>
+      <div className="form-grid two">
         <Input
           id="coupleName1"
           label="First name"
@@ -49,7 +49,7 @@ export function CreateWeddingForm() {
         <Input
           id="coupleName2"
           label="Second name"
-          placeholder="Priya"
+          placeholder="Gaayathri"
           required
           maxLength={60}
           value={names.coupleName2}
@@ -58,12 +58,12 @@ export function CreateWeddingForm() {
       </div>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="notice notice-bad">
           {error}
         </p>
       )}
 
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" disabled={pending}>
         {pending ? "Creating…" : "Create wedding"}
       </Button>
     </form>

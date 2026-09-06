@@ -42,38 +42,22 @@ export function AddInvitationForm({ weddingId }: { weddingId: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} style={{ display: "grid", gap: "1.2rem" }}>
       <div>
-        <span className="mb-2 block text-xs font-medium uppercase tracking-wide text-neutral-600">
-          Ceremony
-        </span>
-        <div className="flex flex-wrap gap-2">
-          {CEREMONY_TYPES.map((type) => {
-            // Show each ceremony in its own accent so the colour system is
-            // visible at the point of choosing, not a surprise afterwards.
-            const accent = resolveAccentColor(DEFAULT_TEMPLATE_ID, type);
-            const selected = ceremonyType === type;
-            return (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setCeremonyType(type)}
-                aria-pressed={selected}
-                className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm transition ${
-                  selected
-                    ? "border-neutral-900 bg-neutral-900 text-white"
-                    : "border-neutral-300 bg-white text-neutral-700 hover:border-neutral-400"
-                }`}
-              >
-                <span
-                  className="h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: accent }}
-                  aria-hidden="true"
-                />
-                {type === "custom" ? "Custom" : CEREMONY_LABELS[type]}
-              </button>
-            );
-          })}
+        <span className="field-label">Ceremony</span>
+        <div className="chiprow">
+          {CEREMONY_TYPES.map((type) => (
+            <button
+              key={type}
+              type="button"
+              className="chip"
+              aria-pressed={ceremonyType === type}
+              onClick={() => setCeremonyType(type)}
+            >
+              <i style={{ background: resolveAccentColor(DEFAULT_TEMPLATE_ID, type) }} />
+              {CEREMONY_LABELS[type]}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -81,7 +65,7 @@ export function AddInvitationForm({ weddingId }: { weddingId: string }) {
         <Input
           id="customName"
           label="Ceremony name"
-          placeholder="Nalangu"
+          placeholder="Mappillai Azhaippu"
           required
           maxLength={60}
           value={customName}
@@ -90,14 +74,16 @@ export function AddInvitationForm({ weddingId }: { weddingId: string }) {
       )}
 
       {error && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="notice notice-bad">
           {error}
         </p>
       )}
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Adding…" : "Add ceremony invitation"}
-      </Button>
+      <div>
+        <Button type="submit" disabled={pending}>
+          {pending ? "Adding…" : "Add ceremony invitation"}
+        </Button>
+      </div>
     </form>
   );
 }

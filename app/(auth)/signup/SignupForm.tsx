@@ -50,7 +50,7 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 space-y-4">
+    <form onSubmit={onSubmit} className="auth-form">
       <Input
         id="name"
         label="Your name"
@@ -84,12 +84,12 @@ export function SignupForm() {
       />
 
       {error && Object.keys(fieldErrors).length === 0 && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="notice notice-bad">
           {error}
         </p>
       )}
 
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" disabled={pending}>
         {pending ? "Creating account…" : "Create account"}
       </Button>
     </form>

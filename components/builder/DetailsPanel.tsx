@@ -2,9 +2,9 @@
 
 import type { CeremonyType } from "@prisma/client";
 import { Button } from "@/components/ui/Button";
-import { Input, Label, Textarea } from "@/components/ui/Field";
+import { Input, Textarea } from "@/components/ui/Field";
 import { CEREMONY_LABELS, CEREMONY_TYPES } from "@/lib/ceremonies";
-import { resolveAccentColor } from "@/lib/templates/registry";
+import { BUILT_TEMPLATES, resolveAccentColor } from "@/lib/templates/registry";
 import type { InvitationSource } from "@/lib/invitation/compose";
 
 type Patch = Partial<InvitationSource>;
@@ -22,20 +22,21 @@ export function DetailsPanel({
   onCoverRemove: () => void;
   coverBusy: boolean;
 }) {
-  // The colour the invitation gets with no override — the ceremony-type
-  // default from the template manifest (Sections 4.4 and 7).
+  // The colour with no override — the ceremony default from the design
+  // manifest (CLAUDE.md Sections 4.4 and 7).
   const ceremonyDefault = resolveAccentColor(source.templateId, source.ceremonyType);
   const usingDefault = source.accentColorOverride === null;
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: "grid", gap: "1.5rem" }}>
       <div>
-        <Label>Ceremony</Label>
-        <div className="flex flex-wrap gap-2">
+        <span className="field-label">Ceremony</span>
+        <div className="chiprow">
           {CEREMONY_TYPES.map((type) => (
             <button
               key={type}
               type="button"
+              className="chip"
               aria-pressed={source.ceremonyType === type}
               onClick={() =>
                 onChange({
@@ -43,18 +44,11 @@ export function DetailsPanel({
                   ...(type !== "custom" ? { customCeremonyName: null } : {}),
                 })
               }
-              className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition ${
-                source.ceremonyType === type
-                  ? "border-neutral-900 bg-neutral-900 text-white"
-                  : "border-neutral-300 bg-white text-neutral-700 hover:border-neutral-400"
-              }`}
             >
-              <span
-                className="h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: resolveAccentColor(source.templateId, type) }}
-                aria-hidden="true"
-              />
-              {type === "custom" ? "Custom" : CEREMONY_LABELS[type]}
+              {/* each ceremony in its own accent, so the colour system is
+                  visible while choosing rather than a surprise afterwards */}
+              <i style={{ background: resolveAccentColor(source.templateId, type) }} />
+              {CEREMONY_LABELS[type]}
             </button>
           ))}
         </div>
@@ -64,34 +58,57 @@ export function DetailsPanel({
         <Input
           id="customCeremonyName"
           label="Ceremony name"
-          placeholder="Nalangu"
+          placeholder="Mappillai Azhaippu"
           maxLength={60}
           value={source.customCeremonyName ?? ""}
           onChange={(e) => onChange({ customCeremonyName: e.target.value || null })}
         />
       )}
 
+      {BUILT_TEMPLATES.length > 1 && (
+        <div>
+          <span className="field-label">Design</span>
+          <div className="chiprow">
+            {BUILT_TEMPLATES.map((t) => (
+              <button
+                key={t.templateId}
+                type="button"
+                className="chip"
+                aria-pressed={source.templateId === t.templateId}
+                onClick={() => onChange({ templateId: t.templateId })}
+              >
+                <i style={{ background: t.silk.field }} />
+                {t.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div>
-        <Label>Accent colour</Label>
-        <div className="flex flex-wrap items-center gap-3">
+        <span className="field-label">Accent colour</span>
+        <div className="swatch-row">
           <input
             type="color"
             aria-label="Accent colour"
             value={source.accentColorOverride ?? ceremonyDefault}
             onChange={(e) => onChange({ accentColorOverride: e.target.value })}
-            className="h-10 w-14 cursor-pointer rounded-lg border border-neutral-300 bg-white p-1"
           />
-          <span className="text-sm text-neutral-600">
+          <span className="muted" style={{ fontSize: "var(--t-sm)" }}>
             {usingDefault
-              ? `Using the ${source.ceremonyType === "custom" ? "template" : CEREMONY_LABELS[source.ceremonyType].toLowerCase()} default`
+              ? `Using the ${
+                  source.ceremonyType === "custom"
+                    ? "design"
+                    : CEREMONY_LABELS[source.ceremonyType].toLowerCase()
+                } default`
               : "Custom colour"}
           </span>
           {!usingDefault && (
             <Button
               type="button"
-              variant="ghost"
+              variant="quiet"
+              size="sm"
               onClick={() => onChange({ accentColorOverride: null })}
-              className="!px-2.5 !py-1.5 text-xs"
             >
               Reset to default
             </Button>
@@ -99,7 +116,7 @@ export function DetailsPanel({
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="form-grid three">
         <Input
           id="date"
           label="Date"
@@ -126,7 +143,7 @@ export function DetailsPanel({
       <Input
         id="venueName"
         label="Venue"
-        placeholder="Sri Maha Mariamman Temple"
+        placeholder="Wisma Tamil Bell Club"
         maxLength={120}
         value={source.venueName ?? ""}
         onChange={(e) => onChange({ venueName: e.target.value || null })}
@@ -155,27 +172,22 @@ export function DetailsPanel({
         label="Message to your guests"
         rows={4}
         maxLength={1200}
-        placeholder="Join us as we celebrate the Haldi ceremony."
+        placeholder="Turmeric, laughter and a little chaos."
         value={source.description ?? ""}
         onChange={(e) => onChange({ description: e.target.value || null })}
       />
 
       <div>
-        <Label>Cover photo</Label>
+        <span className="field-label">Cover photo</span>
         {source.coverPhotoUrl ? (
-          <div className="flex items-center gap-4">
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={source.coverPhotoUrl}
               alt="Current cover"
-              className="h-24 w-20 rounded-lg border border-neutral-200 object-cover"
+              style={{ height: 96, width: 78, objectFit: "cover", borderRadius: 10, border: "1px solid var(--edge)" }}
             />
-            <Button
-              type="button"
-              variant="danger"
-              disabled={coverBusy}
-              onClick={onCoverRemove}
-            >
+            <Button type="button" variant="danger" size="sm" disabled={coverBusy} onClick={onCoverRemove}>
               Remove
             </Button>
           </div>
@@ -184,16 +196,15 @@ export function DetailsPanel({
             type="file"
             accept="image/*"
             disabled={coverBusy}
+            className="filedrop"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) onCoverUpload(file);
-              // Reset so re-picking the same file fires change again.
               e.target.value = "";
             }}
-            className="block w-full text-sm text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-900 file:px-4 file:py-2 file:text-sm file:text-white hover:file:bg-neutral-700"
           />
         )}
-        {coverBusy && <p className="mt-2 text-xs text-neutral-500">Uploading…</p>}
+        {coverBusy && <p className="dim" style={{ fontSize: "var(--t-xs)", marginTop: ".5rem" }}>Uploading…</p>}
       </div>
     </div>
   );

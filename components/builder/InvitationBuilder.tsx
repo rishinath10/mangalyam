@@ -129,18 +129,19 @@ export function InvitationBuilder({
   }
 
   return (
-    <div className="mt-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <div className="builder-head">
         <div>
-          <h1 className="font-[family-name:var(--font-display)] text-3xl text-neutral-900">
-            {previewJson.ceremonyLabel}
-          </h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            {status === "published" ? "Published" : "Draft"} · /i/{source.slug}
-          </p>
+          <h1>{previewJson.ceremonyLabel}</h1>
+          <div className="meta">
+            <span className={`pill ${status === "published" ? "pill-live" : "pill-draft"}`}>
+              {status === "published" ? "Published" : "Draft"}
+            </span>
+            <span>/i/{source.slug}</span>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          {dirty && <span className="text-xs text-amber-700">Unsaved changes</span>}
+        <div className="builder-actions">
+          {dirty && <span style={{ fontSize: "var(--t-xs)", color: "var(--accent)" }}>Unsaved changes</span>}
           <Button type="button" onClick={save} disabled={saving || !dirty}>
             {saving ? "Saving…" : "Save changes"}
           </Button>
@@ -148,14 +149,14 @@ export function InvitationBuilder({
       </div>
 
       {error && (
-        <p role="alert" className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="notice notice-bad" style={{ marginBottom: "1.2rem" }}>
           {error}
         </p>
       )}
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div>
-          <div role="tablist" className="flex gap-1 border-b border-neutral-200">
+      <div className="builder-grid">
+        <div className="t">
+          <div role="tablist" className="tabs">
             {TABS.map((name) => (
               <button
                 key={name}
@@ -163,18 +164,13 @@ export function InvitationBuilder({
                 type="button"
                 aria-selected={tab === name}
                 onClick={() => setTab(name)}
-                className={`-mb-px border-b-2 px-4 py-2.5 text-sm transition ${
-                  tab === name
-                    ? "border-[#8A1C1C] font-medium text-[#8A1C1C]"
-                    : "border-transparent text-neutral-500 hover:text-neutral-900"
-                }`}
               >
                 {name}
               </button>
             ))}
           </div>
 
-          <div className="py-6">
+          <div>
             {tab === "Details" && (
               <DetailsPanel
                 source={source}
@@ -208,8 +204,8 @@ export function InvitationBuilder({
           </div>
         </div>
 
-        <div className="lg:sticky lg:top-20 lg:self-start">
-          <PreviewPane invitation={previewJson} />
+        <div className="builder-preview">
+          <PreviewPane invitation={previewJson} slug={source.slug} />
         </div>
       </div>
     </div>
