@@ -24,7 +24,7 @@ export function Cover({ invitation }: { invitation: InvitationJson }) {
       )}
 
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-full w-full max-w-[420px] text-[var(--ds-gold)] opacity-45"
+        className="pointer-events-none absolute inset-4 mx-auto max-w-[380px] text-[var(--ds-gold)] opacity-50"
         aria-hidden="true"
       >
         <GopuramArch className="h-full w-full" />

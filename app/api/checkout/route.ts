@@ -26,9 +26,13 @@ export async function POST(req: Request) {
     const email = session?.user?.email;
     if (!email) throw badRequest("Your account has no email address.");
 
-    // Throws when the price is unset, which is the intended behaviour: better
-    // a failed checkout than a wrong charge.
-    const amountSen = priceSen(input.pkg);
+    // An unset price must stop the sale — but as a clear refusal, not a crash.
+    let amountSen: number;
+    try {
+      amountSen = priceSen(input.pkg);
+    } catch {
+      throw badRequest("That package is not on sale yet.");
+    }
 
     // The purchase row exists before the customer reaches the gateway, so the
     // webhook always has something to settle against.
