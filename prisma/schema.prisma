@@ -148,7 +148,12 @@ model Invitation {
   ceremonyType        CeremonyType?    @map("ceremony_type")
   customCeremonyName  String?          @map("custom_ceremony_name")
   templateId          String           @map("template_id")
-  accentColorOverride String?          @map("accent_color_override")
+  // A key into the family's curated palette (lib/templates/registry.ts), not
+  // a hex string: retuning a swatch later moves every invitation with it.
+  accentKey           String?          @map("accent_key")
+  // A key into the font-pairing shortlist (lib/templates/fonts.ts). Null
+  // takes the family's default pairing.
+  fontPairing         String?          @map("font_pairing")
   status              InvitationStatus @default(draft)
   date                DateTime?        @db.Date
   startTime           String?          @map("start_time")

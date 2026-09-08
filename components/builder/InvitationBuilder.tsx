@@ -88,7 +88,9 @@ export function InvitationBuilder({
         body: JSON.stringify({
           ceremonyType: source.ceremonyType,
           customCeremonyName: source.customCeremonyName,
-          accentColorOverride: source.accentColorOverride,
+          templateId: source.templateId,
+          accentKey: source.accentKey,
+          fontPairing: source.fontPairing,
           date: source.date,
           startTime: source.startTime,
           endTime: source.endTime,

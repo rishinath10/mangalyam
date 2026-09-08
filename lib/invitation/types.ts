@@ -1,4 +1,5 @@
 import type { CeremonyType, EventType, OpeningStyle } from "@prisma/client";
+import type { FontPairingKey } from "@/lib/templates/fonts";
 
 /**
  * The content contract (CLAUDE.md Section 4.3).
@@ -17,7 +18,9 @@ export interface InvitationJson {
   ceremonyType: CeremonyType | null;
   ceremonyLabel: string;
   templateId: string;
+  /** Resolved from the family's palette — components never see a key. */
   accentColor: string;
+  fontPairing: FontPairingKey;
   couple: {
     /** "Rishi & Gaayathri", "The Kumar Family", or a single name. */
     hostNames: string;

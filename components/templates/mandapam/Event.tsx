@@ -1,11 +1,12 @@
 "use client";
 
-import { MandalaCorner } from "@/components/decor";
+import { CornerFret } from "@/components/decor";
 import { ScrollReveal } from "@/components/motion/primitives";
 import { Countdown } from "@/components/templates/shared/Countdown";
 import { eventStartsAt, formatEventDate, formatTimeRange } from "@/lib/format";
 import type { InvitationJson } from "@/lib/invitation/types";
 
+/** Mandapam's details: one bordered panel, fretwork at opposing corners. */
 export function Event({ invitation }: { invitation: InvitationJson }) {
   const { event, countdown, ceremonyLabel } = invitation;
   const startsAt = eventStartsAt(event.date, event.startTime);
@@ -15,13 +16,11 @@ export function Event({ invitation }: { invitation: InvitationJson }) {
     <section className="px-6 py-16" aria-labelledby="event-heading">
       <ScrollReveal>
         <div className="relative mx-auto max-w-xl rounded-[var(--ds-radius)] border border-[var(--ds-rule)] bg-[var(--ds-surface-alt)] px-6 py-12 text-center sm:px-10">
-          <MandalaCorner
-            className="pointer-events-none absolute left-0 top-0 h-16 w-16 text-[var(--ds-gold)] opacity-60"
-            aria-hidden="true"
+          <CornerFret
+            className="pointer-events-none absolute left-0 top-0 h-14 w-14 text-[var(--ds-gold)] opacity-60"
           />
-          <MandalaCorner
-            className="pointer-events-none absolute bottom-0 right-0 h-16 w-16 rotate-180 text-[var(--ds-gold)] opacity-60"
-            aria-hidden="true"
+          <CornerFret
+            className="pointer-events-none absolute bottom-0 right-0 h-14 w-14 rotate-180 text-[var(--ds-gold)] opacity-60"
           />
 
           <h2
@@ -32,7 +31,7 @@ export function Event({ invitation }: { invitation: InvitationJson }) {
           </h2>
 
           {event.date && (
-            <p className="mt-5 font-[family-name:var(--font-display)] text-2xl text-[var(--ds-brand-deep)] sm:text-3xl">
+            <p className="mt-5 font-[family-name:var(--ds-font-display)] text-2xl text-[var(--ds-brand-deep)] sm:text-3xl">
               {formatEventDate(event.date)}
             </p>
           )}
@@ -44,7 +43,7 @@ export function Event({ invitation }: { invitation: InvitationJson }) {
           {(event.venueName || event.address) && (
             <div className="mt-8 border-t border-[var(--ds-rule)] pt-8">
               {event.venueName && (
-                <p className="font-[family-name:var(--font-display)] text-lg text-[var(--ds-ink)]">
+                <p className="font-[family-name:var(--ds-font-display)] text-lg text-[var(--ds-ink)]">
                   {event.venueName}
                 </p>
               )}

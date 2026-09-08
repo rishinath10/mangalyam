@@ -1,10 +1,15 @@
 "use client";
 
-import { GopuramArch, Kalash } from "@/components/decor";
+import { ArchLine, LotusGlyph, ZariBand } from "@/components/decor";
 import { FadeIn, ScaleIn } from "@/components/motion/primitives";
 import { formatEventDate, splitHostNames } from "@/lib/format";
 import type { InvitationJson } from "@/lib/invitation/types";
 
+/**
+ * Mandapam's cover: symmetric, centred, framed by the pavilion arch. Two
+ * names stacked over an ampersand — the one place a family's layout assumes
+ * a pair, which is why Mandapam is offered to weddings only.
+ */
 export function Cover({ invitation }: { invitation: InvitationJson }) {
   const { couple, event, ceremonyLabel } = invitation;
   const [firstName, secondName] = splitHostNames(couple.hostNames);
@@ -13,13 +18,10 @@ export function Cover({ invitation }: { invitation: InvitationJson }) {
     <header className="relative flex min-h-[92svh] flex-col items-center justify-center overflow-hidden px-6 py-16 text-center">
       {couple.coverPhoto && (
         <div className="absolute inset-0">
-          {/* Decorative backdrop: the couple's names carry the meaning, so an
-              empty alt keeps screen readers from reading a filename. */}
-          <img
-            src={couple.coverPhoto}
-            alt=""
-            className="h-full w-full object-cover"
-          />
+          {/* Decorative backdrop: the names carry the meaning, so an empty alt
+              keeps screen readers from reading out a filename. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={couple.coverPhoto} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-[var(--ds-surface)]/78" />
         </div>
       )}
@@ -28,12 +30,12 @@ export function Cover({ invitation }: { invitation: InvitationJson }) {
         className="pointer-events-none absolute inset-4 mx-auto max-w-[380px] text-[var(--ds-gold)] opacity-50"
         aria-hidden="true"
       >
-        <GopuramArch className="h-full w-full" />
+        <ArchLine className="h-full w-full" preserveAspectRatio="none" />
       </div>
 
       <div className="relative flex flex-col items-center">
         <ScaleIn>
-          <Kalash className="mx-auto h-14 w-14 text-[var(--ds-accent)]" />
+          <LotusGlyph className="mx-auto h-12 w-12 text-[var(--ds-accent)]" />
         </ScaleIn>
 
         <FadeIn delay={0.15}>
@@ -43,7 +45,7 @@ export function Cover({ invitation }: { invitation: InvitationJson }) {
         </FadeIn>
 
         <FadeIn delay={0.3}>
-          <h1 className="mt-5 font-[family-name:var(--font-display)] text-[clamp(2.4rem,11vw,4.25rem)] leading-[1.05] text-[var(--ds-brand-deep)]">
+          <h1 className="mt-5 font-[family-name:var(--ds-font-display)] text-[clamp(2.4rem,11vw,4.25rem)] leading-[1.05] text-[var(--ds-brand-deep)]">
             <span className="block">{firstName}</span>
             {secondName && (
               <>
@@ -58,12 +60,11 @@ export function Cover({ invitation }: { invitation: InvitationJson }) {
 
         {event.date && (
           <FadeIn delay={0.45}>
-            <div className="mt-8 flex flex-col items-center gap-3">
-              <span className="h-px w-16 bg-[var(--ds-accent-line)]" />
+            <div className="mt-8 flex flex-col items-center gap-4">
+              <ZariBand className="h-4 w-40 text-[var(--ds-gold)] opacity-80" />
               <p className="text-sm tracking-[0.16em] text-[var(--ds-ink)]">
                 {formatEventDate(event.date)}
               </p>
-              <span className="h-px w-16 bg-[var(--ds-accent-line)]" />
             </div>
           </FadeIn>
         )}

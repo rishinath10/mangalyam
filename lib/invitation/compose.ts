@@ -1,7 +1,8 @@
 import type { CeremonyType, EventType, OpeningStyle } from "@prisma/client";
 import { ceremonyLabel } from "@/lib/ceremonies";
 import { EVENT_TYPE_LABELS } from "@/lib/events";
-import { resolveAccentColor } from "@/lib/templates/registry";
+import { getManifest, resolveAccentColor } from "@/lib/templates/registry";
+import { isFontPairingKey } from "@/lib/templates/fonts";
 import type { InvitationJson } from "@/lib/invitation/types";
 
 /**
@@ -24,7 +25,8 @@ export interface InvitationSource {
   ceremonyType: CeremonyType | null;
   customCeremonyName: string | null;
   templateId: string;
-  accentColorOverride: string | null;
+  accentKey: string | null;
+  fontPairing: string | null;
   hostNames: string;
   coverPhotoUrl: string | null;
   description: string | null;
@@ -68,8 +70,14 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
     accentColor: resolveAccentColor(
       source.templateId,
       source.ceremonyType,
-      source.accentColorOverride,
+      source.accentKey,
     ),
+    // An unknown or absent pairing falls back to the family's own default
+    // rather than to a hardcoded face.
+    fontPairing:
+      source.fontPairing && isFontPairingKey(source.fontPairing)
+        ? source.fontPairing
+        : getManifest(source.templateId).defaultFontPairing,
     couple: {
       hostNames: source.hostNames,
       coverPhoto: source.coverPhotoUrl,

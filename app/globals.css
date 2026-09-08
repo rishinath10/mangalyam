@@ -70,19 +70,29 @@ html{color-scheme:light;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
     radial-gradient(46% 40% at 58% 100%, rgba(17,107,82,.07), transparent 64%);
 }
 
-*{box-sizing:border-box}
+/* These element resets MUST stay inside @layer base.
+   Layer order beats specificity outright: an unlayered `h1{font-family:…}`
+   overrides `.font-[family-name:var(--ds-font-display)]` in @layer utilities no
+   matter how the selector is written — :where() does not save you, because it
+   lowers specificity and specificity is not what is being compared. Left
+   unlayered, this block silently overrode every invitation's own font and
+   colour with the app chrome's, and `p{margin:0}` beat the mt-* utilities. */
+@layer base {
+  *{box-sizing:border-box}
 
-body{
-  margin:0;background:var(--wine-950);
-  font-family:var(--ui);font-weight:300;font-size:var(--t-base);line-height:1.7;
-  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  body{
+    margin:0;background:var(--wine-950);
+    font-family:var(--ui);font-weight:300;font-size:var(--t-base);line-height:1.7;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+
+  h1,h2,h3,h4{margin:0;font-family:var(--serif);font-weight:400;line-height:1.15;text-wrap:balance;color:var(--head)}
+  p{margin:0}
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
 }
 
-h1,h2,h3,h4{margin:0;font-family:var(--serif);font-weight:400;line-height:1.15;text-wrap:balance;color:var(--head)}
 .num{font-family:var(--figure);font-weight:500;font-variant-numeric:lining-nums tabular-nums}
-p{margin:0}
-a{color:inherit;text-decoration:none}
-img{display:block;max-width:100%}
 
 /* ---------- layout ---------- */
 .wrap{width:var(--measure);margin-inline:auto}
@@ -275,32 +285,26 @@ section[id],header[id]{scroll-margin-top:112px}
 /* ==========================================================
    DESIGN CARDS
    ========================================================== */
-.dsn{position:relative;display:block;min-height:230px;border-radius:calc(var(--r) - 1px);overflow:hidden}
-.dsn--big{min-height:420px}
-.dsn .deco{position:absolute;inset:0;z-index:1}
-.dsn .scrim{position:absolute;inset:auto 0 0;height:62%;background:linear-gradient(transparent,rgba(22,4,8,.66));z-index:1}
-.dsn .lab{position:absolute;z-index:2;inset:auto 0 0;padding:1.2rem;text-align:center;color:#FFF6E4}
-.dsn .lab .ct{display:block;font-size:.5rem;letter-spacing:.26em;text-transform:uppercase;opacity:.85}
-.dsn .lab .cn{display:block;font-family:var(--serif);font-size:1.1rem;line-height:1.18;margin-top:.2rem}
-.dsn .soon{
-  position:absolute;z-index:3;top:.9rem;right:.9rem;font-size:.55rem;letter-spacing:.2em;
-  text-transform:uppercase;padding:.25rem .65rem;border-radius:100px;
-  background:rgba(20,6,10,.5);color:#F4E6BC;border:1px solid rgba(240,213,128,.35);
-  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+/* ---------- design family cards (landing gallery) ---------- */
+.dsn{
+  position:relative;display:block;min-height:250px;border-radius:calc(var(--r) - 1px);
+  overflow:hidden;padding:1.6rem 1.4rem;
 }
-
-.deco-frame{inset:14px!important;border:1px solid rgba(255,246,226,.5);box-shadow:inset 0 0 0 3px rgba(255,246,226,.14);border-radius:8px}
-.deco-weave{background-image:repeating-linear-gradient(0deg,rgba(255,246,226,.14) 0 1px,transparent 1px 8px)}
-.deco-lattice{inset:14px!important;border:1px solid rgba(255,246,226,.3);border-radius:8px;
-  background-image:repeating-linear-gradient(0deg,rgba(255,246,226,.12) 0 1px,transparent 1px 26px),
-                   repeating-linear-gradient(90deg,rgba(255,246,226,.12) 0 1px,transparent 1px 26px)}
-.deco-rule{left:16px!important;top:16px!important;bottom:16px!important;right:auto!important;width:2px;background:rgba(255,246,226,.7)}
-.deco-dots{background-image:radial-gradient(circle,rgba(52,14,6,.3) 0 1.5px,transparent 2px);background-size:18px 18px}
-
-/* the pale silk needs a light ground under dark type, not a faint wash */
-.dsn[data-deco="dots"] .scrim{background:linear-gradient(transparent 32%,rgba(255,246,224,.9) 74%)}
-.dsn[data-deco="dots"] .lab{color:#3A1006}
-.dsn[data-deco="dots"] .lab .ct{color:#7A4A06;opacity:1}
+.dsn--big{min-height:420px}
+.dsn-arch{position:absolute;inset:14px auto 0 50%;transform:translateX(-50%);height:88%;opacity:.4}
+.dsn-dots{position:absolute;right:-14px;top:14px;width:104px;height:104px;opacity:.3}
+.dsn-body{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;justify-content:center}
+.dsn[data-centred] .dsn-body{align-items:center;text-align:center}
+.dsn-mark{width:34px;height:34px}
+.dsn-ct{display:block;font-size:.5rem;letter-spacing:.26em;text-transform:uppercase;margin-top:.9rem}
+.dsn-cn{display:block;font-size:1.45rem;line-height:1.15;margin-top:.35rem;text-wrap:balance}
+.dsn--big .dsn-cn{font-size:2rem}
+.dsn-rule{width:104px;height:12px;margin-top:1rem;opacity:.8}
+.dsn-bar{display:block;width:44px;height:2px;margin-top:1rem}
+.dsn-name{
+  position:absolute;z-index:2;top:.9rem;right:.9rem;font-size:.5rem;letter-spacing:.22em;
+  text-transform:uppercase;padding:.25rem .6rem;border-radius:100px;border:1px solid;
+}
 
 /* ==========================================================
    LANDING SECTIONS
@@ -428,6 +432,8 @@ section[id],header[id]{scroll-margin-top:112px}
 .chip:hover{border-color:var(--edge-hi);color:var(--ink-1)}
 .chip i{width:9px;height:9px;border-radius:50%;flex:none}
 .chip[aria-pressed="true"]{background:var(--gold);border-color:transparent;color:#2C1B04;font-weight:500}
+/* the lettering picker shows each pairing in its own display face */
+.chip-type{font-size:var(--t-md);padding:.4rem 1.1rem}
 
 /* ==========================================================
    BUILDER
@@ -594,7 +600,7 @@ section[id],header[id]{scroll-margin-top:112px}
 .inv-seal-face{display:grid;justify-items:center;gap:.6rem;padding:0 1.1rem}
 .inv-seal-names{
   display:grid;justify-items:center;
-  font-family:var(--font-display),serif;font-weight:400;
+  font-family:var(--ds-font-display),serif;font-weight:400;
   font-size:clamp(1.1rem,5.2vw,1.55rem);line-height:1.08;text-wrap:balance;
 }
 .inv-seal-names i{font-style:italic;color:var(--ds-accent);font-size:.7em;margin:.1em 0}

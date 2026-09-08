@@ -5,7 +5,7 @@ import { assertCanAddInvitation } from "@/lib/entitlements";
 import { ceremonyLabel } from "@/lib/ceremonies";
 import { EVENT_TYPE_LABELS, isWeddingEvent } from "@/lib/events";
 import { uniqueInvitationSlug } from "@/lib/slug";
-import { DEFAULT_TEMPLATE_ID, isSelectableTemplate } from "@/lib/templates/registry";
+import { defaultTemplateFor, isSelectableTemplate } from "@/lib/templates/registry";
 import { badRequest } from "@/lib/api";
 import { invitationCreateSchema } from "@/lib/validation";
 
@@ -32,9 +32,9 @@ export async function POST(req: Request, { params }: Params) {
     // anything is written.
     await assertCanAddInvitation(event.id, event.entitlement);
 
-    const templateId = input.templateId ?? DEFAULT_TEMPLATE_ID;
-    if (!isSelectableTemplate(templateId)) {
-      throw badRequest("That design is not available yet");
+    const templateId = input.templateId ?? defaultTemplateFor(event.eventType);
+    if (!isSelectableTemplate(templateId, event.eventType)) {
+      throw badRequest("That design is not available for this occasion");
     }
 
     // Only a wedding has sub-ceremonies; every other occasion ignores

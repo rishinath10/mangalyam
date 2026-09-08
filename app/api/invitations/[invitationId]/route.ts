@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { badRequest, handle, parseBody } from "@/lib/api";
 import { requireInvitation } from "@/lib/auth/ownership";
 import { buildInvitationJson, invitationInclude } from "@/lib/invitation/build";
-import { isSelectableTemplate } from "@/lib/templates/registry";
+import { getManifest, isSelectableTemplate } from "@/lib/templates/registry";
 import { invitationUpdateSchema } from "@/lib/validation";
 
 type Params = { params: Promise<{ invitationId: string }> };
@@ -27,8 +27,20 @@ export async function PATCH(req: Request, { params }: Params) {
     const { invitation } = await requireInvitation(invitationId);
     const input = await parseBody(req, invitationUpdateSchema);
 
-    if (input.templateId && !isSelectableTemplate(input.templateId)) {
-      throw badRequest("That design is not available yet");
+    const eventType = invitation.event.eventType;
+    if (input.templateId && !isSelectableTemplate(input.templateId, eventType)) {
+      throw badRequest("That design is not available for this occasion");
+    }
+
+    // A palette key only means something inside one family, so it is checked
+    // against whichever family the invitation will actually be on once this
+    // request lands — not the one it is on now.
+    const templateId = input.templateId ?? invitation.templateId;
+    if (input.accentKey) {
+      const manifest = getManifest(templateId);
+      if (!manifest.accents.some((a) => a.key === input.accentKey)) {
+        throw badRequest("That colour is not in this design's palette");
+      }
     }
 
     const ceremonyType = input.ceremonyType ?? invitation.ceremonyType;
@@ -45,8 +57,8 @@ export async function PATCH(req: Request, { params }: Params) {
     if (input.customCeremonyName !== undefined)
       data.customCeremonyName = input.customCeremonyName ?? null;
     if (input.templateId !== undefined) data.templateId = input.templateId;
-    if (input.accentColorOverride !== undefined)
-      data.accentColorOverride = input.accentColorOverride ?? null;
+    if (input.accentKey !== undefined) data.accentKey = input.accentKey ?? null;
+    if (input.fontPairing !== undefined) data.fontPairing = input.fontPairing ?? null;
     // A plain yyyy-mm-dd on a @db.Date column: append UTC midnight so the
     // stored day cannot drift by one in a non-UTC server timezone.
     if (input.date !== undefined)

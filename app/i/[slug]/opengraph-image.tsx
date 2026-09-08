@@ -4,7 +4,6 @@ import { ceremonyLabel } from "@/lib/ceremonies";
 import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { formatEventDate } from "@/lib/format";
 import { resolveAccentColor } from "@/lib/templates/registry";
-import { DESIGN_SYSTEMS } from "@/lib/templates/design-systems";
 import { getManifest } from "@/lib/templates/registry";
 
 export const alt = "Mangalyam invitation";
@@ -46,8 +45,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     );
   }
 
-  const accent = resolveAccentColor(row.templateId, row.ceremonyType, row.accentColorOverride);
-  const tokens = DESIGN_SYSTEMS[getManifest(row.templateId).designSystem];
+  const accent = resolveAccentColor(row.templateId, row.ceremonyType, row.accentKey);
+  const tokens = getManifest(row.templateId).tokens;
   const label = row.ceremonyType
     ? ceremonyLabel(row.ceremonyType, row.customCeremonyName)
     : EVENT_TYPE_LABELS[row.event.eventType];

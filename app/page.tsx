@@ -79,8 +79,8 @@ const FAQ = [
 ];
 
 const SAMPLE_COUPLE = "Rishi & Gaayathri";
-const featured = TEMPLATE_MANIFESTS.find((t) => t.built) ?? TEMPLATE_MANIFESTS[0];
-const rest = TEMPLATE_MANIFESTS.filter((t) => t.templateId !== featured.templateId);
+const SAMPLE_HOST = "The Kumar Family";
+const [weddingFamily, generalFamily] = TEMPLATE_MANIFESTS;
 
 export default async function HomePage() {
   const session = await auth();
@@ -134,11 +134,11 @@ export default async function HomePage() {
 
             <div className="t t--2 t--lift t--center rv c4" data-delay="200">
               <b style={{ fontFamily: "var(--serif)", fontWeight: 400, fontSize: "clamp(2.4rem,4vw,3.2rem)", lineHeight: 1, color: "var(--head)" }}>
-                {withFigures("54")}
+                {withFigures("108")}
               </b>
               <span className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".3rem" }}>
-                distinct looks — {withFigures("6")} designs across {withFigures("9")} ceremonies,
-                before you add a single photograph.
+                distinct looks — {withFigures("2")} families across {withFigures("9")} ceremonies
+                and {withFigures("6")} palette colours, before you add a photograph.
               </span>
             </div>
 
@@ -193,21 +193,29 @@ export default async function HomePage() {
           <div className="wrap">
             <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
               <p className="kick">Choose your card</p>
-              <h2>Six designs, woven in silk</h2>
+              <h2>Two families, drawn not decorated</h2>
               <p>
-                Every design recolours to the ceremony — Haldi in turmeric, Muhurtham in
-                kumkum, Mehendi in green.
+                One for weddings, one for every other occasion. Each recolours to the day —
+                Haldi in turmeric, Muhurtham in kumkum, a housewarming in tulsi green.
               </p>
             </div>
             <div className="bento">
               <div className="t t--flush t--img t--lift rv c6 r2">
-                <DesignCard design={featured} coupleLine={SAMPLE_COUPLE} ceremonyLabel="Haldi" big />
+                <DesignCard
+                  design={weddingFamily}
+                  coupleLine={SAMPLE_COUPLE}
+                  ceremonyLabel="Muhurtham"
+                  big
+                />
               </div>
-              {rest.map((d, i) => (
-                <div key={d.templateId} className="t t--flush t--img t--lift rv c3" data-delay={(i + 1) * 60}>
-                  <DesignCard design={d} coupleLine={SAMPLE_COUPLE} ceremonyLabel="Haldi" />
-                </div>
-              ))}
+              <div className="t t--flush t--img t--lift rv c6 r2" data-delay="80">
+                <DesignCard
+                  design={generalFamily}
+                  coupleLine={SAMPLE_HOST}
+                  ceremonyLabel="Housewarming"
+                  big
+                />
+              </div>
               <div className="t t--2 t--center rv c9">
                 <h3 style={{ fontSize: "var(--t-lg)" }}>Your photograph goes on the cover</h3>
                 <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".5rem" }}>

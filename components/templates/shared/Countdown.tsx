@@ -55,7 +55,7 @@ export function Countdown({ target }: { target: Date }) {
       {cells.map(([value, label]) => (
         <div key={label} className="min-w-[62px] text-center">
           <div
-            className="rounded-[var(--ds-radius)] border border-[var(--ds-accent-line)] bg-[var(--ds-accent-soft)] px-2 py-3 font-[family-name:var(--font-display)] text-2xl tabular-nums text-[var(--ds-ink)] sm:text-3xl"
+            className="rounded-[var(--ds-radius)] border border-[var(--ds-accent-line)] bg-[var(--ds-accent-soft)] px-2 py-3 font-[family-name:var(--ds-font-display)] text-2xl tabular-nums text-[var(--ds-ink)] sm:text-3xl"
             // Seconds change every tick; announcing that to a screen reader
             // would be constant noise.
             aria-hidden={label === "Seconds"}

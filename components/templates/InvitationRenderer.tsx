@@ -1,6 +1,7 @@
 "use client";
 
-import { GopuramTemplate } from "@/components/templates/gopuram";
+import { DeepamTemplate } from "@/components/templates/deepam";
+import { MandapamTemplate } from "@/components/templates/mandapam";
 import { InvitationShell } from "@/components/templates/shared/InvitationShell";
 import { designSystemStyle } from "@/lib/templates/design-systems";
 import { getManifest } from "@/lib/templates/registry";
@@ -8,7 +9,8 @@ import type { InvitationJson } from "@/lib/invitation/types";
 import type { TemplateProps } from "@/lib/templates/types";
 
 const TEMPLATES: Record<string, (props: TemplateProps) => React.ReactNode> = {
-  "gopuram-01": GopuramTemplate,
+  "mandapam-01": MandapamTemplate,
+  "deepam-01": DeepamTemplate,
 };
 
 /**
@@ -24,10 +26,10 @@ const TEMPLATES: Record<string, (props: TemplateProps) => React.ReactNode> = {
  */
 export function InvitationRenderer({ invitation, preview = false }: TemplateProps) {
   const manifest = getManifest(invitation.templateId);
-  const Template = TEMPLATES[manifest.templateId] ?? GopuramTemplate;
+  const Template = TEMPLATES[manifest.templateId] ?? DeepamTemplate;
 
   return (
-    <div style={designSystemStyle(manifest.designSystem, invitation.accentColor)}>
+    <div style={designSystemStyle(manifest, invitation.accentColor, invitation.fontPairing)}>
       <InvitationShell invitation={invitation} preview={preview}>
         <Template invitation={invitation} preview={preview} />
       </InvitationShell>

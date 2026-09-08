@@ -1,28 +1,22 @@
 "use client";
 
-import { Peacock } from "@/components/decor";
 import { ScrollReveal } from "@/components/motion/primitives";
 import { RsvpForm } from "@/components/templates/shared/RsvpForm";
 import { formatShortDate } from "@/lib/format";
-import type { InvitationJson } from "@/lib/invitation/types";
+import { alignClasses, type SectionProps } from "@/components/templates/sections/types";
 
-export function Rsvp({
-  invitation,
-  preview = false,
-}: {
-  invitation: InvitationJson;
-  preview?: boolean;
-}) {
+export function Rsvp({ invitation, Mark, align, preview = false }: SectionProps) {
   const { rsvp } = invitation;
   if (!rsvp.enabled) return null;
+  const a = alignClasses(align);
 
   const closed =
     rsvp.closeDate !== null && new Date(`${rsvp.closeDate}T23:59:59Z`).getTime() < Date.now();
 
   return (
     <section id="rsvp" className="px-6 py-16" aria-labelledby="rsvp-heading">
-      <ScrollReveal className="mx-auto max-w-md text-center">
-        <Peacock className="mx-auto h-14 w-14 text-[var(--ds-accent)] opacity-80" />
+      <ScrollReveal className={`max-w-md ${a.text} ${a.block}`}>
+        <Mark className={`h-12 w-12 text-[var(--ds-accent)] opacity-80 ${a.block}`} />
         <h2
           id="rsvp-heading"
           className="mt-6 text-[11px] uppercase tracking-[0.36em] text-[var(--ds-ink-muted)]"

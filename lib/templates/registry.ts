@@ -1,103 +1,113 @@
-import type { CeremonyType } from "@prisma/client";
-import { CEREMONY_ACCENT_DEFAULTS } from "@/lib/ceremonies";
-import type { DesignSystemKey, TemplateManifest } from "@/lib/templates/types";
+import type { EventType } from "@prisma/client";
+import type { AccentSwatch, TemplateManifest } from "@/lib/templates/types";
+import { EVENT_TYPES } from "@/lib/events";
 
 /**
- * The six launch designs, and the single source of truth for both the
- * marketing gallery and the builder's template picker.
+ * Two template families, and the single source of truth for the marketing
+ * gallery, the builder's picker and the renderer.
  *
- * `built` is the honest bit: only a design with a renderer behind it can be
- * chosen. The rest are listed so the gallery can show the full set without the
- * builder ever offering something that would render as a blank page.
+ * Curated, not open (CLAUDE.md Section 5, post-pivot): a family owns its
+ * layout, type scale and ornament outright. A customer chooses a family, one
+ * swatch from its palette, one font pairing, and supplies their own photo and
+ * words. There is deliberately no route from the builder to an arbitrary hex
+ * or an arbitrary typeface.
  */
+
+/** Tamil wedding materials, in the order they appear across the days. */
+const MANDAPAM_ACCENTS: AccentSwatch[] = [
+  { key: "kumkum", name: "Kumkum", hex: "#A81A2C" },
+  { key: "turmeric", name: "Turmeric", hex: "#E0A32E" },
+  { key: "mehendi", name: "Mehendi", hex: "#2F7D32" },
+  { key: "kadamba", name: "Kadamba", hex: "#7B2D8E" },
+  { key: "chandan", name: "Chandan", hex: "#C8622C" },
+  { key: "peacock", name: "Peacock", hex: "#0E6E8C" },
+];
+
+/** Occasion-neutral: nothing here reads as wedding-specific. */
+const DEEPAM_ACCENTS: AccentSwatch[] = [
+  { key: "brass", name: "Brass", hex: "#A8781F" },
+  { key: "vermilion", name: "Vermilion", hex: "#B3402F" },
+  { key: "tulsi", name: "Tulsi", hex: "#3E7A4E" },
+  { key: "indigo", name: "Indigo", hex: "#35507F" },
+  { key: "plum", name: "Plum", hex: "#7A3A63" },
+  { key: "teal", name: "Teal", hex: "#1E6E70" },
+];
+
 export const TEMPLATE_MANIFESTS: TemplateManifest[] = [
   {
-    templateId: "kanjivaram-01",
-    name: "Kanjivaram",
-    tagline: "Woven silk",
-    designSystem: "kanjivaram",
+    templateId: "mandapam-01",
+    name: "Mandapam",
+    tagline: "The pavilion the ceremony happens under",
+    eventTypes: ["wedding"],
     sections: ["cover", "couple", "event", "schedule", "gallery", "rsvp"],
     features: { music: true, countdown: true },
-    ceremonyAccentDefaults: CEREMONY_ACCENT_DEFAULTS,
-    defaultAccent: "#116B52",
-    silk: { field: "#116B52", gradient: "linear-gradient(168deg,#1B8E6C,#116B52 48%,#094A3A)", deco: "weave" },
-    premium: false,
-    built: false,
-  },
-  {
-    templateId: "gopuram-01",
-    name: "Gopuram",
-    tagline: "Temple tower",
-    designSystem: "gopuram",
-    sections: ["cover", "couple", "event", "schedule", "gallery", "rsvp"],
-    features: { music: true, countdown: true },
-    ceremonyAccentDefaults: CEREMONY_ACCENT_DEFAULTS,
-    defaultAccent: "#A81A2C",
-    silk: { field: "#A81A2C", gradient: "linear-gradient(168deg,#C93044,#A81A2C 48%,#71101D)", deco: "korvai" },
-    premium: false,
+    accents: MANDAPAM_ACCENTS,
+    defaultAccentKey: "kumkum",
+    // Each ceremony opens on the colour that day is actually dressed in.
+    ceremonyAccentKeys: {
+      mehendi: "mehendi",
+      haldi: "turmeric",
+      sangeet: "kadamba",
+      muhurtham: "kumkum",
+      nalangu: "chandan",
+      baraat: "kumkum",
+      reception: "peacock",
+      engagement: "chandan",
+    },
+    fontPairings: ["classic", "inscribed", "fine"],
+    defaultFontPairing: "classic",
+    tokens: {
+      surface: "#FBF6EC",
+      surfaceAlt: "#F3E9D6",
+      ink: "#2A1A12",
+      inkMuted: "#7A6553",
+      rule: "#D9C5A0",
+      brand: "#A81A2C",
+      brandDeep: "#71101D",
+      gold: "#C08A2E",
+      radius: "2px",
+      motionIntensity: 1,
+    },
     built: true,
   },
   {
-    templateId: "mahal-01",
-    name: "Mahal",
-    tagline: "Mughal marble",
-    designSystem: "mahal",
+    templateId: "deepam-01",
+    name: "Deepam",
+    tagline: "The lamp lit for every auspicious morning",
+    // The general family: everything that is not specifically a wedding, and
+    // weddings too for anyone who wants the quieter of the two.
+    eventTypes: [...EVENT_TYPES] as EventType[],
     sections: ["cover", "couple", "event", "schedule", "gallery", "rsvp"],
     features: { music: true, countdown: true },
-    ceremonyAccentDefaults: CEREMONY_ACCENT_DEFAULTS,
-    defaultAccent: "#B21E56",
-    silk: { field: "#B21E56", gradient: "linear-gradient(168deg,#D33A75,#B21E56 48%,#7C0F3C)", deco: "frame" },
-    premium: true,
-    built: false,
-  },
-  {
-    templateId: "jali-01",
-    name: "Jali",
-    tagline: "Pierced lattice",
-    designSystem: "jali",
-    sections: ["cover", "couple", "event", "schedule", "gallery", "rsvp"],
-    features: { music: true, countdown: true },
-    ceremonyAccentDefaults: CEREMONY_ACCENT_DEFAULTS,
-    defaultAccent: "#0D6480",
-    silk: { field: "#0D6480", gradient: "linear-gradient(168deg,#1385A6,#0D6480 48%,#07455A)", deco: "lattice" },
-    premium: true,
-    built: false,
-  },
-  {
-    templateId: "mayil-01",
-    name: "Mayil",
-    tagline: "Peacock plume",
-    designSystem: "mayil",
-    sections: ["cover", "couple", "event", "schedule", "gallery", "rsvp"],
-    features: { music: true, countdown: true },
-    ceremonyAccentDefaults: CEREMONY_ACCENT_DEFAULTS,
-    defaultAccent: "#552042",
-    silk: { field: "#552042", gradient: "linear-gradient(168deg,#752C5C,#552042 48%,#37112C)", deco: "rule" },
-    premium: true,
-    built: false,
-  },
-  {
-    templateId: "kolam-01",
-    name: "Kolam",
-    tagline: "Rice-flour line",
-    designSystem: "kolam",
-    sections: ["cover", "couple", "event", "schedule", "gallery", "rsvp"],
-    features: { music: true, countdown: true },
-    ceremonyAccentDefaults: CEREMONY_ACCENT_DEFAULTS,
-    defaultAccent: "#D89412",
-    silk: { field: "#D89412", gradient: "linear-gradient(168deg,#F0B842,#D89412 48%,#A96D06)", deco: "dots" },
-    premium: false,
-    built: false,
+    accents: DEEPAM_ACCENTS,
+    defaultAccentKey: "brass",
+    ceremonyAccentKeys: {},
+    fontPairings: ["inscribed", "classic", "fine"],
+    defaultFontPairing: "inscribed",
+    tokens: {
+      surface: "#FDFBF5",
+      surfaceAlt: "#F4EFE2",
+      ink: "#241E14",
+      inkMuted: "#6F6553",
+      rule: "#DED5C0",
+      brand: "#8A6B14",
+      brandDeep: "#5E480C",
+      gold: "#B8912F",
+      radius: "10px",
+      motionIntensity: 0.9,
+    },
+    built: true,
   },
 ];
 
-export const DEFAULT_TEMPLATE_ID = "gopuram-01";
+export const DEFAULT_TEMPLATE_ID = "deepam-01";
+export const WEDDING_TEMPLATE_ID = "mandapam-01";
 
 export const BUILT_TEMPLATES = TEMPLATE_MANIFESTS.filter((t) => t.built);
 
 export function getManifest(templateId: string): TemplateManifest {
   const manifest = TEMPLATE_MANIFESTS.find((t) => t.templateId === templateId);
-  // An invitation pointing at a retired design must still render rather than
+  // An invitation pointing at a retired family must still render rather than
   // 500, so fall back to the default instead of throwing.
   return (
     manifest ??
@@ -106,28 +116,44 @@ export function getManifest(templateId: string): TemplateManifest {
   );
 }
 
-/** Only a design with a renderer behind it may be selected. */
-export function isSelectableTemplate(templateId: string): boolean {
-  return TEMPLATE_MANIFESTS.some((t) => t.templateId === templateId && t.built);
+/** The families an occasion may actually choose between. */
+export function templatesForEvent(eventType: EventType): TemplateManifest[] {
+  return BUILT_TEMPLATES.filter((t) => t.eventTypes.includes(eventType));
+}
+
+/** The family a newly created invitation starts on. */
+export function defaultTemplateFor(eventType: EventType): string {
+  return eventType === "wedding" ? WEDDING_TEMPLATE_ID : DEFAULT_TEMPLATE_ID;
 }
 
 /**
- * Accent resolution order (CLAUDE.md Sections 4.4 and 7):
- *   1. the customer's explicit override
- *   2. the design's default for this ceremony
- *   3. the design's own default accent — which is where `custom` lands
+ * A family is selectable only if it is built *and* offered to this occasion —
+ * otherwise a housewarming could be pointed at the wedding family through a
+ * hand-made request.
+ */
+export function isSelectableTemplate(templateId: string, eventType: EventType): boolean {
+  return templatesForEvent(eventType).some((t) => t.templateId === templateId);
+}
+
+/**
+ * Accent resolution: the customer's chosen swatch, else the ceremony's
+ * starting swatch, else the family default. A key that is not in this
+ * family's palette is ignored rather than trusted — palettes differ between
+ * families, and switching family must never leave a stale colour behind.
  */
 export function resolveAccentColor(
   templateId: string,
-  ceremonyType: CeremonyType | null,
-  override?: string | null,
+  ceremonyType: string | null,
+  accentKey?: string | null,
 ): string {
-  if (override && /^#[0-9a-fA-F]{6}$/.test(override)) return override;
   const manifest = getManifest(templateId);
-  // No ceremony (every occasion but a wedding) lands on the design's own
-  // default, the same place "custom" does for a wedding ceremony.
-  if (!ceremonyType) return manifest.defaultAccent;
-  return manifest.ceremonyAccentDefaults[ceremonyType] ?? manifest.defaultAccent;
-}
+  const swatch = (key: string | null | undefined) =>
+    key ? manifest.accents.find((a) => a.key === key) : undefined;
 
-export type { DesignSystemKey };
+  const chosen =
+    swatch(accentKey) ??
+    swatch(ceremonyType ? manifest.ceremonyAccentKeys[ceremonyType as never] : null) ??
+    swatch(manifest.defaultAccentKey);
+
+  return chosen?.hex ?? manifest.accents[0].hex;
+}

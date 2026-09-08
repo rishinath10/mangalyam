@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Field";
 import { CEREMONY_LABELS, CEREMONY_TYPES } from "@/lib/ceremonies";
 import { isWeddingEvent } from "@/lib/events";
-import { BUILT_TEMPLATES, resolveAccentColor } from "@/lib/templates/registry";
+import { FONT_PAIRINGS, isFontPairingKey } from "@/lib/templates/fonts";
+import { getManifest, resolveAccentColor, templatesForEvent } from "@/lib/templates/registry";
 import type { InvitationSource } from "@/lib/invitation/compose";
 
 type Patch = Partial<InvitationSource>;
@@ -23,11 +24,16 @@ export function DetailsPanel({
   onCoverRemove: () => void;
   coverBusy: boolean;
 }) {
-  // The colour with no override — the ceremony default from the design
-  // manifest (CLAUDE.md Sections 4.4 and 7).
-  const ceremonyDefault = resolveAccentColor(source.templateId, source.ceremonyType);
-  const usingDefault = source.accentColorOverride === null;
   const wedding = isWeddingEvent(source.eventType);
+  const families = templatesForEvent(source.eventType);
+  const manifest = getManifest(source.templateId);
+  // What the accent lands on with nothing chosen: the ceremony's own swatch,
+  // else the family default (CLAUDE.md Sections 4.4 and 7).
+  const inherited = resolveAccentColor(source.templateId, source.ceremonyType, null);
+  const pairing =
+    source.fontPairing && isFontPairingKey(source.fontPairing)
+      ? source.fontPairing
+      : manifest.defaultFontPairing;
 
   return (
     <div style={{ display: "grid", gap: "1.5rem" }}>
@@ -51,7 +57,7 @@ export function DetailsPanel({
                 >
                   {/* each ceremony in its own accent, so the colour system is
                       visible while choosing rather than a surprise afterwards */}
-                  <i style={{ background: resolveAccentColor(source.templateId, type) }} />
+                  <i style={{ background: resolveAccentColor(source.templateId, type, null) }} />
                   {CEREMONY_LABELS[type]}
                 </button>
               ))}
@@ -71,55 +77,89 @@ export function DetailsPanel({
         </>
       )}
 
-      {BUILT_TEMPLATES.length > 1 && (
+      {families.length > 1 && (
         <div>
           <span className="field-label">Design</span>
           <div className="chiprow">
-            {BUILT_TEMPLATES.map((t) => (
+            {families.map((family) => (
               <button
-                key={t.templateId}
+                key={family.templateId}
                 type="button"
                 className="chip"
-                aria-pressed={source.templateId === t.templateId}
-                onClick={() => onChange({ templateId: t.templateId })}
+                aria-pressed={source.templateId === family.templateId}
+                // Palettes differ between families, so a swatch chosen in one
+                // is dropped when moving to another rather than silently
+                // resolving to a colour the customer never picked.
+                onClick={() =>
+                  onChange({
+                    templateId: family.templateId,
+                    accentKey: null,
+                    fontPairing: null,
+                  })
+                }
               >
-                <i style={{ background: t.silk.field }} />
-                {t.name}
+                <i style={{ background: family.tokens.brand }} />
+                {family.name}
               </button>
             ))}
           </div>
+          <p className="dim" style={{ fontSize: "var(--t-xs)", marginTop: ".5rem" }}>
+            {manifest.tagline}
+          </p>
         </div>
       )}
 
       <div>
         <span className="field-label">Accent colour</span>
-        <div className="swatch-row">
-          <input
-            type="color"
-            aria-label="Accent colour"
-            value={source.accentColorOverride ?? ceremonyDefault}
-            onChange={(e) => onChange({ accentColorOverride: e.target.value })}
-          />
-          <span className="muted" style={{ fontSize: "var(--t-sm)" }}>
-            {usingDefault
-              ? `Using the ${
-                  source.ceremonyType && source.ceremonyType !== "custom"
-                    ? CEREMONY_LABELS[source.ceremonyType].toLowerCase()
-                    : "design"
-                } default`
-              : "Custom colour"}
-          </span>
-          {!usingDefault && (
-            <Button
+        <div className="chiprow">
+          <button
+            type="button"
+            className="chip"
+            aria-pressed={source.accentKey === null}
+            onClick={() => onChange({ accentKey: null })}
+          >
+            <i style={{ background: inherited }} />
+            {source.ceremonyType && source.ceremonyType !== "custom"
+              ? `${CEREMONY_LABELS[source.ceremonyType]} default`
+              : "Design default"}
+          </button>
+          {manifest.accents.map((swatch) => (
+            <button
+              key={swatch.key}
               type="button"
-              variant="quiet"
-              size="sm"
-              onClick={() => onChange({ accentColorOverride: null })}
+              className="chip"
+              aria-pressed={source.accentKey === swatch.key}
+              onClick={() => onChange({ accentKey: swatch.key })}
             >
-              Reset to default
-            </Button>
-          )}
+              <i style={{ background: swatch.hex }} />
+              {swatch.name}
+            </button>
+          ))}
         </div>
+      </div>
+
+      <div>
+        <span className="field-label">Lettering</span>
+        <div className="chiprow">
+          {manifest.fontPairings.map((key) => (
+            <button
+              key={key}
+              type="button"
+              className="chip chip-type"
+              aria-pressed={pairing === key}
+              onClick={() =>
+                onChange({ fontPairing: key === manifest.defaultFontPairing ? null : key })
+              }
+            >
+              <span style={{ fontFamily: FONT_PAIRINGS[key].display }}>
+                {FONT_PAIRINGS[key].name}
+              </span>
+            </button>
+          ))}
+        </div>
+        <p className="dim" style={{ fontSize: "var(--t-xs)", marginTop: ".5rem" }}>
+          {FONT_PAIRINGS[pairing].note}
+        </p>
       </div>
 
       <div className="form-grid three">

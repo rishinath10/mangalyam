@@ -95,16 +95,26 @@ export const staggerChild: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
 };
 
+/**
+ * `as` exists because wrapping list items in animation divs is not free: an
+ * `<ol>` whose children are `<div>`s is not a list to a screen reader, and —
+ * subtler — it silently breaks `:first-child`/`:last-child`, since each item
+ * becomes the only child of its own wrapper. That is what made `last:pb-0`
+ * match every schedule entry and collapse the spacing between them.
+ */
 export function StaggerList({
   children,
   className,
+  as = "div",
 }: {
   children: ReactNode;
   className?: string;
+  as?: "div" | "ol" | "ul";
 }) {
   const reduce = useReducedMotion();
+  const Component = motion[as];
   return (
-    <motion.div
+    <Component
       className={className}
       variants={staggerParent}
       initial={reduce ? false : "hidden"}
@@ -112,20 +122,23 @@ export function StaggerList({
       viewport={{ once: true, amount: 0.2 }}
     >
       {children}
-    </motion.div>
+    </Component>
   );
 }
 
 export function StaggerItem({
   children,
   className,
+  as = "div",
 }: {
   children: ReactNode;
   className?: string;
+  as?: "div" | "li";
 }) {
+  const Component = motion[as];
   return (
-    <motion.div className={className} variants={staggerChild}>
+    <Component className={className} variants={staggerChild}>
       {children}
-    </motion.div>
+    </Component>
   );
 }

@@ -1,4 +1,5 @@
-import type { CeremonyType } from "@prisma/client";
+import type { CeremonyType, EventType } from "@prisma/client";
+import type { FontPairingKey } from "@/lib/templates/fonts";
 import type { InvitationJson } from "@/lib/invitation/types";
 
 export type SectionKey =
@@ -9,47 +10,52 @@ export type SectionKey =
   | "gallery"
   | "rsvp";
 
-export type DesignSystemKey =
-  | "kanjivaram"
-  | "gopuram"
-  | "mahal"
-  | "jali"
-  | "mayil"
-  | "kolam";
-
-/** How a design shows itself as a card: a silk field plus one flat ornament. */
-export type DecoVariant = "weave" | "korvai" | "frame" | "lattice" | "rule" | "dots";
-
-export interface SilkPreset {
-  field: string;
-  gradient: string;
-  deco: DecoVariant;
+/**
+ * One swatch in a family's curated palette. The customer picks a key, never a
+ * hex — so a palette can be retuned later and every invitation follows,
+ * instead of thousands of frozen hex strings drifting away from the design.
+ */
+export interface AccentSwatch {
+  key: string;
+  name: string;
+  hex: string;
 }
 
-/** What a template declares it supports (CLAUDE.md Section 4.4). */
+/**
+ * What a template family declares (CLAUDE.md Section 4.4, post-pivot).
+ *
+ * Two families ship: one for weddings, one for every other occasion. What a
+ * customer may change is exactly what is listed here — a swatch from
+ * `accents`, a pairing from `fontPairings`, their own photo and words.
+ * Section order, type scale and ornament belong to the family and are not
+ * exposed anywhere in the builder.
+ */
 export interface TemplateManifest {
   templateId: string;
   name: string;
   tagline: string;
-  designSystem: DesignSystemKey;
+  /** Which occasions may choose this family. Wedding-only families list one. */
+  eventTypes: EventType[];
   sections: SectionKey[];
   features: { music: boolean; countdown: boolean };
-  /** Per-template accent overrides layered on the Section 7 presets. */
-  ceremonyAccentDefaults: Partial<Record<CeremonyType, string>>;
-  /** Used when a ceremony has no preset (e.g. `custom`). */
-  defaultAccent: string;
-  /** How the design presents itself in the gallery and the picker. */
-  silk: SilkPreset;
-  /** Signature/Bespoke designs are gated by the `premium_templates` entitlement. */
-  premium: boolean;
+  /** The only colours this family offers. */
+  accents: AccentSwatch[];
+  /** Used when nothing else resolves — must be a key in `accents`. */
+  defaultAccentKey: string;
+  /** Per-ceremony starting swatch, keyed into `accents`. Weddings only. */
+  ceremonyAccentKeys: Partial<Record<CeremonyType, string>>;
+  /** The pairings offered for this family, in picker order. */
+  fontPairings: FontPairingKey[];
+  defaultFontPairing: FontPairingKey;
+  tokens: DesignTokens;
   /** False until a renderer exists — the picker must never offer a blank page. */
   built: boolean;
 }
 
 /**
- * Design tokens live with the design system, not scattered through component
- * logic (CLAUDE.md Section 5). They are emitted as CSS custom properties by
- * `designSystemStyle()` so template markup reads tokens, never hex literals.
+ * Design tokens live with the family, not scattered through component logic
+ * (CLAUDE.md Section 5). `designSystemStyle()` emits them as CSS custom
+ * properties, so template markup reads `var(--ds-*)` and never a hex literal.
  */
 export interface DesignTokens {
   surface: string;
@@ -57,12 +63,10 @@ export interface DesignTokens {
   ink: string;
   inkMuted: string;
   rule: string;
-  /** Brand colour of the design system, distinct from the per-ceremony accent. */
+  /** The family's own colour, distinct from the customer's chosen accent. */
   brand: string;
   brandDeep: string;
   gold: string;
-  fontDisplay: string;
-  fontBody: string;
   radius: string;
   /** Scales every animation's duration; keep low for patchy venue data. */
   motionIntensity: number;

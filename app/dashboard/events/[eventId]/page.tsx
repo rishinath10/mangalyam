@@ -94,7 +94,7 @@ export default async function EventPage({ params, searchParams }: Params) {
             const accent = resolveAccentColor(
               invitation.templateId,
               invitation.ceremonyType,
-              invitation.accentColorOverride,
+              invitation.accentKey,
             );
             const label = invitation.ceremonyType
               ? ceremonyLabel(invitation.ceremonyType, invitation.customCeremonyName)

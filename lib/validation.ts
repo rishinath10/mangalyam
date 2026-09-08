@@ -1,10 +1,7 @@
 import { z } from "zod";
 import { CEREMONY_TYPES } from "@/lib/ceremonies";
 import { EVENT_TYPES } from "@/lib/events";
-
-const hexColor = z
-  .string()
-  .regex(/^#[0-9a-fA-F]{6}$/, "Use a 6-digit hex colour like #8A1C1C");
+import { FONT_PAIRING_KEYS } from "@/lib/templates/fonts";
 
 const isoDate = z
   .string()
@@ -42,7 +39,10 @@ export const invitationUpdateSchema = z.object({
   ceremonyType: z.enum(CEREMONY_TYPES).nullish(),
   customCeremonyName: z.string().trim().max(60).nullish(),
   templateId: z.string().trim().min(1).optional(),
-  accentColorOverride: hexColor.nullish(),
+  // Palette and pairing keys, never a hex or a font name — the route checks
+  // the key against the chosen family's own manifest before it is stored.
+  accentKey: z.string().trim().max(40).nullish(),
+  fontPairing: z.enum(FONT_PAIRING_KEYS).nullish(),
   date: isoDate.nullish(),
   startTime: hhmm.nullish(),
   endTime: hhmm.nullish(),
