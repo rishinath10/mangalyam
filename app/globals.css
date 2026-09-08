@@ -789,3 +789,100 @@ section[id],header[id]{scroll-margin-top:112px}
 .opening-pick b{font-weight:400;color:var(--ink-1);font-size:var(--t-sm)}
 .opening-pick span{grid-column:2;font-size:var(--t-xs);color:var(--ink-3);margin-top:.15rem}
 .opening-pick label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ==========================================================
+   ADMIN
+   The owner's surface. Reuses the dashboard's tone-dark shell,
+   so only the pieces the customer app has no equivalent of are
+   defined here: dense tables, stat tiles and the day strip.
+   ========================================================== */
+.admin-nav{display:flex;gap:1.1rem;flex-wrap:wrap;margin-left:1.4rem;font-size:var(--t-sm)}
+.admin-nav a{color:var(--ink-2)}
+.admin-nav a:hover{color:var(--ink-1)}
+
+/* Stat tiles. Deliberately quiet: these are read at a glance, and a row of
+   loud cards competes with the numbers inside them. */
+.stat-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.9rem}
+@media(max-width:860px){.stat-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:460px){.stat-row{grid-template-columns:1fr}}
+.stat{
+  background:var(--glass);border:1px solid var(--edge);border-radius:14px;
+  padding:1rem 1.1rem;display:grid;gap:.25rem;align-content:start;
+}
+.stat-k{font-size:var(--t-xs);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+.stat-v{font-family:var(--serif);font-weight:400;font-size:1.9rem;line-height:1.05;color:var(--head)}
+.stat-n{font-size:var(--t-xs);color:var(--ink-3)}
+
+.panel{background:var(--glass);border:1px solid var(--edge);border-radius:16px;padding:1.3rem}
+.panel h2{font-size:var(--t-lg)}
+.panel-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+.panel .sub{
+  font-family:var(--ui);font-size:var(--t-xs);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-3);margin:1.5rem 0 .7rem;
+}
+
+/* Tables scroll inside their own container so a wide row never makes the page
+   itself scroll sideways. */
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:var(--t-sm);min-width:520px}
+.tbl th{
+  text-align:left;font-weight:400;font-size:var(--t-xs);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);padding:0 .7rem .6rem;
+}
+.tbl td{padding:.62rem .7rem;border-top:1px solid var(--edge)}
+.tbl .r,.tbl th.r{text-align:right}
+.tbl a{color:var(--ink-1);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--edge-hi)}
+.tbl a:hover{color:var(--accent-soft)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
+
+/* Purchase and quote states. Each reads as a state at a glance rather than
+   needing the word to be parsed. */
+.pill-paid,.pill-accepted,.pill-delivered,.pill-published{background:rgba(60,150,110,.16);color:#8FD5B4;border:1px solid rgba(60,150,110,.3)}
+.pill-pending,.pill-quoted{background:rgba(201,162,39,.14);color:#EBD79B;border:1px solid rgba(201,162,39,.32)}
+.pill-failed,.pill-refunded,.pill-declined{background:rgba(178,60,60,.14);color:#E7A9A9;border:1px solid rgba(178,60,60,.32)}
+.pill-new{background:rgba(90,140,190,.16);color:#AFCBE8;border:1px solid rgba(90,140,190,.32)}
+
+/* The thirty-day strip: three stacked series on one scale, no library. */
+.spark{display:flex;align-items:flex-end;gap:2px;height:96px;margin:.4rem 0 .7rem}
+.spark-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;min-width:3px}
+.spark-col i{display:block;width:100%;border-radius:1px}
+/* Unscoped so the legend swatches take the same colours as the bars — scoping
+   these to .spark left the key's dots with no background at all. */
+.s-up{background:var(--accent)}
+.s-pub{background:#8FD5B4}
+.s-rsvp{background:#7FA8D4}
+/* A day with nothing still needs a mark, or the strip reads as missing data. */
+.spark i.s-nil{height:2px;background:var(--edge)}
+.spark-key{display:flex;gap:1.1rem;font-size:var(--t-xs);color:var(--ink-3)}
+.spark-key span{display:inline-flex;align-items:center;gap:.4rem}
+.spark-key i{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+.admin-search{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.admin-search input{
+  flex:1;min-width:200px;max-width:360px;
+  background:var(--field);border:1px solid var(--edge);border-radius:10px;
+  padding:.6rem .8rem;color:var(--ink-1);font:inherit;font-size:var(--t-sm);
+}
+.admin-search input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+.admin-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;margin:.4rem 0 .2rem}
+.admin-actions label{font-size:var(--t-xs);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.admin-actions select,.admin-num{
+  background:var(--field);border:1px solid var(--edge);border-radius:10px;
+  padding:.45rem .6rem;color:var(--ink-1);font:inherit;font-size:var(--t-sm);
+}
+.admin-num{width:5rem}
+.admin-actions select:focus-visible,.admin-num:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.admin-inline-note{padding:.35rem .6rem}
+
+.quote-details{white-space:pre-line;color:var(--ink-1);font-size:var(--t-sm)}
+.quote-notes{margin-top:.6rem;font-size:var(--t-sm)}
+.quote .admin-actions{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--edge)}
+
+/* The quote form reuses .form-grid but its inputs are bare labels, not .field. */
+.panel label > input,.panel label > textarea{
+  width:100%;background:var(--field);border:1px solid var(--edge);border-radius:10px;
+  padding:.6rem .8rem;color:var(--ink-1);font:inherit;font-size:var(--t-sm);
+}
+.panel label > textarea{resize:vertical}
+.panel label > input:focus-visible,.panel label > textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}

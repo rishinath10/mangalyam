@@ -40,7 +40,9 @@ enum PurchaseStatus {
   refunded
 }
 
-/** Sub-ceremonies within a wedding. Meaningless for any other EventType. */
+/**
+ * Sub-ceremonies within a wedding. Meaningless for any other EventType.
+ */
 enum CeremonyType {
   mehendi
   haldi
@@ -62,7 +64,6 @@ enum InvitationStatus {
 
 /**
  * How the cover opens before the invitation is revealed.
- *
  * `doors` is the temple-door swing, `envelope` folds a flap back, `veil`
  * lifts a soft blur. The renderer maps each to one animation; adding a value
  * here without a case there falls back to `doors` rather than showing nothing.
@@ -79,14 +80,28 @@ enum DesignSystem {
   kalash_royal
 }
 
-model User {
-  id           String    @id @default(uuid()) @db.Uuid
-  email        String    @unique
-  passwordHash String    @map("password_hash")
-  name         String?
-  createdAt    DateTime  @default(now()) @map("created_at")
+/**
+ * A custom job — multiple ceremonies, bespoke artwork, anything outside the
+ * flat single-invitation price. These never enter the self-serve flow, so a
+ * quote is not tied to a User or an Event: the enquiry usually arrives over
+ * WhatsApp from someone who has no account yet.
+ */
+enum QuoteStatus {
+  new
+  quoted
+  accepted
+  declined
+  delivered
+}
 
-  events       Event[]
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  events Event[]
 
   @@map("users")
 }
@@ -121,7 +136,7 @@ model Purchase {
   status            PurchaseStatus @default(pending)
   createdAt         DateTime       @default(now()) @map("created_at")
 
-  event             Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
   @@map("purchases")
@@ -135,98 +150,102 @@ model Entitlement {
   // a custom quote handled outside this table entirely.
   invitationLimit Int    @map("invitation_limit")
 
-  event           Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@map("entitlements")
 }
 
 model Invitation {
-  id                  String           @id @default(uuid()) @db.Uuid
-  eventId             String           @map("event_id") @db.Uuid
-  slug                String           @unique
+  id                 String           @id @default(uuid()) @db.Uuid
+  eventId            String           @map("event_id") @db.Uuid
+  slug               String           @unique
   // Null for every EventType except `wedding`, which alone has sub-ceremonies.
-  ceremonyType        CeremonyType?    @map("ceremony_type")
-  customCeremonyName  String?          @map("custom_ceremony_name")
-  templateId          String           @map("template_id")
+  ceremonyType       CeremonyType?    @map("ceremony_type")
+  customCeremonyName String?          @map("custom_ceremony_name")
+  templateId         String           @map("template_id")
   // A key into the family's curated palette (lib/templates/registry.ts), not
   // a hex string: retuning a swatch later moves every invitation with it.
-  accentKey           String?          @map("accent_key")
+  accentKey          String?          @map("accent_key")
   // A key into the font-pairing shortlist (lib/templates/fonts.ts). Null
   // takes the family's default pairing.
-  fontPairing         String?          @map("font_pairing")
-  status              InvitationStatus @default(draft)
-  date                DateTime?        @db.Date
-  startTime           String?          @map("start_time")
-  endTime             String?          @map("end_time")
-  venueName           String?          @map("venue_name")
-  address             String?
-  mapLink             String?          @map("map_link")
-  description         String?
-  coverPhotoUrl       String?          @map("cover_photo_url")
-  publishedAt         DateTime?        @map("published_at")
-  createdAt           DateTime         @default(now()) @map("created_at")
-  updatedAt           DateTime         @updatedAt @map("updated_at")
+  fontPairing        String?          @map("font_pairing")
+  status             InvitationStatus @default(draft)
+  date               DateTime?        @db.Date
+  startTime          String?          @map("start_time")
+  endTime            String?          @map("end_time")
+  venueName          String?          @map("venue_name")
+  address            String?
+  mapLink            String?          @map("map_link")
+  description        String?
+  coverPhotoUrl      String?          @map("cover_photo_url")
+  publishedAt        DateTime?        @map("published_at")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
 
-  event               Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  scheduleItems       InvitationScheduleItem[]
-  photos              InvitationPhoto[]
-  settings            InvitationSettings?
-  rsvps               Rsvp[]
+  event         Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  scheduleItems InvitationScheduleItem[]
+  photos        InvitationPhoto[]
+  settings      InvitationSettings?
+  rsvps         Rsvp[]
 
   @@index([eventId])
   @@map("invitations")
 }
 
 model InvitationScheduleItem {
-  id           String     @id @default(uuid()) @db.Uuid
-  invitationId String     @map("invitation_id") @db.Uuid
+  id           String  @id @default(uuid()) @db.Uuid
+  invitationId String  @map("invitation_id") @db.Uuid
   time         String
   title        String
   description  String?
-  sortOrder    Int        @default(0) @map("sort_order")
+  sortOrder    Int     @default(0) @map("sort_order")
 
-  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 
   @@index([invitationId])
   @@map("invitation_schedule_items")
 }
 
 model InvitationPhoto {
-  id           String     @id @default(uuid()) @db.Uuid
-  invitationId String     @map("invitation_id") @db.Uuid
+  id           String  @id @default(uuid()) @db.Uuid
+  invitationId String  @map("invitation_id") @db.Uuid
   url          String
   caption      String?
-  sortOrder    Int        @default(0) @map("sort_order")
+  sortOrder    Int     @default(0) @map("sort_order")
 
-  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 
   @@index([invitationId])
   @@map("invitation_photos")
 }
 
 model InvitationSettings {
-  invitationId     String     @id @map("invitation_id") @db.Uuid
-  musicEnabled     Boolean    @default(false) @map("music_enabled")
-  musicUrl         String?    @map("music_url")
-  countdownEnabled Boolean    @default(true) @map("countdown_enabled")
-  galleryEnabled   Boolean    @default(true) @map("gallery_enabled")
-  rsvpEnabled      Boolean    @default(true) @map("rsvp_enabled")
+  invitationId      String    @id @map("invitation_id") @db.Uuid
+  musicEnabled      Boolean   @default(false) @map("music_enabled")
+  musicUrl          String?   @map("music_url")
+  countdownEnabled  Boolean   @default(true) @map("countdown_enabled")
+  galleryEnabled    Boolean   @default(true) @map("gallery_enabled")
+  rsvpEnabled       Boolean   @default(true) @map("rsvp_enabled")
   askMealPreference Boolean   @default(false) @map("ask_meal_preference")
-  rsvpCloseDate    DateTime?  @map("rsvp_close_date") @db.Date
-  language         String     @default("en")
+  rsvpCloseDate     DateTime? @map("rsvp_close_date") @db.Date
+  language          String    @default("en")
 
   // The opening sequence: a tap on the seal reveals the invitation.
-  openingStyle     OpeningStyle @default(doors) @map("opening_style")
-  /** Caption under the host names on the seal. Null uses "Open". */
-  openingText      String?      @map("opening_text")
-  /** Drifts the page down after the opening; a guest touch cancels it. */
-  autoScroll       Boolean      @default(true) @map("auto_scroll")
+  openingStyle OpeningStyle @default(doors) @map("opening_style")
+  /**
+   * Caption under the host names on the seal. Null uses "Open".
+   */
+  openingText  String?      @map("opening_text")
+  /**
+   * Drifts the page down after the opening; a guest touch cancels it.
+   */
+  autoScroll   Boolean      @default(true) @map("auto_scroll")
 
   // The person guests call about the occasion, shown in the action bar.
-  contactName      String?      @map("contact_name")
-  contactPhone     String?      @map("contact_phone")
+  contactName  String? @map("contact_name")
+  contactPhone String? @map("contact_phone")
 
-  invitation       Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 
   @@map("invitation_settings")
 }
@@ -234,16 +253,16 @@ model InvitationSettings {
 // Public-insert, owner-only-read (CLAUDE.md rule #4). Reads must go through an
 // ownership guard; the public submit route must be rate-limited.
 model Rsvp {
-  id             String     @id @default(uuid()) @db.Uuid
-  invitationId   String     @map("invitation_id") @db.Uuid
-  guestName      String     @map("guest_name")
+  id             String   @id @default(uuid()) @db.Uuid
+  invitationId   String   @map("invitation_id") @db.Uuid
+  guestName      String   @map("guest_name")
   attending      Boolean
-  guestCount     Int        @default(1) @map("guest_count")
-  mealPreference String?    @map("meal_preference")
+  guestCount     Int      @default(1) @map("guest_count")
+  mealPreference String?  @map("meal_preference")
   message        String?
-  createdAt      DateTime   @default(now()) @map("created_at")
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  invitation     Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 
   @@index([invitationId])
   @@map("rsvps")
@@ -258,4 +277,24 @@ model Template {
   isActive     Boolean      @default(true) @map("is_active")
 
   @@map("templates")
+}
+
+model Quote {
+  id        String      @id @default(uuid()) @db.Uuid
+  name      String
+  email     String?
+  phone     String?
+  // Free text, not an EventType: a custom job is often several occasions at
+  // once, or something that has no enum value at all.
+  occasion  String?
+  details   String
+  // Sen, like Purchase.amountSen — never a float, and null until quoted.
+  amountSen Int?        @map("amount_sen")
+  status    QuoteStatus @default(new)
+  notes     String?
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  @@index([status, createdAt])
+  @@map("quotes")
 }
