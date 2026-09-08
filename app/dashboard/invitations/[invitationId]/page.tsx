@@ -25,7 +25,11 @@ export default async function InvitationBuilderPage({ params }: Params) {
   });
 
   return (
-    <>
+    // The customiser is a light workspace inside the dashboard's dark chrome
+    // (CLAUDE.md has no opinion here — this is a deliberate, scoped choice):
+    // colour tokens still come entirely from the tone-cream redefinition, so
+    // nothing inside had to be re-themed by hand.
+    <div className="tone-cream builder-light">
       <Link href={`/dashboard/events/${row.eventId}`} className="crumb">
         ← {row.event.hostNames}
       </Link>
@@ -44,6 +48,6 @@ export default async function InvitationBuilderPage({ params }: Params) {
         }))}
         status={row.status}
       />
-    </>
+    </div>
   );
 }

@@ -386,6 +386,16 @@ section[id],header[id]{scroll-margin-top:112px}
 @media(max-width:640px){.dash-email{display:none}.dash-bar-in .btn{margin-left:auto}}
 .dash-body{position:relative;z-index:1;width:var(--measure);margin-inline:auto;padding-block:clamp(2rem,4vw,3rem)}
 
+/* The customiser: a light workspace card floating on the dashboard's dark
+   chrome. Everything inside reads its colours from the tone tokens, so
+   wrapping it in .tone-cream is the entire theme switch — nothing below
+   this needed a colour changed by hand. */
+.builder-light{
+  border-radius:28px;
+  padding:clamp(1.4rem,3vw,2.4rem) clamp(1.2rem,3vw,2.2rem) clamp(2.2rem,4vw,3.2rem);
+  box-shadow:0 34px 80px -38px rgba(10,2,5,.6);
+}
+
 .crumb{font-size:var(--t-sm);color:var(--ink-3);display:inline-flex;align-items:center;gap:.45rem}
 .crumb:hover{color:var(--ink-1)}
 
@@ -529,6 +539,8 @@ section[id],header[id]{scroll-margin-top:112px}
 .rsvp-table tr:last-child td{border-bottom:0}
 .rsvp-table .yes{color:#8FD5B4}
 .rsvp-table .no{color:#DFA1A1}
+.tone-cream .rsvp-table .yes{color:#1E6B4A}
+.tone-cream .rsvp-table .no{color:#A83B3B}
 .rsvp-table .msg{color:var(--ink-3);max-width:26rem}
 .rsvp-table .num{font-variant-numeric:tabular-nums}
 
