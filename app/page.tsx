@@ -123,8 +123,8 @@ export default async function HomePage() {
 
             <div className="t t--img t--lift rv c5 r3" data-delay="120" style={{ minHeight: 340, position: "relative" }}>
               <Image
-                src="/img/hero-silk.webp"
-                alt="Draped maroon Kanjivaram silk with a heavy gold zari border, beside a lit brass peacock lamp"
+                src="/img/hero-mangalyam.webp"
+                alt="A garlanded temple entrance at dusk, hung with jasmine and mango leaves and lit by tall brass lamps"
                 fill
                 priority
                 sizes="(max-width: 1000px) 100vw, 40vw"
