@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { BUILT_TEMPLATES } from "@/lib/templates/registry";
 
-const DESIGNS = ["Kanjivaram", "Mahal", "Gopuram", "Jali", "Mayil", "Kolam"];
+// Read from the registry rather than repeating the names here: this list had
+// gone stale and was still advertising six designs that no longer exist.
 const CEREMONIES = ["Mehendi", "Haldi", "Sangeet", "Muhurtham", "Nalangu", "Reception"];
 
 export function SiteFooter() {
@@ -21,8 +23,8 @@ export function SiteFooter() {
         <div>
           <h4>Designs</h4>
           <ul>
-            {DESIGNS.map((d) => (
-              <li key={d}><Link href="/#designs">{d}</Link></li>
+            {BUILT_TEMPLATES.map((d) => (
+              <li key={d.templateId}><Link href="/#designs">{d.name}</Link></li>
             ))}
           </ul>
         </div>
