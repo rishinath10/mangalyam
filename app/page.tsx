@@ -5,6 +5,7 @@ import { withFigures } from "@/lib/typography";
 import { CEREMONY_BLURBS, CEREMONY_LABELS, CEREMONY_TYPES } from "@/lib/ceremonies";
 import { TEMPLATE_MANIFESTS } from "@/lib/templates/registry";
 import { CeremonyIcon } from "@/components/site/CeremonyIcon";
+import { Constellation } from "@/components/site/Constellation";
 import { DesignCard } from "@/components/site/DesignCard";
 import { Arrow, Tick } from "@/components/site/Icons";
 import { Particles } from "@/components/site/Particles";
@@ -150,6 +151,17 @@ export default async function HomePage() {
             </div>
           </div>
         </header>
+
+        {/* ---------- star-sign gimmick ---------- */}
+        <section className="sec tone-dark" id="stars">
+          <div className="wrap">
+            <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
+              <p className="kick">A small detour before the ceremonies</p>
+              <h2>Every good celebration starts with a sign</h2>
+            </div>
+            <Constellation />
+          </div>
+        </section>
 
         {/* ---------- ceremonies ---------- */}
         <section className="sec tone-cream" id="ceremonies">
