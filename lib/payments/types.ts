@@ -1,17 +1,14 @@
-import type { Package } from "@prisma/client";
-
 /**
  * The gateway seam (CLAUDE.md Section 8). Stripe is the chosen provider, but
  * the app only ever talks to this interface — Billplz or ToyyibPay would be a
  * new implementation of these three methods, not a rewrite of the app.
  *
- * That matters here specifically: most Malaysian couples pay by FPX, and if
+ * That matters here specifically: most Malaysian families pay by FPX, and if
  * Stripe's FPX terms don't work out, switching should cost a file.
  */
 export interface CheckoutRequest {
-  weddingId: string;
+  eventId: string;
   purchaseId: string;
-  pkg: Package;
   /** Minor units — sen. Nothing in this codebase decides the number. */
   amountSen: number;
   currency: string;

@@ -2,17 +2,19 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireUserId } from "@/lib/auth/ownership";
 import { invitationLimitFor } from "@/lib/entitlements";
+import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { withFigures } from "@/lib/typography";
-import { CreateWeddingForm } from "@/components/dashboard/CreateWeddingForm";
+import { CreateEventForm } from "@/components/dashboard/CreateEventForm";
 
-export const metadata = { title: "Your weddings" };
+export const metadata = { title: "Your events" };
 
 export default async function DashboardPage() {
   const userId = await requireUserId();
 
-  // A wedding is the owned, billed unit — this lists weddings, and ceremony
-  // invitations live one level down inside each.
-  const weddings = await db.wedding.findMany({
+  // An event is the owned, billed unit — this lists events, and invitations
+  // live one level down inside each (a wedding may hold several, one per
+  // ceremony; every other occasion holds exactly one).
+  const events = await db.event.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
     include: { entitlement: true, _count: { select: { invitations: true } } },
@@ -22,43 +24,41 @@ export default async function DashboardPage() {
     <>
       <div className="page-head">
         <div>
-          <h1>Your weddings</h1>
-          <p>Each wedding holds a separate invitation for every ceremony.</p>
+          <h1>Your events</h1>
+          <p>A wedding holds a separate invitation for every ceremony. Every other occasion holds one.</p>
         </div>
       </div>
 
-      {weddings.length === 0 ? (
+      {events.length === 0 ? (
         <div className="t empty">
-          <h2>Start with the couple</h2>
+          <h2>Start with the occasion</h2>
           <p>
-            Create your wedding first, then add an invitation for each ceremony —
-            Mehendi, Haldi, Muhurtham and the rest.
+            Create your event first — a wedding, a housewarming, a milestone birthday,
+            a temple consecration — then add its invitation.
           </p>
           <div style={{ maxWidth: "26rem", margin: "1.6rem auto 0", textAlign: "left" }}>
-            <CreateWeddingForm />
+            <CreateEventForm />
           </div>
         </div>
       ) : (
         <>
           <div className="bento">
-            {weddings.map((wedding) => {
-              const limit = invitationLimitFor(wedding.entitlement);
-              const used = wedding._count.invitations;
+            {events.map((event) => {
+              const limit = invitationLimitFor(event.entitlement);
+              const used = event._count.invitations;
               return (
                 <Link
-                  key={wedding.id}
-                  href={`/dashboard/weddings/${wedding.id}`}
+                  key={event.id}
+                  href={`/dashboard/events/${event.id}`}
                   className="t t--lift c4"
                 >
-                  <h2 style={{ fontSize: "var(--t-xl)" }}>
-                    {wedding.coupleName1} &amp; {wedding.coupleName2}
-                  </h2>
+                  <p className="kick">{EVENT_TYPE_LABELS[event.eventType]}</p>
+                  <h2 style={{ fontSize: "var(--t-xl)", marginTop: ".4rem" }}>{event.hostNames}</h2>
                   <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".6rem" }}>
-                    {withFigures(String(used))} of{" "}
-                    {limit === null ? "unlimited" : withFigures(String(limit))} ceremony
-                    invitation{used === 1 ? "" : "s"}
+                    {withFigures(String(used))} of {withFigures(String(limit))} invitation
+                    {used === 1 ? "" : "s"}
                   </p>
-                  {!wedding.entitlement && (
+                  {!event.entitlement && (
                     <span className="pill pill-draft" style={{ marginTop: "1rem" }}>
                       Purchase pending
                     </span>
@@ -69,9 +69,9 @@ export default async function DashboardPage() {
           </div>
 
           <div className="t" style={{ maxWidth: "30rem", marginTop: "2.4rem" }}>
-            <h2 style={{ fontSize: "var(--t-md)" }}>Add another wedding</h2>
+            <h2 style={{ fontSize: "var(--t-md)" }}>Add another event</h2>
             <div style={{ marginTop: "1.1rem" }}>
-              <CreateWeddingForm />
+              <CreateEventForm />
             </div>
           </div>
         </>

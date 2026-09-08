@@ -4,6 +4,7 @@ import type { CeremonyType } from "@prisma/client";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Field";
 import { CEREMONY_LABELS, CEREMONY_TYPES } from "@/lib/ceremonies";
+import { isWeddingEvent } from "@/lib/events";
 import { BUILT_TEMPLATES, resolveAccentColor } from "@/lib/templates/registry";
 import type { InvitationSource } from "@/lib/invitation/compose";
 
@@ -26,43 +27,48 @@ export function DetailsPanel({
   // manifest (CLAUDE.md Sections 4.4 and 7).
   const ceremonyDefault = resolveAccentColor(source.templateId, source.ceremonyType);
   const usingDefault = source.accentColorOverride === null;
+  const wedding = isWeddingEvent(source.eventType);
 
   return (
     <div style={{ display: "grid", gap: "1.5rem" }}>
-      <div>
-        <span className="field-label">Ceremony</span>
-        <div className="chiprow">
-          {CEREMONY_TYPES.map((type) => (
-            <button
-              key={type}
-              type="button"
-              className="chip"
-              aria-pressed={source.ceremonyType === type}
-              onClick={() =>
-                onChange({
-                  ceremonyType: type as CeremonyType,
-                  ...(type !== "custom" ? { customCeremonyName: null } : {}),
-                })
-              }
-            >
-              {/* each ceremony in its own accent, so the colour system is
-                  visible while choosing rather than a surprise afterwards */}
-              <i style={{ background: resolveAccentColor(source.templateId, type) }} />
-              {CEREMONY_LABELS[type]}
-            </button>
-          ))}
-        </div>
-      </div>
+      {wedding && (
+        <>
+          <div>
+            <span className="field-label">Ceremony</span>
+            <div className="chiprow">
+              {CEREMONY_TYPES.map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  className="chip"
+                  aria-pressed={source.ceremonyType === type}
+                  onClick={() =>
+                    onChange({
+                      ceremonyType: type as CeremonyType,
+                      ...(type !== "custom" ? { customCeremonyName: null } : {}),
+                    })
+                  }
+                >
+                  {/* each ceremony in its own accent, so the colour system is
+                      visible while choosing rather than a surprise afterwards */}
+                  <i style={{ background: resolveAccentColor(source.templateId, type) }} />
+                  {CEREMONY_LABELS[type]}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {source.ceremonyType === "custom" && (
-        <Input
-          id="customCeremonyName"
-          label="Ceremony name"
-          placeholder="Mappillai Azhaippu"
-          maxLength={60}
-          value={source.customCeremonyName ?? ""}
-          onChange={(e) => onChange({ customCeremonyName: e.target.value || null })}
-        />
+          {source.ceremonyType === "custom" && (
+            <Input
+              id="customCeremonyName"
+              label="Ceremony name"
+              placeholder="Mappillai Azhaippu"
+              maxLength={60}
+              value={source.customCeremonyName ?? ""}
+              onChange={(e) => onChange({ customCeremonyName: e.target.value || null })}
+            />
+          )}
+        </>
       )}
 
       {BUILT_TEMPLATES.length > 1 && (
@@ -97,9 +103,9 @@ export function DetailsPanel({
           <span className="muted" style={{ fontSize: "var(--t-sm)" }}>
             {usingDefault
               ? `Using the ${
-                  source.ceremonyType === "custom"
-                    ? "design"
-                    : CEREMONY_LABELS[source.ceremonyType].toLowerCase()
+                  source.ceremonyType && source.ceremonyType !== "custom"
+                    ? CEREMONY_LABELS[source.ceremonyType].toLowerCase()
+                    : "design"
                 } default`
               : "Custom colour"}
           </span>

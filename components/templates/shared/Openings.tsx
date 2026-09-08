@@ -1,5 +1,6 @@
 "use client";
 
+import { splitHostNames } from "@/lib/format";
 import type { InvitationJson } from "@/lib/invitation/types";
 
 /**
@@ -19,6 +20,7 @@ export interface OpeningProps {
 
 function Seal({ invitation, onOpen, open }: OpeningProps) {
   const { couple, opening } = invitation;
+  const [first, second] = splitHostNames(couple.hostNames);
   return (
     <button
       type="button"
@@ -26,14 +28,18 @@ function Seal({ invitation, onOpen, open }: OpeningProps) {
       data-open={open || undefined}
       onClick={onOpen}
       disabled={open}
-      aria-label={`Open the invitation for ${couple.name1} and ${couple.name2}`}
+      aria-label={`Open the invitation for ${couple.hostNames}`}
     >
       <span className="inv-seal-pulse" aria-hidden="true" />
       <span className="inv-seal-face">
         <span className="inv-seal-names">
-          {couple.name1}
-          <i aria-hidden="true">&amp;</i>
-          {couple.name2}
+          {first}
+          {second && (
+            <>
+              <i aria-hidden="true">&amp;</i>
+              {second}
+            </>
+          )}
         </span>
         <span className="inv-seal-cta">{opening.text?.trim() || "Open"}</span>
       </span>

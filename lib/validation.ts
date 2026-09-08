@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CEREMONY_TYPES } from "@/lib/ceremonies";
+import { EVENT_TYPES } from "@/lib/events";
 
 const hexColor = z
   .string()
@@ -22,21 +23,23 @@ const httpUrl = z
   .url()
   .refine((u) => /^https?:\/\//i.test(u), "Must be an http(s) link");
 
-export const weddingCreateSchema = z.object({
-  coupleName1: z.string().trim().min(1, "Enter the first name").max(60),
-  coupleName2: z.string().trim().min(1, "Enter the second name").max(60),
+export const eventCreateSchema = z.object({
+  hostNames: z.string().trim().min(1, "Tell us who this is for").max(120),
+  eventType: z.enum(EVENT_TYPES),
 });
 
-export const weddingUpdateSchema = weddingCreateSchema.partial();
+export const eventUpdateSchema = eventCreateSchema.partial();
 
 export const invitationCreateSchema = z.object({
-  ceremonyType: z.enum(CEREMONY_TYPES),
+  // Only meaningful for a wedding event; ignored (and stored as null) for
+  // every other occasion, which has no ceremony to choose.
+  ceremonyType: z.enum(CEREMONY_TYPES).optional(),
   customCeremonyName: z.string().trim().min(1).max(60).optional(),
   templateId: z.string().trim().min(1).optional(),
 });
 
 export const invitationUpdateSchema = z.object({
-  ceremonyType: z.enum(CEREMONY_TYPES).optional(),
+  ceremonyType: z.enum(CEREMONY_TYPES).nullish(),
   customCeremonyName: z.string().trim().max(60).nullish(),
   templateId: z.string().trim().min(1).optional(),
   accentColorOverride: hexColor.nullish(),

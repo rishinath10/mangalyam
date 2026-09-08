@@ -56,6 +56,18 @@ export function formatTimeRange(start: string | null, end: string | null): strin
   return s || e;
 }
 
+/**
+ * Splits "Rishi & Gaayathri" into its two names so a wedding template can
+ * style the ampersand between them; "The Kumar Family" or a single name has
+ * no " & " to find and comes back as one part. Templates for occasions that
+ * are never a pair (a housewarming, a birthday) should just render the whole
+ * string and never call this.
+ */
+export function splitHostNames(hostNames: string): [string, string | null] {
+  const m = /^(.+?)\s*&\s*(.+)$/.exec(hostNames.trim());
+  return m ? [m[1], m[2]] : [hostNames, null];
+}
+
 /** Combines the plain date and time into a real instant for the countdown. */
 export function eventStartsAt(iso: string | null, hhmm: string | null): Date | null {
   if (!iso) return null;

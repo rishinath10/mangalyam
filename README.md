@@ -1,7 +1,9 @@
 # Mangalyam
 
-Digital wedding invitations for Malaysian Indian families. One wedding holds a
-separate invitation, link and RSVP for every ceremony.
+Digital invitations for Malaysian Indian celebrations — weddings, naming
+ceremonies, housewarmings, milestone birthdays, temple consecrations, home
+poojas, and community events. A wedding holds a separate invitation, link and
+RSVP for every ceremony; every other occasion holds exactly one.
 
 The product brief is `CLAUDE.md` — it is the source of truth for scope and the
 non-negotiable rules. Read Section 13 before changing anything structural.
@@ -36,11 +38,12 @@ npm run dev
 | `STRIPE_SECRET_KEY` | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | Signing secret for `/api/webhooks/stripe` |
 | `PAYMENT_CURRENCY` | Defaults to `myr` |
-| `PRICE_ESSENTIAL_SEN` / `PRICE_SIGNATURE_SEN` / `PRICE_BESPOKE_SEN` | Prices in **sen**, integers |
+| `PRICE_STANDARD_SEN` | The one flat price, in **sen**, integer |
 
-Prices are deliberately not in the codebase. A package with no price set shows
-as "not on sale yet" and cannot be checked out — better a blocked sale than a
-wrong charge.
+One flat price for one invitation — no tiers, no bundles. Anything beyond that
+(a second ceremony, bespoke work) is a direct conversation, not a checkout.
+The price is deliberately not in the codebase: with none set, checkout shows
+as "not on sale yet" rather than charging the wrong amount or zero.
 
 Point the Stripe webhook at `/api/webhooks/stripe` and subscribe to
 `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
@@ -49,10 +52,18 @@ async events matter: FPX settles after the customer leaves the page.
 
 ## Things that will bite you if you don't know them
 
-**There is no Row Level Security.** Every route touching a wedding-owned row
+**There is no Row Level Security.** Every route touching an event-owned row
 goes through a guard in `lib/auth/ownership.ts`, which resolves the row and
-proves ownership in one query. Never fetch a wedding-owned row by id alone.
+proves ownership in one query. Never fetch an event-owned row by id alone.
 Unowned resources return 404, not 403, so the API doesn't leak which ids exist.
+
+**`Event` is the top-level billed entity, not `Wedding`.** Mangalyam covers
+every Malaysian Indian celebration, not only weddings — `hostNames` is a
+flexible display string ("Rishi & Gaayathri", "The Kumar Family", one name),
+and `EventType` decides which occasion it is. Only `wedding` has sub-ceremonies
+(`CeremonyType`, wedding-only and nullable); every other occasion's single
+invitation carries `ceremonyType: null` and is labelled from `EVENT_TYPE_LABELS`
+instead.
 
 **One renderer.** The builder preview and the public page mount the same
 component with the same JSON, both built by `composeInvitationJson`. There is

@@ -209,7 +209,7 @@ export function InvitationBuilder({
                 invitationId={source.invitationId}
                 slug={source.slug}
                 status={status}
-                coupleLine={`${source.coupleName1} & ${source.coupleName2}`}
+                coupleLine={source.hostNames}
                 ceremonyLabel={previewJson.ceremonyLabel}
                 onSlugChange={(slug) => setSource((s) => ({ ...s, slug }))}
                 onStatusChange={(next) => {

@@ -36,15 +36,15 @@ export const stripeGateway: PaymentGateway = {
               currency: req.currency,
               unit_amount: req.amountSen,
               product_data: {
-                name: `Mangalyam — ${req.pkg} package`,
-                description: "One wedding. Digital invitations for every ceremony.",
+                name: "Mangalyam — one invitation",
+                description: "One occasion, one digital invitation, unlimited RSVPs.",
               },
             },
           },
         ],
         // Everything needed to settle the purchase travels with the session,
         // so the webhook never has to guess which row it belongs to.
-        metadata: { purchaseId: req.purchaseId, weddingId: req.weddingId, package: req.pkg },
+        metadata: { purchaseId: req.purchaseId, eventId: req.eventId },
       },
       // Stripe deduplicates on this key, so a double-clicked button or a
       // retried request cannot create two checkouts for one purchase.

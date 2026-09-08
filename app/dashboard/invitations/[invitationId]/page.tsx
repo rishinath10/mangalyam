@@ -26,8 +26,8 @@ export default async function InvitationBuilderPage({ params }: Params) {
 
   return (
     <>
-      <Link href={`/dashboard/weddings/${row.weddingId}`} className="crumb">
-        ← {row.wedding.coupleName1} &amp; {row.wedding.coupleName2}
+      <Link href={`/dashboard/events/${row.eventId}`} className="crumb">
+        ← {row.event.hostNames}
       </Link>
 
       {/* The server hands over a plain source object; every edit from here on

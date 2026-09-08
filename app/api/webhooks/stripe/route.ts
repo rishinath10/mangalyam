@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { paymentGateway } from "@/lib/payments";
-import { PACKAGE_ENTITLEMENTS } from "@/lib/packages";
+import { STANDARD_ENTITLEMENT } from "@/lib/pricing";
 
 // The signature is computed over the exact bytes Stripe sent, so this route
 // must read the raw body and must not run on the edge.
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
   const purchase = await db.purchase.findUnique({
     where: { id: event.purchaseId },
-    include: { wedding: { include: { entitlement: true } } },
+    include: { event: { include: { entitlement: true } } },
   });
 
   if (!purchase) {
@@ -58,8 +58,6 @@ export async function POST(req: Request) {
     );
   }
 
-  const grant = PACKAGE_ENTITLEMENTS[purchase.package];
-
   await db.$transaction([
     db.purchase.update({
       where: { id: purchase.id },
@@ -68,9 +66,9 @@ export async function POST(req: Request) {
     // upsert, because a customer who somehow pays twice should end up with the
     // entitlement they bought rather than a unique-constraint crash
     db.entitlement.upsert({
-      where: { weddingId: purchase.weddingId },
-      update: grant,
-      create: { weddingId: purchase.weddingId, ...grant },
+      where: { eventId: purchase.eventId },
+      update: STANDARD_ENTITLEMENT,
+      create: { eventId: purchase.eventId, ...STANDARD_ENTITLEMENT },
     }),
   ]);
 

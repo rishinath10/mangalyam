@@ -3,6 +3,7 @@ import { requireInvitation } from "@/lib/auth/ownership";
 import { ApiError } from "@/lib/api";
 import { NextResponse } from "next/server";
 import { ceremonyLabel } from "@/lib/ceremonies";
+import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { slugify } from "@/lib/slug";
 
 type Params = { params: Promise<{ invitationId: string }> };
@@ -45,9 +46,10 @@ export async function GET(_req: Request, { params }: Params) {
 
     // A BOM so Excel reads the UTF-8 names correctly rather than mangling them.
     const csv = `﻿${header.map(csvCell).join(",")}\n${rows.join("\n")}\n`;
-    const name = slugify(
-      `${ceremonyLabel(invitation.ceremonyType, invitation.customCeremonyName)} rsvps`,
-    );
+    const label = invitation.ceremonyType
+      ? ceremonyLabel(invitation.ceremonyType, invitation.customCeremonyName)
+      : EVENT_TYPE_LABELS[invitation.event.eventType];
+    const name = slugify(`${label} rsvps`);
 
     return new NextResponse(csv, {
       headers: {

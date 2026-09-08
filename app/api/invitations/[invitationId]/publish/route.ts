@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { badRequest, forbidden, handle, parseBody } from "@/lib/api";
 import { requireInvitation } from "@/lib/auth/ownership";
-import { invitationLimitFor } from "@/lib/entitlements";
+import { CONTACT_MESSAGE, invitationLimitFor } from "@/lib/entitlements";
 import { z } from "zod";
 
 type Params = { params: Promise<{ invitationId: string }> };
@@ -33,18 +33,16 @@ export async function POST(req: Request, { params }: Params) {
     if (!invitation.venueName?.trim()) throw badRequest("Add a venue before publishing.");
 
     if (invitation.status !== "published") {
-      const limit = invitationLimitFor(invitation.wedding.entitlement);
-      if (limit !== null) {
-        const live = await db.invitation.count({
-          where: { weddingId: invitation.weddingId, status: "published" },
-        });
-        if (live >= limit) {
-          throw forbidden(
-            invitation.wedding.entitlement
-              ? `Your package covers ${limit} published invitation${limit === 1 ? "" : "s"}. Unpublish another, or upgrade.`
-              : "Complete your purchase to publish this invitation.",
-          );
-        }
+      const limit = invitationLimitFor(invitation.event.entitlement);
+      const live = await db.invitation.count({
+        where: { eventId: invitation.eventId, status: "published" },
+      });
+      if (live >= limit) {
+        throw forbidden(
+          invitation.event.entitlement
+            ? CONTACT_MESSAGE
+            : "Complete your purchase to publish this invitation.",
+        );
       }
     }
 

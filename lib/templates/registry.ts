@@ -119,11 +119,14 @@ export function isSelectableTemplate(templateId: string): boolean {
  */
 export function resolveAccentColor(
   templateId: string,
-  ceremonyType: CeremonyType,
+  ceremonyType: CeremonyType | null,
   override?: string | null,
 ): string {
   if (override && /^#[0-9a-fA-F]{6}$/.test(override)) return override;
   const manifest = getManifest(templateId);
+  // No ceremony (every occasion but a wedding) lands on the design's own
+  // default, the same place "custom" does for a wedding ceremony.
+  if (!ceremonyType) return manifest.defaultAccent;
   return manifest.ceremonyAccentDefaults[ceremonyType] ?? manifest.defaultAccent;
 }
 

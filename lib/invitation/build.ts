@@ -1,9 +1,9 @@
 import type {
+  Event,
   Invitation,
   InvitationPhoto,
   InvitationScheduleItem,
   InvitationSettings,
-  Wedding,
 } from "@prisma/client";
 import {
   composeInvitationJson,
@@ -12,7 +12,7 @@ import {
 import type { InvitationJson } from "@/lib/invitation/types";
 
 export type InvitationWithRelations = Invitation & {
-  wedding: Wedding;
+  event: Event;
   scheduleItems: InvitationScheduleItem[];
   photos: InvitationPhoto[];
   settings: InvitationSettings | null;
@@ -20,7 +20,7 @@ export type InvitationWithRelations = Invitation & {
 
 /** Prisma include that produces exactly `InvitationWithRelations`. */
 export const invitationInclude = {
-  wedding: true,
+  event: true,
   scheduleItems: { orderBy: { sortOrder: "asc" } },
   photos: { orderBy: { sortOrder: "asc" } },
   settings: true,
@@ -38,14 +38,14 @@ export function toInvitationSource(row: InvitationWithRelations): InvitationSour
   const s = row.settings;
   return {
     invitationId: row.id,
-    weddingId: row.weddingId,
+    eventId: row.eventId,
+    eventType: row.event.eventType,
     slug: row.slug,
     ceremonyType: row.ceremonyType,
     customCeremonyName: row.customCeremonyName,
     templateId: row.templateId,
     accentColorOverride: row.accentColorOverride,
-    coupleName1: row.wedding.coupleName1,
-    coupleName2: row.wedding.coupleName2,
+    hostNames: row.event.hostNames,
     coverPhotoUrl: row.coverPhotoUrl,
     description: row.description,
     date: isoDate(row.date),

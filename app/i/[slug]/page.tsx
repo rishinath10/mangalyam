@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!row) return { title: "Invitation not found" };
 
   const json = buildInvitationJson(row);
-  const title = `${json.couple.name1} & ${json.couple.name2} — ${json.ceremonyLabel}`;
+  const title = `${json.couple.hostNames} — ${json.ceremonyLabel}`;
   const description = [json.event.venueName, formatEventDate(json.event.date)]
     .filter(Boolean)
     .join(" · ");

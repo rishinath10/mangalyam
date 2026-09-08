@@ -38,7 +38,7 @@ export function GopuramTemplate({ invitation, preview = false }: TemplateProps) 
       <footer className="px-6 pb-14 pt-4 text-center">
         <Garland className="mx-auto h-8 w-44 rotate-180 text-[var(--ds-accent)] opacity-45" />
         <p className="mt-5 text-[10px] uppercase tracking-[0.3em] text-[var(--ds-ink-muted)]">
-          {invitation.couple.name1} &amp; {invitation.couple.name2}
+          {invitation.couple.hostNames}
         </p>
       </footer>
 

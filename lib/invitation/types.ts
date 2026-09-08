@@ -1,4 +1,4 @@
-import type { CeremonyType, OpeningStyle } from "@prisma/client";
+import type { CeremonyType, EventType, OpeningStyle } from "@prisma/client";
 
 /**
  * The content contract (CLAUDE.md Section 4.3).
@@ -10,15 +10,17 @@ import type { CeremonyType, OpeningStyle } from "@prisma/client";
  */
 export interface InvitationJson {
   invitationId: string;
-  weddingId: string;
+  eventId: string;
+  eventType: EventType;
   slug: string;
-  ceremonyType: CeremonyType;
+  /** Null for every occasion except a wedding, which alone has sub-ceremonies. */
+  ceremonyType: CeremonyType | null;
   ceremonyLabel: string;
   templateId: string;
   accentColor: string;
   couple: {
-    name1: string;
-    name2: string;
+    /** "Rishi & Gaayathri", "The Kumar Family", or a single name. */
+    hostNames: string;
     coverPhoto: string | null;
     message: string | null;
   };
@@ -37,7 +39,7 @@ export interface InvitationJson {
   countdown: { enabled: boolean };
   /** The cover a guest taps before the invitation is revealed. */
   opening: { style: OpeningStyle; text: string | null; autoScroll: boolean };
-  /** The person guests ring about this ceremony. */
+  /** The person guests ring about this occasion. */
   contact: { name: string | null; phone: string | null };
 }
 

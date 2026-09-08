@@ -1,12 +1,13 @@
 import { ImageResponse } from "next/og";
 import { db } from "@/lib/db";
 import { ceremonyLabel } from "@/lib/ceremonies";
+import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { formatEventDate } from "@/lib/format";
 import { resolveAccentColor } from "@/lib/templates/registry";
 import { DESIGN_SYSTEMS } from "@/lib/templates/design-systems";
 import { getManifest } from "@/lib/templates/registry";
 
-export const alt = "Wedding invitation";
+export const alt = "Mangalyam invitation";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -25,7 +26,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
 
   const row = await db.invitation.findFirst({
     where: { slug, status: "published" },
-    include: { wedding: true },
+    include: { event: true },
   });
 
   if (!row) {
@@ -47,7 +48,9 @@ export default async function Image({ params }: { params: Promise<{ slug: string
 
   const accent = resolveAccentColor(row.templateId, row.ceremonyType, row.accentColorOverride);
   const tokens = DESIGN_SYSTEMS[getManifest(row.templateId).designSystem];
-  const label = ceremonyLabel(row.ceremonyType, row.customCeremonyName);
+  const label = row.ceremonyType
+    ? ceremonyLabel(row.ceremonyType, row.customCeremonyName)
+    : EVENT_TYPE_LABELS[row.event.eventType];
 
   return new ImageResponse(
     (
@@ -67,7 +70,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         </div>
 
         <div style={{ fontSize: 96, color: tokens.brandDeep, marginTop: 28, display: "flex" }}>
-          {row.wedding.coupleName1} &amp; {row.wedding.coupleName2}
+          {row.event.hostNames}
         </div>
 
         {row.date && (

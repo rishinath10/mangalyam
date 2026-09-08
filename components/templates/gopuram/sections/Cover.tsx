@@ -2,11 +2,12 @@
 
 import { GopuramArch, Kalash } from "@/components/decor";
 import { FadeIn, ScaleIn } from "@/components/motion/primitives";
-import { formatEventDate } from "@/lib/format";
+import { formatEventDate, splitHostNames } from "@/lib/format";
 import type { InvitationJson } from "@/lib/invitation/types";
 
 export function Cover({ invitation }: { invitation: InvitationJson }) {
   const { couple, event, ceremonyLabel } = invitation;
+  const [firstName, secondName] = splitHostNames(couple.hostNames);
 
   return (
     <header className="relative flex min-h-[92svh] flex-col items-center justify-center overflow-hidden px-6 py-16 text-center">
@@ -43,11 +44,15 @@ export function Cover({ invitation }: { invitation: InvitationJson }) {
 
         <FadeIn delay={0.3}>
           <h1 className="mt-5 font-[family-name:var(--font-display)] text-[clamp(2.4rem,11vw,4.25rem)] leading-[1.05] text-[var(--ds-brand-deep)]">
-            <span className="block">{couple.name1}</span>
-            <span className="my-2 block text-[0.45em] tracking-[0.3em] text-[var(--ds-accent)]">
-              &amp;
-            </span>
-            <span className="block">{couple.name2}</span>
+            <span className="block">{firstName}</span>
+            {secondName && (
+              <>
+                <span className="my-2 block text-[0.45em] tracking-[0.3em] text-[var(--ds-accent)]">
+                  &amp;
+                </span>
+                <span className="block">{secondName}</span>
+              </>
+            )}
           </h1>
         </FadeIn>
 

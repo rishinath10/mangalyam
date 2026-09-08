@@ -1,25 +1,24 @@
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { badRequest, handle, parseBody } from "@/lib/api";
-import { requireWedding } from "@/lib/auth/ownership";
+import { requireEvent } from "@/lib/auth/ownership";
 import { auth } from "@/lib/auth";
 import { paymentGateway } from "@/lib/payments";
-import { CURRENCY, priceSen } from "@/lib/packages";
+import { CURRENCY, priceSen } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 
 const checkoutSchema = z.object({
-  weddingId: z.string().uuid(),
-  pkg: z.enum(["essential", "signature", "bespoke"]),
+  eventId: z.string().uuid(),
 });
 
 export async function POST(req: Request) {
   return handle(async () => {
     const input = await parseBody(req, checkoutSchema);
-    const { wedding } = await requireWedding(input.weddingId);
+    const { event } = await requireEvent(input.eventId);
 
-    if (wedding.entitlement) {
-      throw badRequest("This wedding has already been paid for.");
+    if (event.entitlement) {
+      throw badRequest("This event has already been paid for.");
     }
 
     const session = await auth();
@@ -29,17 +28,16 @@ export async function POST(req: Request) {
     // An unset price must stop the sale — but as a clear refusal, not a crash.
     let amountSen: number;
     try {
-      amountSen = priceSen(input.pkg);
+      amountSen = priceSen();
     } catch {
-      throw badRequest("That package is not on sale yet.");
+      throw badRequest("Invitations are not on sale yet.");
     }
 
     // The purchase row exists before the customer reaches the gateway, so the
     // webhook always has something to settle against.
     const purchase = await db.purchase.create({
       data: {
-        weddingId: wedding.id,
-        package: input.pkg,
+        eventId: event.id,
         amountSen,
         status: "pending",
       },
@@ -49,14 +47,13 @@ export async function POST(req: Request) {
     const gateway = paymentGateway();
 
     const checkout = await gateway.createCheckout({
-      weddingId: wedding.id,
+      eventId: event.id,
       purchaseId: purchase.id,
-      pkg: input.pkg,
       amountSen,
       currency: CURRENCY,
       customerEmail: email,
-      successUrl: `${base}/dashboard/weddings/${wedding.id}?paid=1`,
-      cancelUrl: `${base}/dashboard/weddings/${wedding.id}?cancelled=1`,
+      successUrl: `${base}/dashboard/events/${event.id}?paid=1`,
+      cancelUrl: `${base}/dashboard/events/${event.id}?cancelled=1`,
     });
 
     await db.purchase.update({

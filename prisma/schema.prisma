@@ -1,9 +1,10 @@
 // Mangalyam — PostgreSQL schema (CLAUDE.md Section 4.2)
 //
-// Structural rule #1: `weddings` is the top-level owned/billed entity.
-// `invitations` (one per ceremony) hang off a wedding, never the reverse.
+// Structural rule #1: `events` is the top-level owned/billed entity.
+// `invitations` (one per occasion, or one per ceremony for a wedding) hang
+// off an event, never the reverse.
 //
-// There is no RLS here. Every route touching a wedding-owned row must call the
+// There is no RLS here. Every route touching an event-owned row must call the
 // ownership guards in lib/auth/ownership.ts explicitly.
 
 generator client {
@@ -15,10 +16,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Package {
-  essential
-  signature
-  bespoke
+/**
+ * The occasion an Event celebrates. "Mangalyam" means auspicious, not
+ * wedding — the product covers the Malaysian Indian celebration calendar, not
+ * only weddings. Only `wedding` events carry sub-ceremonies (CeremonyType);
+ * every other type gets exactly one Invitation with no ceremony of its own.
+ */
+enum EventType {
+  wedding
+  naming_ceremony
+  housewarming
+  sixtieth_birthday
+  temple_consecration
+  home_pooja
+  community_event
+  custom
 }
 
 enum PurchaseStatus {
@@ -28,6 +40,7 @@ enum PurchaseStatus {
   refunded
 }
 
+/** Sub-ceremonies within a wedding. Meaningless for any other EventType. */
 enum CeremonyType {
   mehendi
   haldi
@@ -73,17 +86,21 @@ model User {
   name         String?
   createdAt    DateTime  @default(now()) @map("created_at")
 
-  weddings     Wedding[]
+  events       Event[]
 
   @@map("users")
 }
 
-model Wedding {
-  id          String   @id @default(uuid()) @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
-  coupleName1 String   @map("couple_name1")
-  coupleName2 String   @map("couple_name2")
-  createdAt   DateTime @default(now()) @map("created_at")
+model Event {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  // A flexible display string rather than a couple pair — "Rishi & Gaayathri"
+  // for a wedding, "The Kumar Family" for a housewarming, one name for a
+  // solo celebrant. Templates render it as-is; only a wedding's own template
+  // family looks for an "&" to style two names specially.
+  hostNames String    @map("host_names")
+  eventType EventType @map("event_type")
+  createdAt DateTime  @default(now()) @map("created_at")
 
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   purchases   Purchase[]
@@ -91,47 +108,44 @@ model Wedding {
   invitations Invitation[]
 
   @@index([userId])
-  @@map("weddings")
+  @@map("events")
 }
 
 model Purchase {
   id                String         @id @default(uuid()) @db.Uuid
-  weddingId         String         @map("wedding_id") @db.Uuid
-  package           Package
+  eventId           String         @map("event_id") @db.Uuid
   // Amounts are stored in sen (MYR minor units) to avoid float rounding.
-  // Actual per-tier pricing is still an open decision (CLAUDE.md Section 14) —
-  // nothing in this codebase may hardcode a price.
+  // One flat self-serve price — nothing in this codebase may hardcode it.
   amountSen         Int            @map("amount_sen")
   paymentGatewayRef String?        @map("payment_gateway_ref")
   status            PurchaseStatus @default(pending)
   createdAt         DateTime       @default(now()) @map("created_at")
 
-  wedding           Wedding        @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  event             Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@index([weddingId])
+  @@index([eventId])
   @@map("purchases")
 }
 
 model Entitlement {
-  id               String  @id @default(uuid()) @db.Uuid
-  weddingId        String  @unique @map("wedding_id") @db.Uuid
-  // null = unlimited (bespoke tier). A number caps published ceremony invitations.
-  invitationLimit  Int?    @map("invitation_limit")
-  premiumTemplates Boolean @default(false) @map("premium_templates")
-  giftRegistry     Boolean @default(false) @map("gift_registry")
-  customDomain     Boolean @default(false) @map("custom_domain")
-  removeBranding   Boolean @default(false) @map("remove_branding")
+  id              String @id @default(uuid()) @db.Uuid
+  eventId         String @unique @map("event_id") @db.Uuid
+  // Self-serve is always exactly one invitation (CLAUDE.md Section 8): there
+  // are no public tiers or bundles. A second invitation, or anything else, is
+  // a custom quote handled outside this table entirely.
+  invitationLimit Int    @map("invitation_limit")
 
-  wedding          Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  event           Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@map("entitlements")
 }
 
 model Invitation {
   id                  String           @id @default(uuid()) @db.Uuid
-  weddingId           String           @map("wedding_id") @db.Uuid
+  eventId             String           @map("event_id") @db.Uuid
   slug                String           @unique
-  ceremonyType        CeremonyType     @map("ceremony_type")
+  // Null for every EventType except `wedding`, which alone has sub-ceremonies.
+  ceremonyType        CeremonyType?    @map("ceremony_type")
   customCeremonyName  String?          @map("custom_ceremony_name")
   templateId          String           @map("template_id")
   accentColorOverride String?          @map("accent_color_override")
@@ -148,13 +162,13 @@ model Invitation {
   createdAt           DateTime         @default(now()) @map("created_at")
   updatedAt           DateTime         @updatedAt @map("updated_at")
 
-  wedding             Wedding                  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  event               Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   scheduleItems       InvitationScheduleItem[]
   photos              InvitationPhoto[]
   settings            InvitationSettings?
   rsvps               Rsvp[]
 
-  @@index([weddingId])
+  @@index([eventId])
   @@map("invitations")
 }
 
@@ -198,12 +212,12 @@ model InvitationSettings {
 
   // The opening sequence: a tap on the seal reveals the invitation.
   openingStyle     OpeningStyle @default(doors) @map("opening_style")
-  /** Caption under the couple's names on the seal. Null uses "Open". */
+  /** Caption under the host names on the seal. Null uses "Open". */
   openingText      String?      @map("opening_text")
   /** Drifts the page down after the opening; a guest touch cancels it. */
   autoScroll       Boolean      @default(true) @map("auto_scroll")
 
-  // The person guests call about the ceremony, shown in the action bar.
+  // The person guests call about the occasion, shown in the action bar.
   contactName      String?      @map("contact_name")
   contactPhone     String?      @map("contact_phone")
 

@@ -2,74 +2,67 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { ApiError } from "@/lib/api";
-import { requireWedding } from "@/lib/auth/ownership";
-import { invitationUsage } from "@/lib/entitlements";
+import { requireEvent } from "@/lib/auth/ownership";
+import { CONTACT_MESSAGE, invitationUsage } from "@/lib/entitlements";
 import { ceremonyLabel } from "@/lib/ceremonies";
+import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { formatShortDate, formatTimeRange } from "@/lib/format";
+import { isPurchasable } from "@/lib/pricing";
 import { resolveAccentColor } from "@/lib/templates/registry";
 import { withFigures } from "@/lib/typography";
 import { AddInvitationForm } from "@/components/dashboard/AddInvitationForm";
 import { PurchasePanel } from "@/components/dashboard/PurchasePanel";
-import { PACKAGE_ENTITLEMENTS, PACKAGE_NAMES, isPurchasable } from "@/lib/packages";
 
 type Params = {
-  params: Promise<{ weddingId: string }>;
+  params: Promise<{ eventId: string }>;
   searchParams: Promise<{ paid?: string; cancelled?: string }>;
 };
 
-const TIER_COPY = {
-  essential: ["Standard designs", "Unlimited RSVPs", "Gallery, timeline and countdown", "WhatsApp sharing"],
-  signature: ["Everything in Essential", "All designs, premium included", "Background music", "Meal preferences for your caterer"],
-  bespoke: ["Everything in Signature", "A card drawn for you by hand", "Mangalyam branding removed", "Priority support"],
-} as const;
-
-export default async function WeddingPage({ params, searchParams }: Params) {
-  const { weddingId } = await params;
+export default async function EventPage({ params, searchParams }: Params) {
+  const { eventId } = await params;
   const query = await searchParams;
 
-  // requireWedding throws a 404 ApiError for a wedding the caller does not
-  // own; in a page that has to become Next's notFound(), not a JSON body.
-  let wedding;
+  // requireEvent throws a 404 ApiError for an event the caller does not own;
+  // in a page that has to become Next's notFound(), not a JSON body.
+  let event;
   try {
-    ({ wedding } = await requireWedding(weddingId));
+    ({ event } = await requireEvent(eventId));
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) notFound();
     throw err;
   }
 
-  const usage = await invitationUsage(wedding.id, wedding.entitlement);
+  const usage = await invitationUsage(event.id, event.entitlement);
   const invitations = await db.invitation.findMany({
-    where: { weddingId: wedding.id },
+    where: { eventId: event.id },
     orderBy: [{ date: "asc" }, { createdAt: "asc" }],
     include: { _count: { select: { rsvps: true } } },
   });
 
-  const canAdd = usage.remaining === null || usage.remaining > 0;
+  const canAdd = usage.remaining > 0;
 
   return (
     <>
       <Link href="/dashboard" className="crumb">
-        ← All weddings
+        ← All events
       </Link>
 
       <div className="page-head" style={{ marginTop: "1rem" }}>
         <div>
-          <h1>
-            {wedding.coupleName1} &amp; {wedding.coupleName2}
-          </h1>
+          <p className="kick">{EVENT_TYPE_LABELS[event.eventType]}</p>
+          <h1 style={{ marginTop: ".3rem" }}>{event.hostNames}</h1>
           <p>
-            {withFigures(String(usage.used))} of{" "}
-            {usage.limit === null ? "unlimited" : withFigures(String(usage.limit))} ceremony
-            invitation{usage.used === 1 ? "" : "s"} used
-            {!wedding.entitlement && " · purchase pending"}
+            {withFigures(String(usage.used))} of {withFigures(String(usage.limit))} invitation
+            {usage.used === 1 ? "" : "s"} used
+            {!event.entitlement && " · purchase pending"}
           </p>
         </div>
       </div>
 
-      {query.paid && !wedding.entitlement && (
+      {query.paid && !event.entitlement && (
         <p className="notice notice-good" style={{ marginBottom: "1.5rem" }}>
           Payment received. Bank transfers can take a few minutes to confirm — this page
-          will show your package as soon as it clears.
+          will update as soon as it clears.
         </p>
       )}
       {query.cancelled && (
@@ -78,38 +71,22 @@ export default async function WeddingPage({ params, searchParams }: Params) {
         </p>
       )}
 
-      {!wedding.entitlement && (
+      {!event.entitlement && (
         <section style={{ marginBottom: "2.6rem" }}>
-          <h2 style={{ fontSize: "var(--t-md)", marginBottom: "1rem" }}>Choose a package</h2>
+          <h2 style={{ fontSize: "var(--t-md)", marginBottom: "1rem" }}>Pay to publish</h2>
           <p className="muted" style={{ fontSize: "var(--t-sm)", marginBottom: "1.2rem", maxWidth: "56ch" }}>
-            You can build and preview without paying. A package is what lets you publish
-            and share — one payment for this wedding, no subscription.
+            You can build and preview without paying. Payment is what lets you publish and
+            share — one payment for this event, no subscription.
           </p>
-          <PurchasePanel
-            weddingId={wedding.id}
-            tiers={(["essential", "signature", "bespoke"] as const).map((pkg) => {
-              const limit = PACKAGE_ENTITLEMENTS[pkg].invitationLimit;
-              return {
-                pkg,
-                name: PACKAGE_NAMES[pkg],
-                inc:
-                  limit === null
-                    ? "Unlimited ceremony invitations"
-                    : `${limit} ceremony invitation${limit === 1 ? "" : "s"}`,
-                items: [...TIER_COPY[pkg]],
-                feature: pkg === "signature",
-                purchasable: isPurchasable(pkg),
-              };
-            })}
-          />
+          <PurchasePanel eventId={event.id} purchasable={isPurchasable()} />
         </section>
       )}
 
-      <h2 style={{ fontSize: "var(--t-md)", marginBottom: "1rem" }}>Ceremonies</h2>
+      <h2 style={{ fontSize: "var(--t-md)", marginBottom: "1rem" }}>Invitations</h2>
 
       {invitations.length === 0 ? (
         <p className="t dim" style={{ fontSize: "var(--t-sm)" }}>
-          No ceremony invitations yet. Add your first one below.
+          No invitation yet. Add it below.
         </p>
       ) : (
         <div className="stack">
@@ -119,6 +96,9 @@ export default async function WeddingPage({ params, searchParams }: Params) {
               invitation.ceremonyType,
               invitation.accentColorOverride,
             );
+            const label = invitation.ceremonyType
+              ? ceremonyLabel(invitation.ceremonyType, invitation.customCeremonyName)
+              : EVENT_TYPE_LABELS[event.eventType];
             const when = [
               formatShortDate(invitation.date ? invitation.date.toISOString().slice(0, 10) : null),
               formatTimeRange(invitation.startTime, invitation.endTime),
@@ -134,7 +114,7 @@ export default async function WeddingPage({ params, searchParams }: Params) {
               >
                 <span className="swatch" style={{ background: accent }} aria-hidden="true" />
                 <span className="body">
-                  <b>{ceremonyLabel(invitation.ceremonyType, invitation.customCeremonyName)}</b>
+                  <b>{label}</b>
                   <span>{when || "No date set yet"}</span>
                 </span>
                 {invitation._count.rsvps > 0 && (
@@ -153,16 +133,14 @@ export default async function WeddingPage({ params, searchParams }: Params) {
       )}
 
       <div className="t" style={{ marginTop: "2.4rem" }}>
-        <h2 style={{ fontSize: "var(--t-md)" }}>Add a ceremony</h2>
+        <h2 style={{ fontSize: "var(--t-md)" }}>Add an invitation</h2>
         {canAdd ? (
           <div style={{ marginTop: "1.2rem" }}>
-            <AddInvitationForm weddingId={wedding.id} />
+            <AddInvitationForm eventId={event.id} eventType={event.eventType} />
           </div>
         ) : (
           <p className="notice notice-bad" style={{ marginTop: "1rem" }}>
-            {wedding.entitlement
-              ? `Your package includes ${usage.limit} ceremony invitation${usage.limit === 1 ? "" : "s"}. Upgrade to add more.`
-              : "Complete your purchase to add more ceremony invitations."}
+            {event.entitlement ? CONTACT_MESSAGE : "Complete your purchase to add an invitation."}
           </p>
         )}
       </div>

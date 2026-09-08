@@ -2,14 +2,26 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { CeremonyType } from "@prisma/client";
+import type { CeremonyType, EventType } from "@prisma/client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import { CEREMONY_LABELS, CEREMONY_TYPES } from "@/lib/ceremonies";
+import { isWeddingEvent } from "@/lib/events";
 import { DEFAULT_TEMPLATE_ID, resolveAccentColor } from "@/lib/templates/registry";
 
-export function AddInvitationForm({ weddingId }: { weddingId: string }) {
+/**
+ * Only a wedding has sub-ceremonies to choose between; every other occasion
+ * gets exactly one invitation with no ceremony picker at all.
+ */
+export function AddInvitationForm({
+  eventId,
+  eventType,
+}: {
+  eventId: string;
+  eventType: EventType;
+}) {
   const router = useRouter();
+  const wedding = isWeddingEvent(eventType);
   const [ceremonyType, setCeremonyType] = useState<CeremonyType>("haldi");
   const [customName, setCustomName] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -20,18 +32,22 @@ export function AddInvitationForm({ weddingId }: { weddingId: string }) {
     setPending(true);
     setError(null);
 
-    const res = await fetch(`/api/weddings/${weddingId}/invitations`, {
+    const res = await fetch(`/api/events/${eventId}/invitations`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ceremonyType,
-        ...(ceremonyType === "custom" ? { customCeremonyName: customName } : {}),
-      }),
+      body: JSON.stringify(
+        wedding
+          ? {
+              ceremonyType,
+              ...(ceremonyType === "custom" ? { customCeremonyName: customName } : {}),
+            }
+          : {},
+      ),
     });
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error ?? "Could not add the ceremony.");
+      setError(body.error ?? "Could not add the invitation.");
       setPending(false);
       return;
     }
@@ -43,34 +59,38 @@ export function AddInvitationForm({ weddingId }: { weddingId: string }) {
 
   return (
     <form onSubmit={onSubmit} style={{ display: "grid", gap: "1.2rem" }}>
-      <div>
-        <span className="field-label">Ceremony</span>
-        <div className="chiprow">
-          {CEREMONY_TYPES.map((type) => (
-            <button
-              key={type}
-              type="button"
-              className="chip"
-              aria-pressed={ceremonyType === type}
-              onClick={() => setCeremonyType(type)}
-            >
-              <i style={{ background: resolveAccentColor(DEFAULT_TEMPLATE_ID, type) }} />
-              {CEREMONY_LABELS[type]}
-            </button>
-          ))}
-        </div>
-      </div>
+      {wedding && (
+        <>
+          <div>
+            <span className="field-label">Ceremony</span>
+            <div className="chiprow">
+              {CEREMONY_TYPES.map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  className="chip"
+                  aria-pressed={ceremonyType === type}
+                  onClick={() => setCeremonyType(type)}
+                >
+                  <i style={{ background: resolveAccentColor(DEFAULT_TEMPLATE_ID, type) }} />
+                  {CEREMONY_LABELS[type]}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {ceremonyType === "custom" && (
-        <Input
-          id="customName"
-          label="Ceremony name"
-          placeholder="Mappillai Azhaippu"
-          required
-          maxLength={60}
-          value={customName}
-          onChange={(e) => setCustomName(e.target.value)}
-        />
+          {ceremonyType === "custom" && (
+            <Input
+              id="customName"
+              label="Ceremony name"
+              placeholder="Mappillai Azhaippu"
+              required
+              maxLength={60}
+              value={customName}
+              onChange={(e) => setCustomName(e.target.value)}
+            />
+          )}
+        </>
       )}
 
       {error && (
@@ -81,7 +101,7 @@ export function AddInvitationForm({ weddingId }: { weddingId: string }) {
 
       <div>
         <Button type="submit" disabled={pending}>
-          {pending ? "Adding…" : "Add ceremony invitation"}
+          {pending ? "Adding…" : wedding ? "Add ceremony invitation" : "Create invitation"}
         </Button>
       </div>
     </form>

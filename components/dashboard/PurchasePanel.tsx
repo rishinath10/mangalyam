@@ -1,44 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import type { Package } from "@prisma/client";
 import { Button } from "@/components/ui/Button";
 import { Tick } from "@/components/site/Icons";
-import { withFigures } from "@/lib/typography";
 
-interface Tier {
-  pkg: Package;
-  name: string;
-  inc: string;
-  items: string[];
-  feature: boolean;
-  purchasable: boolean;
-}
+const INCLUDED = [
+  "Any of our designs",
+  "Unlimited RSVPs",
+  "Gallery, timeline and countdown",
+  "WhatsApp sharing",
+];
 
-export function PurchasePanel({
-  weddingId,
-  tiers,
-}: {
-  weddingId: string;
-  tiers: Tier[];
-}) {
-  const [busy, setBusy] = useState<Package | null>(null);
+/**
+ * One flat price, one invitation, no tiers (CLAUDE.md Section 8 pivot).
+ * Anything beyond this — a second ceremony, bespoke work — is a direct
+ * conversation, not a second card on this panel.
+ */
+export function PurchasePanel({ eventId, purchasable }: { eventId: string; purchasable: boolean }) {
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function buy(pkg: Package) {
-    setBusy(pkg);
+  async function buy() {
+    setBusy(true);
     setError(null);
 
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ weddingId, pkg }),
+      body: JSON.stringify({ eventId }),
     });
     const body = await res.json().catch(() => ({}));
 
     if (!res.ok || !body.url) {
       setError(body.error ?? "Could not start checkout. Please try again.");
-      setBusy(null);
+      setBusy(false);
       return;
     }
 
@@ -54,39 +49,25 @@ export function PurchasePanel({
         </p>
       )}
 
-      <div className="bento">
-        {tiers.map((t) => (
-          <div key={t.pkg} className={`t c4 tier ${t.feature ? "t--2 t--lit" : ""}`}>
-            {t.feature && <span className="flag">Most weddings</span>}
-            <h3>{t.name}</h3>
-            <p className="inc">{withFigures(t.inc)}</p>
-            <ul>
-              {t.items.map((i) => (
-                <li key={i}>
-                  <Tick />
-                  <span>{i}</span>
-                </li>
-              ))}
-            </ul>
-            <Button
-              type="button"
-              variant={t.feature ? "gold" : "line"}
-              onClick={() => buy(t.pkg)}
-              disabled={busy !== null || !t.purchasable}
-            >
-              {busy === t.pkg
-                ? "Opening checkout…"
-                : t.purchasable
-                  ? `Choose ${t.name}`
-                  : "Not on sale yet"}
-            </Button>
-          </div>
-        ))}
+      <div className="t t--2 t--lit tier" style={{ maxWidth: "26rem" }}>
+        <h3>One invitation</h3>
+        <p className="inc">One payment. No subscription.</p>
+        <ul>
+          {INCLUDED.map((item) => (
+            <li key={item}>
+              <Tick />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+        <Button type="button" variant="gold" onClick={buy} disabled={busy || !purchasable}>
+          {busy ? "Opening checkout…" : purchasable ? "Pay and publish" : "Not on sale yet"}
+        </Button>
       </div>
 
-      {tiers.some((t) => !t.purchasable) && (
+      {!purchasable && (
         <p className="dim" style={{ fontSize: "var(--t-xs)" }}>
-          A package shows as not on sale until its price is configured. Prices are
+          Checkout shows as not on sale until the price is configured. The price is
           set in the environment, never in the code.
         </p>
       )}

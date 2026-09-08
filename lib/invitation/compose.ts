@@ -1,5 +1,6 @@
-import type { CeremonyType, OpeningStyle } from "@prisma/client";
+import type { CeremonyType, EventType, OpeningStyle } from "@prisma/client";
 import { ceremonyLabel } from "@/lib/ceremonies";
+import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { resolveAccentColor } from "@/lib/templates/registry";
 import type { InvitationJson } from "@/lib/invitation/types";
 
@@ -16,14 +17,15 @@ import type { InvitationJson } from "@/lib/invitation/types";
  */
 export interface InvitationSource {
   invitationId: string;
-  weddingId: string;
+  eventId: string;
+  eventType: EventType;
   slug: string;
-  ceremonyType: CeremonyType;
+  /** Only meaningful when eventType is "wedding"; null otherwise. */
+  ceremonyType: CeremonyType | null;
   customCeremonyName: string | null;
   templateId: string;
   accentColorOverride: string | null;
-  coupleName1: string;
-  coupleName2: string;
+  hostNames: string;
   coverPhotoUrl: string | null;
   description: string | null;
   date: string | null; // yyyy-mm-dd
@@ -53,10 +55,15 @@ export interface InvitationSource {
 export function composeInvitationJson(source: InvitationSource): InvitationJson {
   return {
     invitationId: source.invitationId,
-    weddingId: source.weddingId,
+    eventId: source.eventId,
+    eventType: source.eventType,
     slug: source.slug,
     ceremonyType: source.ceremonyType,
-    ceremonyLabel: ceremonyLabel(source.ceremonyType, source.customCeremonyName),
+    // A wedding names its chosen ceremony; every other occasion is labelled
+    // from its EventType, since it has no ceremony to choose.
+    ceremonyLabel: source.ceremonyType
+      ? ceremonyLabel(source.ceremonyType, source.customCeremonyName)
+      : EVENT_TYPE_LABELS[source.eventType],
     templateId: source.templateId,
     accentColor: resolveAccentColor(
       source.templateId,
@@ -64,8 +71,7 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
       source.accentColorOverride,
     ),
     couple: {
-      name1: source.coupleName1,
-      name2: source.coupleName2,
+      hostNames: source.hostNames,
       coverPhoto: source.coverPhotoUrl,
       message: source.description,
     },
