@@ -98,44 +98,54 @@ html{color-scheme:light;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 .wrap{width:var(--measure);margin-inline:auto}
 .sec{padding-block:var(--sec)}
 
-/* ---------- hero aura ----------
-   A slow drift behind the hero, in the three colours .tone-dark already
-   paints with — rose, gold and peacock — so nothing new enters the palette.
+/* ---------- ambient field ----------
+   One glow for the whole page, not a paint per section.
+
+   .tone-dark carries its own radial gradients, and those are positioned
+   against each element — so they restarted at every section boundary and two
+   dark sections in a row met at a visible seam (hero into stars, faq into the
+   closing block). Here the dark sections go transparent and this single layer
+   shows through all of them, so the light runs unbroken between them.
+
+   position:fixed keeps each layer viewport-sized rather than scaling with a
+   ~7000px page: rotating a layer that tall is the expensive way to get the
+   same picture. It also means the glow sits still while the page scrolls over
+   it, which is what stops any edge appearing in the first place.
 
    Two counter-rotating layers rather than one: a single rotation reads as a
-   turntable, while two at different speeds never repeat the same arrangement
-   and the movement stops looking mechanical.
-
-   Deliberately no filter:blur() — a radial-gradient that fades to transparent
-   is already soft, and blurring a layer this large is the one thing here that
-   would actually cost frames on a phone. Only `rotate` is animated, so the
-   whole effect stays on the compositor. */
-.hero-aura{position:relative;isolation:isolate;overflow:hidden}
-
-.hero-aura::before,
-.hero-aura::after{
-  content:"";position:absolute;z-index:-1;pointer-events:none;
-  left:50%;top:50%;width:170%;aspect-ratio:1;margin:-85% 0 0 -85%;
+   turntable, while two at different periods never repeat the same
+   arrangement. Only `rotate` is animated, so this stays on the compositor,
+   and there is deliberately no filter:blur() — a radial-gradient that fades
+   to transparent is already soft, and blurring a layer this size is the one
+   thing here that would cost frames on a phone. */
+.page-shell::before,
+.page-shell::after{
+  content:"";position:fixed;z-index:-1;pointer-events:none;
+  left:50%;top:50%;width:170vmax;aspect-ratio:1;margin:-85vmax 0 0 -85vmax;
   will-change:transform;
 }
-/* Wide, shallow blobs: at 170% width a circular falloff spills past the hero
-   and just tints the whole block flatly. */
-.hero-aura::before{
+/* Wide, shallow blobs: a circular falloff at this size just tints the whole
+   viewport flatly instead of reading as light. */
+.page-shell::before{
   background:
     radial-gradient(26% 18% at 32% 30%, rgba(178,30,86,.28), transparent 60%),
     radial-gradient(22% 16% at 74% 62%, rgba(201,162,39,.18), transparent 60%);
   animation:hero-drift 44s linear infinite;
 }
-.hero-aura::after{
+.page-shell::after{
   background:
     radial-gradient(24% 17% at 68% 26%, rgba(13,100,128,.21), transparent 60%),
-    radial-gradient(20% 15% at 26% 70%, rgba(201,162,39,.10), transparent 60%);
+    radial-gradient(20% 15% at 26% 70%, rgba(201,162,39,.13), transparent 60%);
   animation:hero-drift 67s linear infinite reverse;
 }
 @keyframes hero-drift{to{transform:rotate(360deg)}}
 
+/* The dark blocks become windows onto that field. Cream blocks keep their own
+   opaque background and simply cover it. */
+.page-shell > .tone-dark{background-color:transparent;background-image:none}
+
 @media(prefers-reduced-motion:reduce){
-  .hero-aura::before,.hero-aura::after{animation:none}
+  .page-shell::before,.page-shell::after{animation:none}
 }
 section[id],header[id]{scroll-margin-top:112px}
 
@@ -306,7 +316,7 @@ section[id],header[id]{scroll-margin-top:112px}
 .nav-sheet a{font-family:var(--serif);font-size:clamp(1.6rem,6.5vw,2.2rem);color:#F2E7D3;padding:.25rem 1rem}
 .nav-sheet a:hover{color:var(--gold-lt)}
 
-.page-shell{padding-top:98px;position:relative;z-index:1}
+.page-shell{padding-top:98px;position:relative;z-index:1;isolation:isolate}
 
 /* ==========================================================
    SITE FOOTER
