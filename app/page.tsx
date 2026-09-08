@@ -94,7 +94,7 @@ export default async function HomePage() {
 
       <div className="page-shell">
         {/* ---------- hero ---------- */}
-        <header className="tone-dark" id="top">
+        <header className="tone-dark hero-aura" id="top">
           <div className="wrap bento" style={{ paddingBlock: "clamp(1rem,2.5vw,2rem) var(--sec)" }}>
             <div className="t t--lit t--center rv c7 r2">
               <p className="kick">
