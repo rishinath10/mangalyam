@@ -29,6 +29,7 @@ export interface InvitationSource {
   fontPairing: string | null;
   hostNames: string;
   coverPhotoUrl: string | null;
+  frameUrl: string | null;
   description: string | null;
   date: string | null; // yyyy-mm-dd
   startTime: string | null; // HH:mm
@@ -78,6 +79,7 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
       source.fontPairing && isFontPairingKey(source.fontPairing)
         ? source.fontPairing
         : getManifest(source.templateId).defaultFontPairing,
+    frame: source.frameUrl,
     couple: {
       hostNames: source.hostNames,
       coverPhoto: source.coverPhotoUrl,

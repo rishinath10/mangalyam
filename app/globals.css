@@ -886,3 +886,61 @@ section[id],header[id]{scroll-margin-top:112px}
 }
 .panel label > textarea{resize:vertical}
 .panel label > input:focus-visible,.panel label > textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* ---------- cover frame ----------
+   Customer-supplied artwork drawn around the cover.
+
+   The stage locks to the artwork's own 3:4 rather than filling the screen. A
+   border has to keep all four edges, and a phone is roughly 9:19.5 — filling
+   it would either distort the artwork or crop its left and right borders off.
+   Sized from height so the whole card is visible without scrolling, and
+   capped by width on a narrow phone. */
+.inv-frame-stage{
+  position:relative;z-index:1;
+  aspect-ratio:3/4;
+  width:min(100%, calc(82svh * 3 / 4));
+  max-height:82svh;
+  margin-inline:auto;
+}
+/* A framed cover is a card, so the header's own generous side padding only
+   shrinks it. Pull that in and let the card take the width it can. */
+header:has(> .inv-frame-stage){padding-left:.75rem;padding-right:.75rem;padding-block:1rem}
+.inv-frame-art{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;pointer-events:none;user-select:none;
+}
+/* The safe area keeps live text off the border. Generated artwork varies, so
+   the inset is a variable rather than a constant an author has to fight. */
+.inv-frame-safe{
+  --frame-inset-x:13%;
+  --frame-inset-y:12%;
+  position:absolute;inset:var(--frame-inset-y) var(--frame-inset-x);
+  display:flex;flex-direction:column;justify-content:center;
+  /* Deepam's cover is three bands held apart by justify-between across a whole
+     screen. Centred inside a card they have nothing holding them apart, and
+     the date rule lands on the host name's descenders — so the gap has to be
+     explicit here rather than inherited from the unframed layout. */
+  gap:clamp(.9rem,3.5cqw,1.6rem);
+  overflow:hidden;
+}
+.inv-frame-safe > *{flex:0 0 auto}
+
+/* A framed cover is a card on the page, not a full screen — the header's own
+   min-height and padding would otherwise strand it near the top. */
+.inv-frame-stage:only-child,
+header:has(> .inv-frame-stage){place-content:center}
+
+/* Frame artwork is mostly transparent, so a preview on a flat panel shows
+   almost nothing. The checkerboard is what makes the empty centre legible as
+   empty rather than as white. */
+.frame-chip{
+  display:block;width:78px;height:104px;border-radius:8px;overflow:hidden;
+  border:1px solid var(--edge);
+  background-color:#fff;
+  background-image:
+    linear-gradient(45deg,#e6e0d4 25%,transparent 25%,transparent 75%,#e6e0d4 75%),
+    linear-gradient(45deg,#e6e0d4 25%,transparent 25%,transparent 75%,#e6e0d4 75%);
+  background-size:12px 12px;
+  background-position:0 0,6px 6px;
+}
+.frame-chip img{width:100%;height:100%;object-fit:cover;display:block}

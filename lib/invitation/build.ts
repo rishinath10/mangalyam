@@ -48,6 +48,7 @@ export function toInvitationSource(row: InvitationWithRelations): InvitationSour
     fontPairing: row.fontPairing,
     hostNames: row.event.hostNames,
     coverPhotoUrl: row.coverPhotoUrl,
+    frameUrl: row.frameUrl,
     description: row.description,
     date: isoDate(row.date),
     startTime: row.startTime,

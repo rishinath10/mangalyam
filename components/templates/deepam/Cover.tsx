@@ -2,6 +2,7 @@
 
 import { FlameGlyph, KolamDots } from "@/components/decor";
 import { FadeIn, ScaleIn } from "@/components/motion/primitives";
+import { CoverFrame } from "@/components/templates/shared/CoverFrame";
 import { formatEventDate } from "@/lib/format";
 import type { InvitationJson } from "@/lib/invitation/types";
 
@@ -12,6 +13,7 @@ import type { InvitationJson } from "@/lib/invitation/types";
  */
 export function Cover({ invitation }: { invitation: InvitationJson }) {
   const { couple, event, ceremonyLabel } = invitation;
+  const framed = Boolean(invitation.frame);
 
   return (
     /* justify-between, not justify-center: centring this much smaller block on
@@ -27,10 +29,15 @@ export function Cover({ invitation }: { invitation: InvitationJson }) {
         </div>
       )}
 
-      <KolamDots
-        className="pointer-events-none absolute -right-6 top-10 h-40 w-40 text-[var(--ds-gold)] opacity-30"
-      />
+      {/* Same reasoning as Mandapam's arch: the kolam field reads as the
+          family's own edge treatment, and artwork replaces it. */}
+      {!framed && (
+        <KolamDots
+          className="pointer-events-none absolute -right-6 top-10 h-40 w-40 text-[var(--ds-gold)] opacity-30"
+        />
+      )}
 
+      <CoverFrame frame={invitation.frame}>
       <div className="relative">
         <ScaleIn>
           <FlameGlyph className="h-12 w-12 text-[var(--ds-accent)]" />
@@ -63,6 +70,7 @@ export function Cover({ invitation }: { invitation: InvitationJson }) {
           </FadeIn>
         )}
       </div>
+      </CoverFrame>
     </header>
   );
 }

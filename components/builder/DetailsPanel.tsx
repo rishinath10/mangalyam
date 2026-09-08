@@ -17,12 +17,18 @@ export function DetailsPanel({
   onCoverUpload,
   onCoverRemove,
   coverBusy,
+  onFrameUpload,
+  onFrameRemove,
+  frameBusy,
 }: {
   source: InvitationSource;
   onChange: (patch: Patch) => void;
   onCoverUpload: (file: File) => void;
   onCoverRemove: () => void;
   coverBusy: boolean;
+  onFrameUpload: (file: File) => void;
+  onFrameRemove: () => void;
+  frameBusy: boolean;
 }) {
   const wedding = isWeddingEvent(source.eventType);
   const families = templatesForEvent(source.eventType);
@@ -251,6 +257,42 @@ export function DetailsPanel({
           />
         )}
         {coverBusy && <p className="dim" style={{ fontSize: "var(--t-xs)", marginTop: ".5rem" }}>Uploading…</p>}
+      </div>
+
+      <div>
+        <span className="field-label">Frame artwork</span>
+        <p className="dim" style={{ fontSize: "var(--t-xs)", marginBottom: ".7rem" }}>
+          A decorative border drawn around the cover, at full strength. Use a
+          3:4 PNG or WebP with a transparent centre — your names are printed on
+          top as live text, so they should not be part of the image. Adding one
+          replaces the design&rsquo;s own border.
+        </p>
+        {source.frameUrl ? (
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            {/* Checkerboard behind it: a frame is mostly transparent, and on a
+                plain panel there is no way to see what it will actually cover. */}
+            <span className="frame-chip">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={source.frameUrl} alt="Current frame" />
+            </span>
+            <Button type="button" variant="danger" size="sm" disabled={frameBusy} onClick={onFrameRemove}>
+              Remove
+            </Button>
+          </div>
+        ) : (
+          <input
+            type="file"
+            accept="image/png,image/webp"
+            disabled={frameBusy}
+            className="filedrop"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onFrameUpload(file);
+              e.target.value = "";
+            }}
+          />
+        )}
+        {frameBusy && <p className="dim" style={{ fontSize: "var(--t-xs)", marginTop: ".5rem" }}>Uploading…</p>}
       </div>
     </div>
   );

@@ -42,13 +42,17 @@ export const ACCEPTED_IMAGE_TYPES = [
   "image/heif",
 ] as const;
 
-type Variant = "cover" | "gallery";
+type Variant = "cover" | "gallery" | "frame";
 
 // Wedding photos come straight off a phone at 4000px+. Resizing on upload is
 // what keeps a guest on venue wifi from downloading 8MB per image.
 const VARIANTS: Record<Variant, { width: number; height: number; quality: number }> = {
   cover: { width: 1600, height: 2000, quality: 80 },
   gallery: { width: 1200, height: 1200, quality: 78 },
+  // Frame artwork is line work at the very edge of the card, where WebP's
+  // ringing shows first, so it gets a higher quality than a photograph at a
+  // smaller size. 3:4 at 1080x1440 is the generated-artwork target.
+  frame: { width: 1080, height: 1440, quality: 88 },
 };
 
 export interface StoredImage {
@@ -73,7 +77,10 @@ export async function storeImage(
   const pipeline = sharp(input, { failOn: "error" })
     .rotate() // honour EXIF orientation before the tags are dropped
     .resize({ width, height, fit: "inside", withoutEnlargement: true })
-    .webp({ quality });
+    // alphaQuality 100: a frame's transparent centre is the whole point, and
+    // WebP's default lossy alpha softens the border's inner edge into a halo
+    // over the cover behind it.
+    .webp(variant === "frame" ? { quality, alphaQuality: 100 } : { quality });
 
   const { data, info } = await pipeline.toBuffer({ resolveWithObject: true });
 

@@ -21,6 +21,12 @@ export interface InvitationJson {
   /** Resolved from the family's palette — components never see a key. */
   accentColor: string;
   fontPairing: FontPairingKey;
+  /**
+   * Decorative border drawn around the cover at full strength, expected 3:4
+   * with an empty centre. Null for the great majority of invitations — the
+   * families are designed to look complete without one.
+   */
+  frame: string | null;
   couple: {
     /** "Rishi & Gaayathri", "The Kumar Family", or a single name. */
     hostNames: string;

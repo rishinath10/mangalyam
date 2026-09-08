@@ -178,6 +178,14 @@ model Invitation {
   mapLink            String?          @map("map_link")
   description        String?
   coverPhotoUrl      String?          @map("cover_photo_url")
+  /**
+   * Decorative artwork drawn *around* the cover at full strength — a printed
+   * card's border. Distinct from coverPhotoUrl, which is a photograph sitting
+   * behind a ~78% scrim as texture. A frame is expected to be 3:4 with a
+   * transparent or empty centre, because the names are live text drawn on top
+   * of it and never baked into the image.
+   */
+  frameUrl           String?          @map("frame_url")
   publishedAt        DateTime?        @map("published_at")
   createdAt          DateTime         @default(now()) @map("created_at")
   updatedAt          DateTime         @updatedAt @map("updated_at")

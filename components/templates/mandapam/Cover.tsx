@@ -2,6 +2,7 @@
 
 import { ArchLine, LotusGlyph, ZariBand } from "@/components/decor";
 import { FadeIn, ScaleIn } from "@/components/motion/primitives";
+import { CoverFrame } from "@/components/templates/shared/CoverFrame";
 import { formatEventDate, splitHostNames } from "@/lib/format";
 import type { InvitationJson } from "@/lib/invitation/types";
 
@@ -13,6 +14,7 @@ import type { InvitationJson } from "@/lib/invitation/types";
 export function Cover({ invitation }: { invitation: InvitationJson }) {
   const { couple, event, ceremonyLabel } = invitation;
   const [firstName, secondName] = splitHostNames(couple.hostNames);
+  const framed = Boolean(invitation.frame);
 
   return (
     <header className="relative flex min-h-[92svh] flex-col items-center justify-center overflow-hidden px-6 py-16 text-center">
@@ -26,13 +28,18 @@ export function Cover({ invitation }: { invitation: InvitationJson }) {
         </div>
       )}
 
-      <div
-        className="pointer-events-none absolute inset-4 mx-auto max-w-[380px] text-[var(--ds-gold)] opacity-50"
-        aria-hidden="true"
-      >
-        <ArchLine className="h-full w-full" preserveAspectRatio="none" />
-      </div>
+      {/* The arch is Mandapam's own border. With customer artwork in place
+          there are two borders competing, so the family's steps aside. */}
+      {!framed && (
+        <div
+          className="pointer-events-none absolute inset-4 mx-auto max-w-[380px] text-[var(--ds-gold)] opacity-50"
+          aria-hidden="true"
+        >
+          <ArchLine className="h-full w-full" preserveAspectRatio="none" />
+        </div>
+      )}
 
+      <CoverFrame frame={invitation.frame}>
       <div className="relative flex flex-col items-center">
         <ScaleIn>
           <LotusGlyph className="mx-auto h-12 w-12 text-[var(--ds-accent)]" />
@@ -69,6 +76,7 @@ export function Cover({ invitation }: { invitation: InvitationJson }) {
           </FadeIn>
         )}
       </div>
+      </CoverFrame>
     </header>
   );
 }
