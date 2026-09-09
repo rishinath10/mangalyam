@@ -25,7 +25,8 @@ function s3(): S3Client {
       accessKeyId: required("S3_ACCESS_KEY_ID"),
       secretAccessKey: required("S3_SECRET_ACCESS_KEY"),
     },
-    // MinIO serves buckets as a path segment, not a hostname prefix.
+    // Path-style addressing: works for MinIO, and Cloudflare R2 supports it
+    // too, so the same client config serves either without a code change.
     forcePathStyle: true,
   });
   return client;
