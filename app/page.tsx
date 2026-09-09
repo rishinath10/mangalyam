@@ -115,7 +115,7 @@ export default async function HomePage() {
         {/* ---------- hero ---------- */}
         <header className="tone-dark" id="top">
           <div className="wrap bento" style={{ paddingBlock: "clamp(1rem,2.5vw,2rem) var(--sec)" }}>
-            <div className="t t--lit t--center rv c7 r2">
+            <div className="t t--lit t--center rv c7 r2 hero-copy">
               <p className="kick">
                 Traditions meet tomorrow<span className="dash" />
               </p>
@@ -140,7 +140,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="t t--img t--lift rv c5 r3" data-delay="120" style={{ minHeight: 340, position: "relative" }}>
+            <div className="t t--img t--lift rv c5 r3 hero-media" data-delay="120" style={{ minHeight: 340, position: "relative" }}>
               <Image
                 src="/img/hero-mangalyam.webp"
                 alt="A garlanded temple entrance at dusk, hung with jasmine and mango leaves and lit by tall brass lamps"

@@ -162,6 +162,12 @@ section[id],header[id]{scroll-margin-top:112px}
 @media(max-width:560px){
   .bento{grid-template-columns:repeat(2,minmax(0,1fr))}
   .c3{grid-column:span 1}.c4,.c5,.c6,.c7,.c8,.c9,.c12{grid-column:span 2}
+  /* The hero's image is second in the markup (so a reader without CSS still
+     gets the words first), but on a phone the photo is the more immediate
+     thing — order swaps it to the top without touching the desktop layout,
+     where the image sits beside the text rather than above it. */
+  .hero-media{order:-1}
+  .hero-copy{order:1}
 }
 
 /* ---------- glass ---------- */
