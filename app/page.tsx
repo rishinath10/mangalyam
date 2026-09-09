@@ -114,7 +114,7 @@ export default async function HomePage() {
       <div className="page-shell">
         {/* ---------- hero ---------- */}
         <header className="tone-dark" id="top">
-          <div className="wrap bento" style={{ paddingBlock: "clamp(1rem,2.5vw,2rem) var(--sec)" }}>
+          <div className="wrap bento hero-bento">
             <div className="t t--lit t--center rv c7 r2 hero-copy">
               <p className="kick">
                 Traditions meet tomorrow<span className="dash" />
@@ -151,7 +151,7 @@ export default async function HomePage() {
               />
             </div>
 
-            <div className="t t--2 t--lift t--center rv c4" data-delay="200">
+            <div className="t t--2 t--lift t--center rv c4 hero-stat" data-delay="200">
               <b style={{ fontFamily: "var(--serif)", fontWeight: 400, fontSize: "clamp(2.4rem,4vw,3.2rem)", lineHeight: 1, color: "var(--head)" }}>
                 {withFigures(String(DISTINCT_LOOKS))}
               </b>
@@ -162,7 +162,7 @@ export default async function HomePage() {
               </span>
             </div>
 
-            <div className="t t--2 t--lift t--center rv c3" data-delay="260">
+            <div className="t t--2 t--lift t--center rv c3 hero-price" data-delay="260">
               <p className="kick">Pay once</p>
               <h3 style={{ fontSize: "var(--t-lg)", marginTop: ".5rem" }}>No subscription, ever</h3>
               <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".4rem" }}>

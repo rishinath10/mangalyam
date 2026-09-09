@@ -158,6 +158,10 @@ section[id],header[id]{scroll-margin-top:112px}
   .bento{grid-template-columns:repeat(6,minmax(0,1fr))}
   .c4,.c5,.c6,.c7,.c8,.c9{grid-column:span 6}.c3{grid-column:span 3}
   .r2,.r3{grid-row:auto}
+  /* The generic rules leave the price tile alone on a half-empty row, with the
+     stat above it at full width. The two belong together at every size, so
+     they are halved as a pair here and again on a phone. */
+  .hero-stat,.hero-price{grid-column:span 3}
 }
 @media(max-width:560px){
   .bento{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -168,6 +172,21 @@ section[id],header[id]{scroll-margin-top:112px}
      where the image sits beside the text rather than above it. */
   .hero-media{order:-1}
   .hero-copy{order:1}
+
+  /* The two small hero tiles pair up rather than stacking: side by side they
+     read as one row of reassurance under the photograph, where stacked they
+     were two more full-width slabs to scroll past before the headline. They
+     are named individually because .c4 and .c3 are shared with the ceremony,
+     step and pillar tiles, which must keep their own full width. */
+  .hero-stat,.hero-price{grid-column:span 1}
+  .hero-stat,.hero-price{padding:1.05rem .95rem}
+  /* Half the width means half the room, so the supporting lines step down
+     rather than wrapping into a wall. Direct children only: withFigures wraps
+     every digit run in its own <span class="num">, and a descendant selector
+     here shrinks the 108 itself along with the sentence under it. */
+  .hero-stat > span{font-size:var(--t-xs);line-height:1.45}
+  .hero-price > h3{font-size:var(--t-md)}
+  .hero-price > p{font-size:var(--t-xs)}
 }
 
 /* ---------- glass ---------- */
@@ -323,6 +342,22 @@ section[id],header[id]{scroll-margin-top:112px}
 .nav-sheet a:hover{color:var(--gold-lt)}
 
 .page-shell{padding-top:98px;position:relative;z-index:1;isolation:isolate}
+.hero-bento{padding-block:clamp(1rem,2.5vw,2rem) var(--sec)}
+
+/* On a phone the nav sits 14px from the top and is 60px tall, so 98px of shell
+   padding plus the hero's own top padding left 40px of nothing between the bar
+   and the photograph. The photo is the first thing worth seeing; it should
+   start just under the bar, not a thumb-scroll below it. */
+@media(max-width:560px){
+  .page-shell{padding-top:90px}
+  .hero-bento{padding-block:0 clamp(1.4rem,5vw,2.2rem)}
+
+  /* The star-sign detour is a light aside between two substantial sections,
+     and it was carrying a full --sec of air on both faces — over 100px of
+     nothing on either side of it once the hero's own bottom padding is added.
+     Trimmed here only: the sections that carry real weight keep their room. */
+  #stars{padding-block:clamp(1.4rem,5vw,2.2rem)}
+}
 
 /* ==========================================================
    SITE FOOTER
