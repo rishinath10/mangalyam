@@ -61,11 +61,11 @@ const karla = Karla({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: {
-    default: "Mangalyam — an invitation for every ceremony",
+    default: "Mangalyam — an invitation for every auspicious day",
     template: "%s · Mangalyam",
   },
   description:
-    "Digital wedding invitations for Malaysian Indian families. One wedding, a separate invitation and RSVP for every ceremony.",
+    "Digital invitations for Malaysian Indian families — weddings, housewarmings, naming ceremonies and every auspicious day between. One flat price, RSVPs included.",
 };
 
 export default function RootLayout({

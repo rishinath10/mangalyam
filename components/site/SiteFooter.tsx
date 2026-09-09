@@ -3,7 +3,16 @@ import { BUILT_TEMPLATES } from "@/lib/templates/registry";
 
 // Read from the registry rather than repeating the names here: this list had
 // gone stale and was still advertising six designs that no longer exist.
-const CEREMONIES = ["Mehendi", "Haldi", "Sangeet", "Muhurtham", "Nalangu", "Reception"];
+// Occasions, not wedding ceremonies: this column sat next to a designs list
+// that covers all seven event types while naming only a wedding's rituals.
+const OCCASIONS = [
+  "Weddings",
+  "Housewarmings",
+  "Naming Ceremonies",
+  "60th Birthdays",
+  "Temple Consecrations",
+  "Home Poojas",
+];
 
 export function SiteFooter() {
   return (
@@ -15,8 +24,8 @@ export function SiteFooter() {
             <span className="tg">Celebrations that last a lifetime</span>
           </Link>
           <p>
-            Digital wedding invitations for Malaysian Indian families. One wedding,
-            an invitation for every ceremony.
+            Digital invitations for Malaysian Indian families — weddings, housewarmings,
+            naming ceremonies and every auspicious day between.
           </p>
         </div>
 
@@ -30,9 +39,9 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h4>Ceremonies</h4>
+          <h4>Occasions</h4>
           <ul>
-            {CEREMONIES.map((c) => (
+            {OCCASIONS.map((c) => (
               <li key={c}><Link href="/#ceremonies">{c}</Link></li>
             ))}
           </ul>

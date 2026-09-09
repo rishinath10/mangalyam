@@ -24,6 +24,29 @@ export function priceSen(): number {
   return value;
 }
 
+/**
+ * The price as a customer reads it, or null when none is configured.
+ *
+ * Returns null rather than throwing so the landing page can render honestly
+ * before a price is set — a marketing page must not 500 because an
+ * environment variable is missing, and it must not invent a figure either.
+ * Whole ringgit drop the decimals: "RM 49" is what a price reads like on a
+ * page, "RM 49.00" is what it reads like on a receipt.
+ */
+export function priceLabel(): string | null {
+  let sen: number;
+  try {
+    sen = priceSen();
+  } catch {
+    return null;
+  }
+  return new Intl.NumberFormat("en-MY", {
+    style: "currency",
+    currency: "MYR",
+    minimumFractionDigits: sen % 100 === 0 ? 0 : 2,
+  }).format(sen / 100);
+}
+
 /** True once a price is actually configured — used to hide checkout otherwise. */
 export function isPurchasable(): boolean {
   try {

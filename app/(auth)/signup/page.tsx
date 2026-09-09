@@ -8,7 +8,7 @@ export default function SignupPage() {
     <>
       <h1>Create your account</h1>
       <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".4rem" }}>
-        One account holds every ceremony in your wedding.
+        One account holds every occasion you celebrate.
       </p>
 
       <SignupForm />
