@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { badRequest, handle } from "@/lib/api";
-import { requireInvitation } from "@/lib/auth/ownership";
+import { badRequest, handle, notFound } from "@/lib/api";
+import { requireAdmin } from "@/lib/auth/admin";
 import {
   ACCEPTED_IMAGE_TYPES,
   MAX_UPLOAD_BYTES,
@@ -16,11 +16,26 @@ export const runtime = "nodejs";
  * Frame artwork: the decorative border drawn around the cover at full
  * strength. Same shape as the cover route, but a different storage variant —
  * a frame keeps its alpha, where a cover photo never has any.
+ *
+ * Admin-only, and deliberately so. A frame is bespoke artwork drawn to a 3:4
+ * stage with a transparent middle, because the names are live text printed on
+ * top of it; a customer's own PNG almost always fights the design it replaces
+ * rather than finishing it. So the capability stays, the self-serve upload
+ * does not — this is how a commissioned border gets fitted for someone.
+ *
+ * requireAdmin() rather than requireInvitation(): the guard here is the
+ * allowlist, not ownership, since the whole point is reaching an invitation
+ * belonging to somebody else.
  */
 export async function POST(req: Request, { params }: Params) {
   return handle(async () => {
+    await requireAdmin();
     const { invitationId } = await params;
-    const { invitation } = await requireInvitation(invitationId);
+    const invitation = await db.invitation.findUnique({
+      where: { id: invitationId },
+      select: { id: true, frameUrl: true },
+    });
+    if (!invitation) throw notFound("Invitation");
 
     const form = await req.formData().catch(() => null);
     const file = form?.get("file");
@@ -46,6 +61,7 @@ export async function POST(req: Request, { params }: Params) {
     const updated = await db.invitation.update({
       where: { id: invitation.id },
       data: { frameUrl: stored.url },
+      select: { id: true, frameUrl: true },
     });
     if (previous) await deleteImage(previous);
 
@@ -55,11 +71,18 @@ export async function POST(req: Request, { params }: Params) {
 
 export async function DELETE(_req: Request, { params }: Params) {
   return handle(async () => {
+    await requireAdmin();
     const { invitationId } = await params;
-    const { invitation } = await requireInvitation(invitationId);
+    const invitation = await db.invitation.findUnique({
+      where: { id: invitationId },
+      select: { id: true, frameUrl: true },
+    });
+    if (!invitation) throw notFound("Invitation");
+
     const updated = await db.invitation.update({
       where: { id: invitation.id },
       data: { frameUrl: null },
+      select: { id: true, frameUrl: true },
     });
     if (invitation.frameUrl) await deleteImage(invitation.frameUrl);
     return updated;

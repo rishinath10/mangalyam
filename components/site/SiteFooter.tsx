@@ -53,6 +53,7 @@ export function SiteFooter() {
             <li><Link href="/#how">How it works</Link></li>
             <li><Link href="/#pricing">Pricing</Link></li>
             <li><Link href="/#faq">FAQ</Link></li>
+            <li><Link href="/create">Create an invitation</Link></li>
             <li><Link href="/login">Sign in</Link></li>
           </ul>
         </div>

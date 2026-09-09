@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
-import { badRequest, forbidden, handle, parseBody } from "@/lib/api";
+import { badRequest, handle, parseBody } from "@/lib/api";
 import { requireInvitation } from "@/lib/auth/ownership";
-import { CONTACT_MESSAGE, invitationLimitFor } from "@/lib/entitlements";
+import { assertCanPublish } from "@/lib/entitlements";
 import { z } from "zod";
 
 type Params = { params: Promise<{ invitationId: string }> };
@@ -9,10 +9,14 @@ type Params = { params: Promise<{ invitationId: string }> };
 const publishSchema = z.object({ publish: z.boolean() });
 
 /**
- * Publishing is where the entitlement actually bites (CLAUDE.md Section 8).
- * The builder lets a customer draft freely; the limit is counted against
- * *published* invitations, so someone on Essential can lay out all their
- * ceremonies and then choose which one goes live.
+ * Publishing is where the entitlement actually bites (CLAUDE.md Section 8),
+ * and it is the only thing the payment buys. Anyone can build an invitation
+ * and watch it work — the create wizard does exactly that before there is even
+ * an account. Going public is what costs, so an event with no entitlement is
+ * refused here however complete its draft is.
+ *
+ * Unpublishing is deliberately never gated: someone who has paid and wants
+ * their link taken down must not be argued with.
  */
 export async function POST(req: Request, { params }: Params) {
   return handle(async () => {
@@ -33,17 +37,7 @@ export async function POST(req: Request, { params }: Params) {
     if (!invitation.venueName?.trim()) throw badRequest("Add a venue before publishing.");
 
     if (invitation.status !== "published") {
-      const limit = invitationLimitFor(invitation.event.entitlement);
-      const live = await db.invitation.count({
-        where: { eventId: invitation.eventId, status: "published" },
-      });
-      if (live >= limit) {
-        throw forbidden(
-          invitation.event.entitlement
-            ? CONTACT_MESSAGE
-            : "Complete your purchase to publish this invitation.",
-        );
-      }
+      await assertCanPublish(invitation.eventId, invitation.event.entitlement);
     }
 
     return db.invitation.update({

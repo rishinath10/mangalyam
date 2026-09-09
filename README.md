@@ -90,6 +90,33 @@ whole page and the opening plays somewhere below the fold. In the builder the
 clamp comes from `--frame-h` on `.phone-scroll`; on the published page it is
 the viewport.
 
+**The invitation is built before there is an account.** `/create` is a
+six-step wizard, reachable signed out, and the whole draft lives in the
+visitor's own `localStorage` (`lib/draft.ts`, `lib/draft-storage.ts`) until the
+last step. There are deliberately no anonymous rows: a row with no owner would
+need a second ownership story alongside `lib/auth/ownership.ts`, and that is
+exactly the kind of parallel rule that rots. `POST /api/drafts/claim` is the
+single moment unguarded work becomes guarded — it creates the `Event` and its
+`Invitation` together, with `userId` taken from the session and never from the
+request body. The cover photo is the one exception to the payload: it is
+re-encoded to a phone-sized JPEG data URL in the browser and uploaded
+afterwards through the ordinary cover route, so image decoding stays in one
+place. Anything read back out of `localStorage` is untrusted input and goes
+through `normalise()` first.
+
+**Building is free; publishing is what is paid for.** `assertCanPublish` in
+`lib/entitlements.ts` is the paywall, and the only one. An event with no
+`Entitlement` may hold a complete draft and may not publish it, whatever
+`UNPAID_DRAFT_ALLOWANCE` says — that constant sizes how many invitations can
+*exist*, not how many can be *public*, and conflating the two is how an unpaid
+event once published successfully. Unpublishing is never gated.
+
+**Frame artwork is admin-only.** `POST/DELETE /api/admin/invitations/:id/frame`
+is behind `requireAdmin()`, not an ownership guard, because the point is
+reaching someone else's invitation to fit commissioned artwork. Customers have
+no upload for it: a 3:4 PNG with a transparent middle is a drawing job, and a
+customer's own file competes with the design's border rather than finishing it.
+
 **Payments go through `lib/payments`.** The app depends on the
 `PaymentGateway` interface, not on Stripe. Swapping to Billplz or ToyyibPay
 means a new adapter and one changed line in `lib/payments/index.ts`.

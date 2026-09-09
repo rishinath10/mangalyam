@@ -971,3 +971,175 @@ header:has(> .inv-frame-stage){place-content:center}
   background-position:0 0,6px 6px;
 }
 .frame-chip img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Fitting a frame from the admin table: a narrow cell, so the control has to
+   stay small and the errors have to sit inline rather than as a banner. */
+.frame-cell{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;min-width:180px}
+.frame-cell .frame-chip{width:44px;height:59px}
+.frame-cell .dim{font-size:var(--t-xs)}
+.filedrop-sm{padding:.4rem;font-size:var(--t-xs);max-width:190px}
+
+/* ==========================================================
+   THE CREATE WIZARD  (/create)
+   ==========================================================
+   Reachable without an account, so it carries its own chrome rather than the
+   dashboard's — a visitor here has not signed in and there is nothing to sign
+   out of. */
+.wz-shell{min-height:100dvh;position:relative}
+/* Opaque, where the dashboard's bar is glassy. The step headings here are
+   set at --t-2xl, and a 2.5rem serif reading through 18% of tint does not
+   look like depth — it looks like a rendering fault. */
+.wz-bar{
+  position:sticky;top:0;z-index:60;background:var(--wine-950);
+}
+.wz-bar-in{width:var(--measure);margin-inline:auto;height:70px;display:flex;align-items:center;gap:1.2rem}
+.wz-bar-alt{margin-left:auto}
+.wz-body-wrap{position:relative;z-index:1;width:var(--measure);margin-inline:auto;padding-block:clamp(1.4rem,3vw,2.4rem)}
+
+/* ---------- the step rail ---------- */
+/* Numbered, tappable, and honest about progress: a finished step gets a tick
+   and stays reachable, an unreached one is still shown so the length of the
+   whole thing is never a surprise. */
+.wz-rail{
+  list-style:none;margin:0 0 clamp(1.2rem,2.4vw,1.8rem);
+  /* Sticky directly under the bar, and given the bar's own treatment so the
+     tiles scrolling beneath it do not read through the gaps between chips. */
+  position:sticky;top:70px;z-index:55;
+  padding:.7rem 0 .8rem;
+  /* Same reasoning as the bar, and the two together read as one block of
+     chrome rather than two competing sheets of glass. */
+  background:var(--wine-950);
+  box-shadow:0 1px 0 var(--edge);
+  display:flex;gap:.35rem;overflow-x:auto;overscroll-behavior-x:contain;
+  scrollbar-width:none;
+}
+.wz-rail::-webkit-scrollbar{display:none}
+.wz-rail button{
+  display:flex;align-items:center;gap:.55rem;white-space:nowrap;
+  padding:.5rem .95rem;border-radius:100px;border:1px solid var(--edge);
+  background:var(--glass);color:var(--ink-3);font-size:var(--t-sm);
+  transition:color .2s,border-color .2s,background .2s;
+}
+.wz-rail button:hover{color:var(--ink-1);border-color:var(--edge-hi)}
+.wz-rail button i{
+  font-style:normal;width:20px;height:20px;flex:none;border-radius:50%;
+  display:grid;place-items:center;font-size:.62rem;
+  border:1px solid var(--edge-hi);color:var(--ink-3);
+  font-family:var(--figure);font-variant-numeric:lining-nums tabular-nums;
+}
+.wz-rail button[data-done] i{background:var(--accent);border-color:transparent;color:#2C1B04}
+.wz-rail button[aria-current="step"]{background:var(--gold);border-color:transparent;color:#2C1B04;font-weight:500}
+.wz-rail button[aria-current="step"] i{border-color:rgba(44,27,4,.35);color:#2C1B04}
+
+/* ---------- the two columns ---------- */
+.wz-grid{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:clamp(1rem,2.4vw,2rem);align-items:start}
+.wz-panel{scroll-margin-top:140px}
+.wz-panel h2{font-size:var(--t-2xl);margin-top:.5rem}
+.wz-blurb{font-size:var(--t-sm);margin-top:.5rem;max-width:52ch}
+.wz-body{margin-top:clamp(1.4rem,2.6vw,2rem)}
+.wz-fields{display:grid;gap:1.5rem}
+.wz-hint{font-size:var(--t-xs);margin-top:.5rem}
+.wz-note{font-size:var(--t-sm);color:var(--ink-2);border-left:2px solid var(--edge-hi);padding-left:.9rem}
+.wz-inset{display:grid;gap:1rem;padding:1rem;border-radius:14px;border:1px dashed var(--edge);}
+.wz-blocker{margin-top:1.2rem}
+.wz-nav{display:flex;gap:.7rem;align-items:center;margin-top:1.8rem;padding-top:1.4rem;border-top:1px solid var(--edge)}
+.wz-nav .btn + .btn{margin-left:auto}
+.wz-resume{display:flex;flex-wrap:wrap;gap:.4rem;align-items:baseline;margin-top:1.2rem}
+.wz-resume button{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.wz-issues{margin:.5rem 0 0;padding-left:1.1rem;display:grid;gap:.25rem}
+
+/* ---------- occasion and ceremony tiles ---------- */
+.occ-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.6rem}
+.occ{
+  display:flex;flex-direction:column;align-items:flex-start;gap:.45rem;text-align:left;
+  padding:1rem;border-radius:16px;border:1px solid var(--edge);background:var(--glass);
+  transition:border-color .2s,background .2s,transform .2s;
+}
+.occ:hover{border-color:var(--edge-hi);background:var(--glass-2);transform:translateY(-2px)}
+.occ .occ-ic{width:30px;height:30px;color:var(--accent);margin-bottom:.15rem}
+.occ b{font-family:var(--serif);font-size:var(--t-md);font-weight:500;color:var(--head)}
+.occ span{font-size:var(--t-xs);color:var(--ink-3);line-height:1.4}
+.occ[aria-pressed="true"]{border-color:var(--accent);background:var(--glass-2)}
+.occ[aria-pressed="true"] .occ-ic{color:var(--gold)}
+
+.cer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.5rem}
+.cer{
+  display:grid;grid-template-columns:auto 1fr;gap:.15rem .6rem;text-align:left;
+  padding:.75rem .9rem;border-radius:14px;border:1px solid var(--edge);background:var(--glass);
+  transition:border-color .2s,background .2s;
+}
+.cer:hover{border-color:var(--edge-hi)}
+.cer i{width:9px;height:9px;border-radius:50%;align-self:center;grid-row:span 2}
+.cer b{font-size:var(--t-sm);font-weight:500;color:var(--ink-1)}
+.cer span{grid-column:2;font-size:var(--t-xs);color:var(--ink-3)}
+.cer[aria-pressed="true"]{border-color:var(--accent);background:var(--glass-2)}
+.cer[aria-pressed="true"] b{color:var(--head)}
+
+/* ---------- design family cards ---------- */
+.fam-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.7rem}
+.fam{
+  display:flex;flex-direction:column;align-items:flex-start;gap:.4rem;text-align:left;
+  padding:1.1rem;border-radius:16px;border:1px solid var(--edge);background:var(--glass);
+  transition:border-color .2s,background .2s;
+}
+.fam:hover{border-color:var(--edge-hi)}
+.fam-swatches{display:flex;gap:.25rem;margin-bottom:.4rem}
+.fam-swatches i{width:22px;height:5px;border-radius:100px}
+.fam b{font-family:var(--serif);font-size:var(--t-lg);font-weight:500;color:var(--head)}
+.fam span{font-size:var(--t-xs);color:var(--ink-3);line-height:1.45}
+.fam[aria-pressed="true"]{border-color:var(--accent);background:var(--glass-2)}
+
+/* ---------- the cover pick ---------- */
+.cover-pick{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.cover-pick img{height:120px;width:96px;object-fit:cover;border-radius:12px;border:1px solid var(--edge)}
+
+/* ---------- finishing up ---------- */
+.wz-authtabs{display:flex;gap:.3rem;flex-wrap:wrap}
+.wz-authtabs button{
+  padding:.5rem 1rem;border-radius:100px;font-size:var(--t-sm);color:var(--ink-3);
+  border:1px solid transparent;transition:color .2s,background .2s;
+}
+.wz-authtabs button:hover{color:var(--ink-1);background:var(--glass)}
+.wz-authtabs button[aria-selected="true"]{background:var(--gold);color:#2C1B04;font-weight:500}
+.wz-done h3{font-family:var(--serif);font-size:var(--t-xl);margin-top:.5rem}
+.wz-done p{font-size:var(--t-sm);margin-top:.6rem;max-width:48ch}
+.wz-done-links{display:flex;gap:.7rem;flex-wrap:wrap}
+
+/* ---------- the preview column ---------- */
+/* Below the bar and the rail together, so a stuck preview is never half
+   hidden under the step chips. */
+.wz-preview{position:sticky;top:150px}
+
+/* On a phone there is no room beside the questions, so the preview becomes a
+   sheet: hidden by default, pulled up by the bar pinned to the bottom. The
+   markup order never changes — only which of the two is on screen. */
+.wz-peek{display:none}
+@media(max-width:1080px){
+  .wz-grid{grid-template-columns:1fr}
+  /* Starts below the bar rather than over it: the brand stays put, and the
+     sheet never has to win a stacking fight it would lose anyway — .wz-body-wrap
+     opens its own stacking context, so a z-index here cannot reach past it.
+     Opaque, not translucent: a gold tile read through 6% of tint is still a
+     gold tile, and the preview needs its own ground. */
+  .wz-preview{
+    position:fixed;inset:70px 0 0;z-index:80;display:none;
+    background:var(--wine-950);
+    overflow-y:auto;padding:1.4rem 1.1rem 5.5rem;
+  }
+  .wz-preview[data-open]{display:block}
+  .wz-preview-in{max-width:390px;margin-inline:auto}
+  .wz-body-wrap{padding-bottom:5.5rem}
+  .wz-peek{
+    display:block;position:fixed;inset:auto 0 0;z-index:90;
+    padding:.9rem 1.1rem calc(.9rem + env(safe-area-inset-bottom));
+    background:rgba(22,5,11,.92);border-top:1px solid var(--edge);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    font-size:var(--t-sm);letter-spacing:.06em;color:var(--gold-lt);
+  }
+}
+.wz-replay{
+  display:block;margin:.9rem auto 0;font-size:var(--t-xs);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
+  padding:.4rem .8rem;border-radius:100px;transition:color .2s,background .2s;
+}
+.wz-replay:hover{color:var(--accent-soft);background:var(--glass)}

@@ -47,6 +47,9 @@ export default async function InvitationBuilderPage({ params }: Params) {
           sortOrder: photo.sortOrder,
         }))}
         status={row.status}
+        // From the ownership guard's own include, so the Share tab can say why
+        // publishing is refused instead of only failing when it is tried.
+        paid={Boolean(owned.event.entitlement)}
       />
     </div>
   );

@@ -2,21 +2,26 @@
 
 import { useEffect, useState } from "react";
 import type { InvitationStatus } from "@prisma/client";
-import { Button } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 
 export function SharePanel({
+  eventId,
   invitationId,
   slug,
   status,
+  paid,
   coupleLine,
   ceremonyLabel,
   onSlugChange,
   onStatusChange,
 }: {
+  eventId: string;
   invitationId: string;
   slug: string;
   status: InvitationStatus;
+  /** Whether this event has an entitlement. Publishing is refused without one. */
+  paid: boolean;
   coupleLine: string;
   ceremonyLabel: string;
   onSlugChange: (slug: string) => void;
@@ -95,23 +100,33 @@ export function SharePanel({
           <span className={`pill ${published ? "pill-live" : "pill-draft"}`}>
             {published ? "Published" : "Draft"}
           </span>
-          <Button
-            type="button"
-            variant={published ? "line" : "gold"}
-            onClick={togglePublish}
-            disabled={busy !== null}
-          >
-            {busy === "publish"
-              ? "Working…"
-              : published
-                ? "Unpublish"
-                : "Publish this invitation"}
-          </Button>
+          {/* Unpaid, the button becomes the way to pay: hiding it would leave
+              the customer looking for the thing they already decided to do. */}
+          {!published && !paid ? (
+            <ButtonLink variant="gold" href={`/dashboard/events/${eventId}`}>
+              Pay to publish
+            </ButtonLink>
+          ) : (
+            <Button
+              type="button"
+              variant={published ? "line" : "gold"}
+              onClick={togglePublish}
+              disabled={busy !== null}
+            >
+              {busy === "publish"
+                ? "Working…"
+                : published
+                  ? "Unpublish"
+                  : "Publish this invitation"}
+            </Button>
+          )}
         </div>
         <p className="dim" style={{ fontSize: "var(--t-xs)", marginTop: ".7rem" }}>
           {published
             ? "Guests can open this link and reply. Edits you save appear immediately — the link never changes."
-            : "Drafts are private. Publishing needs a date and a venue."}
+            : paid
+              ? "Drafts are private. Publishing needs a date and a venue."
+              : "Drafts are private, and stay editable for as long as you like. One payment is what puts this link in front of your guests."}
         </p>
       </div>
 

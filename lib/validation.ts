@@ -103,6 +103,34 @@ export const photoReorderSchema = z.object({
   ids: z.array(z.string().uuid()).max(60),
 });
 
+/**
+ * What the create wizard sends when a visitor finishes and signs in: the whole
+ * invitation in one request, because until this moment none of it existed
+ * anywhere but their browser.
+ *
+ * The cover photo is deliberately not here. It goes up afterwards through the
+ * ordinary cover route, so image decoding keeps happening in exactly one place
+ * with one set of size and type limits.
+ */
+export const draftClaimSchema = z.object({
+  eventType: z.enum(EVENT_TYPES),
+  hostNames: z.string().trim().min(1, "Tell us who this is for").max(120),
+  ceremonyType: z.enum(CEREMONY_TYPES).nullish(),
+  customCeremonyName: z.string().trim().max(60).nullish(),
+  templateId: z.string().trim().min(1),
+  accentKey: z.string().trim().max(40).nullish(),
+  fontPairing: z.enum(FONT_PAIRING_KEYS).nullish(),
+  date: isoDate.nullish(),
+  startTime: hhmm.nullish(),
+  endTime: hhmm.nullish(),
+  venueName: z.string().trim().max(120).nullish(),
+  address: z.string().trim().max(400).nullish(),
+  mapLink: httpUrl.nullish(),
+  description: z.string().trim().max(1200).nullish(),
+  schedule: z.array(scheduleItemSchema).max(30).default([]),
+  settings: settingsUpdateSchema.default({}),
+});
+
 export const rsvpCreateSchema = z.object({
   guestName: z.string().trim().min(1, "Please tell us your name").max(80),
   attending: z.boolean(),

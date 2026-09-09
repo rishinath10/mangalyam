@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { customerDetail } from "@/lib/admin/queries";
 import { humanise, ringgit, shortDate } from "@/lib/admin/format";
 import { EventActions } from "@/components/admin/EventActions";
+import { InvitationFrame } from "@/components/admin/InvitationFrame";
 
 export const dynamic = "force-dynamic";
 
@@ -107,6 +108,7 @@ export default async function AdminCustomer({
                       <th>Link</th>
                       <th>Status</th>
                       <th>Design</th>
+                      <th>Frame</th>
                       <th className="r">RSVPs</th>
                     </tr>
                   </thead>
@@ -129,6 +131,9 @@ export default async function AdminCustomer({
                         <td className="dim">
                           {inv.templateId}
                           {inv.ceremonyType ? ` · ${humanise(inv.ceremonyType)}` : ""}
+                        </td>
+                        <td>
+                          <InvitationFrame invitationId={inv.id} frameUrl={inv.frameUrl} />
                         </td>
                         <td className="r num">{inv._count.rsvps}</td>
                       </tr>

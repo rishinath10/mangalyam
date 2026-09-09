@@ -20,10 +20,13 @@ export function InvitationBuilder({
   initialSource,
   initialPhotos,
   status: initialStatus,
+  paid,
 }: {
   initialSource: InvitationSource;
   initialPhotos: GalleryPhoto[];
   status: InvitationStatus;
+  /** Whether the event above this invitation has been paid for. */
+  paid: boolean;
 }) {
   const [status, setStatus] = useState(initialStatus);
   const router = useRouter();
@@ -34,7 +37,6 @@ export function InvitationBuilder({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [coverBusy, setCoverBusy] = useState(false);
-  const [frameBusy, setFrameBusy] = useState(false);
 
   /**
    * The preview is derived from local state through the same composer the
@@ -75,32 +77,6 @@ export function InvitationBuilder({
     await fetch(`/api/invitations/${source.invitationId}/cover`, { method: "DELETE" });
     setSource((s) => ({ ...s, coverPhotoUrl: null }));
     setCoverBusy(false);
-  }
-
-  async function uploadFrame(file: File) {
-    setFrameBusy(true);
-    setError(null);
-    const body = new FormData();
-    body.append("file", file);
-    const res = await fetch(`/api/invitations/${source.invitationId}/frame`, {
-      method: "POST",
-      body,
-    });
-    if (!res.ok) {
-      const payload = await res.json().catch(() => ({}));
-      setError(payload.error ?? "Could not upload the frame.");
-    } else {
-      const updated = await res.json();
-      setSource((s) => ({ ...s, frameUrl: updated.frameUrl }));
-    }
-    setFrameBusy(false);
-  }
-
-  async function removeFrame() {
-    setFrameBusy(true);
-    await fetch(`/api/invitations/${source.invitationId}/frame`, { method: "DELETE" });
-    setSource((s) => ({ ...s, frameUrl: null }));
-    setFrameBusy(false);
   }
 
   async function save() {
@@ -210,9 +186,6 @@ export function InvitationBuilder({
                 onCoverUpload={uploadCover}
                 onCoverRemove={removeCover}
                 coverBusy={coverBusy}
-                onFrameUpload={uploadFrame}
-                onFrameRemove={removeFrame}
-                frameBusy={frameBusy}
               />
             )}
             {tab === "Timeline" && (
@@ -238,7 +211,9 @@ export function InvitationBuilder({
             )}
             {tab === "Share" && (
               <SharePanel
+                eventId={source.eventId}
                 invitationId={source.invitationId}
+                paid={paid}
                 slug={source.slug}
                 status={status}
                 coupleLine={source.hostNames}

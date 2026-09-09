@@ -376,7 +376,7 @@ export default async function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <Link className="btn btn-gold" href="/signup">
+                <Link className="btn btn-gold" href="/create">
                   Create your invitation <Arrow />
                 </Link>
               </div>
@@ -446,7 +446,7 @@ export default async function HomePage() {
                     Start with the names and the occasion. Everything else can be decided
                     later, and changed after you publish.
                   </p>
-                  <Link className="btn btn-gold" href="/signup">
+                  <Link className="btn btn-gold" href="/create">
                     Create your invitation <Arrow />
                   </Link>
                 </div>

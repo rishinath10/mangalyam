@@ -4,7 +4,6 @@ import { requireUserId } from "@/lib/auth/ownership";
 import { invitationLimitFor } from "@/lib/entitlements";
 import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { withFigures } from "@/lib/typography";
-import { CreateEventForm } from "@/components/dashboard/CreateEventForm";
 
 export const metadata = { title: "Your events" };
 
@@ -29,15 +28,21 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {/* There is one way to start an invitation, and it is the same one a
+          visitor with no account uses: the wizard at /create. Keeping a second,
+          shorter form here would mean two flows to hold in step with each
+          other, and the short one always drifts behind. */}
       {events.length === 0 ? (
         <div className="t empty">
-          <h2>Start with the occasion</h2>
+          <h2>Nothing here yet</h2>
           <p>
-            Create your event first — a wedding, a housewarming, a milestone birthday,
-            a temple consecration — then add its invitation.
+            Your first invitation takes about twenty minutes, and you can see it
+            working before you decide anything.
           </p>
-          <div style={{ maxWidth: "26rem", margin: "1.6rem auto 0", textAlign: "left" }}>
-            <CreateEventForm />
+          <div style={{ marginTop: "1.6rem" }}>
+            <Link className="btn btn-gold" href="/create">
+              Create an invitation
+            </Link>
           </div>
         </div>
       ) : (
@@ -69,9 +74,15 @@ export default async function DashboardPage() {
           </div>
 
           <div className="t" style={{ maxWidth: "30rem", marginTop: "2.4rem" }}>
-            <h2 style={{ fontSize: "var(--t-md)" }}>Add another event</h2>
-            <div style={{ marginTop: "1.1rem" }}>
-              <CreateEventForm />
+            <h2 style={{ fontSize: "var(--t-md)" }}>Another occasion</h2>
+            <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".6rem" }}>
+              Each occasion is billed on its own, and starts the same way the
+              first one did.
+            </p>
+            <div style={{ marginTop: "1.2rem" }}>
+              <Link className="btn btn-line" href="/create">
+                Start another invitation
+              </Link>
             </div>
           </div>
         </>

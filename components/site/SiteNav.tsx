@@ -37,7 +37,7 @@ export function SiteNav({ signedIn }: { signedIn: boolean }) {
 
   const cta = signedIn
     ? { href: "/dashboard", label: "Your dashboard" }
-    : { href: "/signup", label: "Create your invitation" };
+    : { href: "/create", label: "Create your invitation" };
 
   return (
     <>

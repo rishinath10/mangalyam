@@ -113,6 +113,9 @@ export async function customerDetail(userId: string) {
               templateId: true,
               ceremonyType: true,
               createdAt: true,
+              // Frame artwork is fitted from this page — self-serve no longer
+              // offers it, so the admin table is the only place it is visible.
+              frameUrl: true,
               _count: { select: { rsvps: true } },
             },
           },

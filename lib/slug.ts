@@ -1,14 +1,9 @@
 import { db } from "@/lib/db";
+import { slugify } from "@/lib/slugify";
 
-export function slugify(input: string): string {
-  return input
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
-}
+// Re-exported so server callers keep importing one module for slugs; the rule
+// itself lives in lib/slugify.ts, which the browser can safely reach.
+export { slugify };
 
 /**
  * Builds `rishi-priya-haldi` style slugs. Slugs are globally unique because
