@@ -1,0 +1,67 @@
+# Postgres and MinIO for Mangalyam.
+#
+# Coolify usually manages these as its own services — in that case use this
+# file as the reference for what the app expects, and create them through
+# Coolify's UI instead. On a plain Docker host, `docker compose up -d` here
+# gives you both, and the app itself is deployed separately from the
+# Dockerfile so it can be rebuilt without touching the data services.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mangalyam
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: mangalyam
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Not published to the host: the app reaches it over the Docker network.
+    # Exposing 5432 publicly is how a database ends up in a breach report.
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mangalyam -d mangalyam"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?set MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD}
+    volumes:
+      - miniodata:/data
+    expose:
+      - "9000"
+      - "9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # Creates the bucket and makes it publicly readable, then exits. Guests must
+  # be able to GET an invitation photo without credentials; nobody may PUT.
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?}
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD &&
+      mc mb --ignore-existing local/mangalyam &&
+      mc anonymous set download local/mangalyam &&
+      echo 'bucket ready'
+      "
+
+volumes:
+  pgdata:
+  miniodata:
