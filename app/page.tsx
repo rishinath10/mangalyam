@@ -6,6 +6,7 @@ import { CEREMONY_LABELS } from "@/lib/ceremonies";
 import { EVENT_TYPES, EVENT_TYPE_BLURBS, EVENT_TYPE_LABELS } from "@/lib/events";
 import { TEMPLATE_MANIFESTS } from "@/lib/templates/registry";
 import { EventIcon } from "@/components/site/EventIcon";
+import { TodayPanchangam } from "@/components/site/TodayPanchangam";
 import { Constellation } from "@/components/site/Constellation";
 import { DesignCard } from "@/components/site/DesignCard";
 import { Arrow, Tick } from "@/components/site/Icons";
@@ -151,35 +152,12 @@ export default async function HomePage() {
               />
             </div>
 
-            {/* Two reassurances under the photograph. On a desktop they are cards
-                with room to explain themselves; on a phone they shrink to a pair
-                of pills with the claim alone, because four lines of specification
-                is not what anyone reads on the way to the headline. */}
-            <div className="t t--2 t--lift t--center rv c4 hero-stat" data-delay="200">
-              <b className="hero-fig">{withFigures(String(DISTINCT_LOOKS))}</b>
-              <span className="muted hero-note">
-                <span className="on-wide">
-                  distinct looks — {withFigures("2")} families, {withFigures("6")} palette
-                  colours, {withFigures("3")} letterings and {withFigures("3")} ways to open,
-                  before you add a photograph.
-                </span>
-                <span className="on-narrow">designs</span>
-              </span>
+            {/* Where the two reassurance pills were. A count of designs is a
+                fact about us; this is the thing the family checks first. */}
+            <div className="rv c12 hero-aus" data-delay="200">
+              <TodayPanchangam />
             </div>
 
-            <div className="t t--2 t--lift t--center rv c3 hero-price" data-delay="260">
-              <p className="kick hero-fig">
-                <span className="on-wide">Pay once</span>
-                <span className="on-narrow">Pay once,</span>
-              </p>
-              <span className="muted hero-note">
-                <span className="on-wide">
-                  <b className="hero-price-h">No subscription, ever</b>
-                  One payment, one invitation.
-                </span>
-                <span className="on-narrow">no renewals</span>
-              </span>
-            </div>
           </div>
         </header>
 
@@ -242,7 +220,8 @@ export default async function HomePage() {
               <p>
                 One for weddings, one for every other occasion. Each recolours to the
                 day — a muhurtham in kumkum, a housewarming in tulsi green, a sixtieth
-                in plum.
+                in plum. {withFigures(String(DISTINCT_LOOKS))} distinct looks between
+                them, before you add a photograph.
               </p>
             </div>
             <div className="bento">

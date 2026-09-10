@@ -174,9 +174,6 @@ section[id],header[id]{scroll-margin-top:112px}
      were two more full-width slabs to scroll past before the headline. They
      are named individually because .c4 and .c3 are shared with the ceremony,
      step and pillar tiles, which must keep their own full width. */
-  /* The tiles pair up here; how they look on a phone lives with the rest of
-     the hero-tile rules further down, after .t has had its say. */
-  .hero-stat,.hero-price{grid-column:span 1}
 }
 
 /* ---------- glass ---------- */
@@ -347,51 +344,10 @@ section[id],header[id]{scroll-margin-top:112px}
 .page-shell{padding-top:98px;position:relative;z-index:1;isolation:isolate}
 .hero-bento{padding-block:clamp(1rem,2.5vw,2rem) var(--sec)}
 
-/* The two reassurance tiles under the hero photograph. */
-.hero-stat .hero-fig{
-  font-family:var(--serif);font-weight:400;font-size:clamp(2.4rem,4vw,3.2rem);
-  line-height:1;color:var(--head);
-}
-.hero-note{font-size:var(--t-sm);margin-top:.3rem}
-.hero-price .hero-fig{margin:0}
-.hero-price .hero-note{margin-top:.5rem}
-.hero-price-h{
-  display:block;font-family:var(--serif);font-weight:400;font-size:var(--t-lg);
-  color:var(--head);margin-bottom:.4rem;
-}
 /* The short forms only exist for the phone; the long ones only for everywhere
    else. Both are in the markup so the swap is a media query rather than a
    width read in JavaScript, which would differ between the server render and
    the first paint. */
-.on-narrow{display:none}
-
-/* Pills, not cards: the claim and nothing else, on a shape that reads as one
-   glance rather than a paragraph to work through — about a third of the height
-   they had. This block sits after .t deliberately; the two carry the same
-   specificity, so whichever is written last is the one that applies. */
-@media(max-width:560px){
-  .on-wide{display:none}
-  .on-narrow{display:inline}
-  /* One line each, in the same shape. Wrapping put two lines in one pill and
-     one in the other, which read as a mismatched pair rather than a set — and
-     at that height a 100px radius stops looking like a pill and starts looking
-     like an egg. nowrap on both axes is what holds the shape. */
-  .hero-stat,.hero-price{
-    flex-direction:row;align-items:baseline;justify-content:center;
-    gap:.34rem;flex-wrap:nowrap;white-space:nowrap;
-    min-height:46px;padding:0 .7rem;border-radius:100px;text-align:center;
-  }
-  .hero-stat .hero-fig{font-size:1.12rem;line-height:1}
-  /* The kick's uppercase tracking is what made this half too wide to fit
-     beside its own label; as a serif word it sits at the same weight as the
-     other pill's figure. */
-  .hero-price .hero-fig{
-    font-family:var(--serif);font-weight:400;font-size:1rem;
-    letter-spacing:0;text-transform:none;line-height:1;color:var(--accent-soft);
-  }
-  .hero-note{font-size:.78rem;margin:0;line-height:1}
-}
-
 /* On a phone the nav sits 14px from the top and is 60px tall, so 98px of shell
    padding plus the hero's own top padding left 40px of nothing between the bar
    and the photograph. The photo is the first thing worth seeing; it should
@@ -1482,3 +1438,43 @@ header:has(> .inv-frame-stage){place-content:center}
 .save-state[data-tone="bad"]{color:#A83B3B}
 .save-state[data-tone="good"]{color:#1E6B4A}
 .save-state:empty{display:none}
+
+/* ==========================================================
+   TODAY'S PANCHANGAM  (the strip under the hero)
+   ========================================================== */
+.hero-aus{padding:0}
+.today{display:grid;gap:.85rem}
+/* Holds the space before the client has worked out what today is, so the page
+   does not jump once it does. */
+.today--wait{min-height:104px;border-radius:var(--r);border:1px solid var(--edge);background:var(--glass)}
+
+.today-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.today-cell{display:grid;gap:.3rem;min-width:0}
+.today-k{
+  font-size:var(--t-xs);letter-spacing:.22em;text-transform:uppercase;color:var(--accent);
+}
+.today-cell b{
+  font-family:var(--serif);font-weight:400;font-size:var(--t-md);
+  color:var(--head);line-height:1.3;
+}
+
+.today-note{
+  font-size:var(--t-xs);color:var(--ink-3);line-height:1.55;
+  padding-top:.8rem;border-top:1px solid var(--edge);
+}
+/* The Tamil month rides in the footnote as a tag: it belongs with the date but
+   would make a fourth column out of a one-word fact. */
+.today-note span{
+  display:inline-block;margin-right:.6rem;padding:.15rem .55rem;border-radius:100px;
+  border:1px solid var(--edge-hi);color:var(--ink-2);
+  letter-spacing:.1em;text-transform:uppercase;font-size:.64rem;vertical-align:.1em;
+}
+
+@media(max-width:700px){
+  /* Three columns at 390px gives each about a hundred pixels, and the star line
+     is a sentence. Stacked, each fact keeps its own row. */
+  .today-row{grid-template-columns:1fr;gap:.7rem}
+  .today-cell{grid-template-columns:auto 1fr;align-items:baseline;gap:.2rem .7rem}
+  .today-cell b{font-size:var(--t-sm)}
+  .today-k{font-size:.64rem;letter-spacing:.16em}
+}
