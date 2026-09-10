@@ -1449,10 +1449,17 @@ header:has(> .inv-frame-stage){place-content:center}
 .today--wait{min-height:104px;border-radius:var(--r);border:1px solid var(--edge);background:var(--glass)}
 
 .today-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
-.today-cell{display:grid;gap:.3rem;min-width:0}
+/* Icon on the left spanning both lines, label over value beside it. The same
+   shape at every width, so nothing has to be re-thought on a phone. */
+.today-cell{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  gap:.2rem .7rem;align-items:center;min-width:0;
+}
+.today-ic{grid-row:span 2;align-self:center;width:27px;height:27px;color:var(--accent)}
 .today-k{
   font-size:var(--t-xs);letter-spacing:.22em;text-transform:uppercase;color:var(--accent);
 }
+.today-k,.today-cell b{grid-column:2}
 .today-cell b{
   font-family:var(--serif);font-weight:400;font-size:var(--t-md);
   color:var(--head);line-height:1.3;
@@ -1473,8 +1480,8 @@ header:has(> .inv-frame-stage){place-content:center}
 @media(max-width:700px){
   /* Three columns at 390px gives each about a hundred pixels, and the star line
      is a sentence. Stacked, each fact keeps its own row. */
-  .today-row{grid-template-columns:1fr;gap:.7rem}
-  .today-cell{grid-template-columns:auto 1fr;align-items:baseline;gap:.2rem .7rem}
+  .today-row{grid-template-columns:1fr;gap:.75rem}
+  .today-ic{width:23px;height:23px}
   .today-cell b{font-size:var(--t-sm)}
   .today-k{font-size:.64rem;letter-spacing:.16em}
 }
