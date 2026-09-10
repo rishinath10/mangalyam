@@ -5,6 +5,7 @@ import { ApiError } from "@/lib/api";
 import { isAdmin } from "@/lib/auth/admin";
 import { requireInvitation } from "@/lib/auth/ownership";
 import { invitationInclude, toInvitationSource } from "@/lib/invitation/build";
+import { resolveTemplateArt } from "@/lib/templates/art-store";
 import { InvitationBuilder } from "@/components/builder/InvitationBuilder";
 
 type Params = { params: Promise<{ invitationId: string }> };
@@ -25,6 +26,10 @@ export default async function InvitationBuilderPage({ params }: Params) {
     include: invitationInclude,
   });
 
+  // Resolved here so the live preview and the published page show the same
+  // artwork — the browser has no way to reach the uploads itself.
+  const art = await resolveTemplateArt(row.templateId);
+
   return (
     // The customiser is a light workspace inside the dashboard's dark chrome
     // (CLAUDE.md has no opinion here — this is a deliberate, scoped choice):
@@ -38,7 +43,7 @@ export default async function InvitationBuilderPage({ params }: Params) {
       {/* The server hands over a plain source object; every edit from here on
           is local state composed into the same JSON the published page uses. */}
       <InvitationBuilder
-        initialSource={toInvitationSource(row)}
+        initialSource={toInvitationSource(row, art)}
         // Photo ids are not part of the content contract, but the gallery
         // editor needs them to patch and delete individual photos.
         initialPhotos={row.photos.map((photo) => ({

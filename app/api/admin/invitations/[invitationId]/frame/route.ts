@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth/admin";
 import {
   ACCEPTED_IMAGE_TYPES,
   MAX_UPLOAD_BYTES,
+  UnreadableImageError,
   deleteImage,
   storeImage,
 } from "@/lib/storage";
@@ -53,7 +54,10 @@ export async function POST(req: Request, { params }: Params) {
     let stored;
     try {
       stored = await storeImage(buffer, "frame", `invitations/${invitation.id}`);
-    } catch {
+    } catch (err) {
+      // A storage outage is ours, not theirs: let it through as a 500
+      // rather than telling someone their file is broken when it is not.
+      if (!(err instanceof UnreadableImageError)) throw err;
       throw badRequest("That file could not be read as an image");
     }
 

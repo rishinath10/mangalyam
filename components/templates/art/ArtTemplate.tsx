@@ -32,7 +32,9 @@ import { Ground } from "./Ground";
  */
 export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
   const manifest = getManifest(invitation.templateId);
-  const art = manifest.art ?? {};
+  // From the JSON first: the server already merged any admin uploads over the
+  // manifest, and a template must not go looking things up for itself (rule #2).
+  const art = invitation.art ?? manifest.art ?? {};
   const { couple, event, ceremonyLabel } = invitation;
   const [firstName, secondName] = splitHostNames(couple.hostNames);
   // A customer's own frame wins over the family's: they paid for it, and two

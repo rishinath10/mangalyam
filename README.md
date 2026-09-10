@@ -117,6 +117,21 @@ reaching someone else's invitation to fit commissioned artwork. Customers have
 no upload for it: a 3:4 PNG with a transparent middle is a drawing job, and a
 customer's own file competes with the design's border rather than finishing it.
 
+**A design is a folder of art, not a component.** A family with `art` in its
+manifest is rendered by `ArtTemplate`; adding a design is a folder under
+`public/templates/` and a registry entry. `/admin/designs` uploads artwork over
+the top of that, stored in `template_art`. The registry stays synchronous — it
+is read from eighteen places including pure browser modules — so the database
+never reaches the client: the server resolves art through
+`lib/templates/art-store.ts` and puts it in the invitation JSON, which is where
+the renderer reads it from. Artwork never contains text; the names, date and
+venue print as live text over a clear centre. See `docs/TEMPLATE-ART.md`.
+
+**A bad upload and a storage outage are different failures.** `storeImage`
+throws `UnreadableImageError` only when sharp cannot decode the file; an S3
+failure propagates as a 500. They used to share one catch, so an unreachable
+bucket told the customer their photograph was corrupt.
+
 **Payments go through `lib/payments`.** The app depends on the
 `PaymentGateway` interface, not on Stripe. Swapping to Billplz or ToyyibPay
 means a new adapter and one changed line in `lib/payments/index.ts`.

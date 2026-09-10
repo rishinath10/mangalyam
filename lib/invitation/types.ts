@@ -1,4 +1,5 @@
 import type { CeremonyType, EventType, OpeningStyle } from "@prisma/client";
+import type { TemplateArt } from "@/lib/templates/types";
 import type { FontPairingKey } from "@/lib/templates/fonts";
 
 /**
@@ -27,6 +28,12 @@ export interface InvitationJson {
    * families are designed to look complete without one.
    */
   frame: string | null;
+  /**
+   * The template family's artwork, resolved server-side. The renderer reads it
+   * from here rather than from the registry, so an admin upload reaches a card
+   * without the browser ever touching the database.
+   */
+  art?: TemplateArt;
   couple: {
     /** "Ashwin & Kalyani", "The Kumar Family", or a single name. */
     hostNames: string;

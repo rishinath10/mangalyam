@@ -37,7 +37,8 @@ export function InvitationRenderer({
   // A coded family uses its own component; a drawn one needs no component at
   // all, which is what lets a design be a folder of art and a manifest entry.
   const Template =
-    TEMPLATES[manifest.templateId] ?? (manifest.art ? ArtTemplate : DeepamTemplate);
+    TEMPLATES[manifest.templateId] ??
+    (invitation.art || manifest.art ? ArtTemplate : DeepamTemplate);
 
   return (
     <div style={designSystemStyle(manifest, invitation.accentColor, invitation.fontPairing)}>

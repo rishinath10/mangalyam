@@ -37,6 +37,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <nav className="admin-nav">
             <Link href="/admin">Overview</Link>
             <Link href="/admin/customers">Customers</Link>
+            <Link href="/admin/designs">Designs</Link>
             <Link href="/admin/quotes">Quotes</Link>
           </nav>
           {/* Out of the nav: this leaves the admin area rather than moving

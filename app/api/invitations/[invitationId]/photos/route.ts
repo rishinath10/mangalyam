@@ -4,6 +4,7 @@ import { requireInvitation } from "@/lib/auth/ownership";
 import {
   ACCEPTED_IMAGE_TYPES,
   MAX_UPLOAD_BYTES,
+  UnreadableImageError,
   storeImage,
 } from "@/lib/storage";
 import { photoReorderSchema } from "@/lib/validation";
@@ -58,7 +59,10 @@ export async function POST(req: Request, { params }: Params) {
     let stored;
     try {
       stored = await storeImage(buffer, "gallery", `invitations/${invitation.id}`);
-    } catch {
+    } catch (err) {
+      // A storage outage is ours, not theirs: let it through as a 500
+      // rather than telling someone their file is broken when it is not.
+      if (!(err instanceof UnreadableImageError)) throw err;
       throw badRequest("That file could not be read as an image");
     }
 

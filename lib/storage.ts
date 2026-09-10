@@ -43,7 +43,10 @@ export const ACCEPTED_IMAGE_TYPES = [
   "image/heif",
 ] as const;
 
-type Variant = "cover" | "gallery" | "frame";
+type Variant = "cover" | "gallery" | "frame" | "ground" | "crest" | "divider";
+
+/** The artwork variants: line work with an alpha channel that has to survive. */
+const ART_VARIANTS: Variant[] = ["frame", "crest", "divider"];
 
 // Wedding photos come straight off a phone at 4000px+. Resizing on upload is
 // what keeps a guest on venue wifi from downloading 8MB per image.
@@ -54,7 +57,28 @@ const VARIANTS: Record<Variant, { width: number; height: number; quality: number
   // ringing shows first, so it gets a higher quality than a photograph at a
   // smaller size. 3:4 at 1080x1440 is the generated-artwork target.
   frame: { width: 1080, height: 1440, quality: 88 },
+  // The other three pieces of a drawn family. Same reasoning as the frame:
+  // ornament, not photography, so quality stays high and the sizes stay small.
+  ground: { width: 900, height: 900, quality: 82 },
+  crest: { width: 900, height: 560, quality: 90 },
+  divider: { width: 1200, height: 160, quality: 90 },
 };
+
+/**
+ * The file itself was not an image, or was one sharp refuses to decode.
+ *
+ * Distinct from a storage failure on purpose. Both used to surface to the
+ * caller as one catch-all, so an unreachable bucket told the customer their
+ * photograph was corrupt — sending them off to re-export a file that was
+ * always fine, while the actual outage went unreported. Whose fault it is
+ * decides both the message and the status code.
+ */
+export class UnreadableImageError extends Error {
+  constructor() {
+    super("Unreadable image");
+    this.name = "UnreadableImageError";
+  }
+}
 
 export interface StoredImage {
   key: string;
@@ -81,9 +105,17 @@ export async function storeImage(
     // alphaQuality 100: a frame's transparent centre is the whole point, and
     // WebP's default lossy alpha softens the border's inner edge into a halo
     // over the cover behind it.
-    .webp(variant === "frame" ? { quality, alphaQuality: 100 } : { quality });
+    .webp(ART_VARIANTS.includes(variant) ? { quality, alphaQuality: 100 } : { quality });
 
-  const { data, info } = await pipeline.toBuffer({ resolveWithObject: true });
+  let data: Buffer;
+  let info: { width: number; height: number };
+  try {
+    ({ data, info } = await pipeline.toBuffer({ resolveWithObject: true }));
+  } catch {
+    // Only the decode is caught here. Everything after this line is our
+    // infrastructure, and an outage there must not be blamed on the upload.
+    throw new UnreadableImageError();
+  }
 
   const bucket = required("S3_BUCKET");
   const key = `${prefix}/${randomUUID()}.webp`;

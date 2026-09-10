@@ -4,6 +4,7 @@ import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { getManifest, resolveAccentColor } from "@/lib/templates/registry";
 import { isFontPairingKey } from "@/lib/templates/fonts";
 import type { InvitationJson } from "@/lib/invitation/types";
+import type { TemplateArt } from "@/lib/templates/types";
 
 /**
  * A flat, plain-data description of an invitation: no Prisma types, no Date
@@ -30,6 +31,12 @@ export interface InvitationSource {
   hostNames: string;
   coverPhotoUrl: string | null;
   frameUrl: string | null;
+  /**
+   * The family's own artwork, already resolved by the server against any
+   * admin uploads. Absent means "use whatever the manifest ships", which is
+   * what every purely code-defined family does.
+   */
+  art?: TemplateArt;
   description: string | null;
   date: string | null; // yyyy-mm-dd
   startTime: string | null; // HH:mm
@@ -80,6 +87,7 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
         ? source.fontPairing
         : getManifest(source.templateId).defaultFontPairing,
     frame: source.frameUrl,
+    art: source.art,
     couple: {
       hostNames: source.hostNames,
       coverPhoto: source.coverPhotoUrl,

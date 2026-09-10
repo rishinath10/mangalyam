@@ -1485,3 +1485,39 @@ header:has(> .inv-frame-stage){place-content:center}
   .today-cell b{font-size:var(--t-sm)}
   .today-k{font-size:.64rem;letter-spacing:.16em}
 }
+
+/* ---------- admin: template artwork ---------- */
+.art-grid{display:grid;gap:.7rem}
+.art-slot{
+  display:flex;gap:1rem;align-items:flex-start;
+  padding:.9rem 1rem;border-radius:14px;
+  border:1px solid var(--edge);background:var(--glass);
+}
+/* Checkerboard, because these files are mostly transparent and on a flat panel
+   a clear centre and a white centre look exactly the same — which is the most
+   common fault in generated artwork, so it has to be visible here. */
+.art-chip{
+  flex:none;display:grid;place-items:center;overflow:hidden;
+  width:74px;height:98px;border-radius:8px;border:1px solid var(--edge);
+  background-color:#fff;
+  background-image:
+    linear-gradient(45deg,#e6e0d4 25%,transparent 25%,transparent 75%,#e6e0d4 75%),
+    linear-gradient(45deg,#e6e0d4 25%,transparent 25%,transparent 75%,#e6e0d4 75%);
+  background-size:12px 12px;background-position:0 0,6px 6px;
+}
+.art-chip[data-wide]{width:110px;height:56px}
+.art-chip img{width:100%;height:100%;object-fit:contain;display:block}
+.art-chip i{font-style:normal;font-size:var(--t-xs);color:#8B7565}
+
+.art-body{min-width:0;flex:1;display:grid;gap:.3rem}
+.art-body b{font-size:var(--t-sm);font-weight:500;color:var(--head)}
+.art-body .dim{font-size:var(--t-xs);line-height:1.5}
+.art-acts{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.4rem}
+.art-acts .dim,.art-err{font-size:var(--t-xs)}
+.art-err{color:#E7A9A9}
+.art-src{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+
+@media(max-width:640px){
+  .art-slot{flex-direction:column}
+  .art-chip{width:88px;height:116px}
+}

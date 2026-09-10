@@ -5,6 +5,7 @@ import { InvitationRenderer } from "@/components/templates/InvitationRenderer";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { buildInvitationJson, invitationInclude } from "@/lib/invitation/build";
+import { resolveTemplateArt } from "@/lib/templates/art-store";
 import { formatEventDate } from "@/lib/format";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -71,18 +72,20 @@ export default async function InvitationPage({ params }: Params) {
   const published = await loadPublished(slug);
   if (published) {
     // Same builder, same component the live preview uses (rule #3).
-    return <InvitationRenderer invitation={buildInvitationJson(published)} />;
+    const art = await resolveTemplateArt(published.templateId);
+    return <InvitationRenderer invitation={buildInvitationJson(published, art)} />;
   }
 
   const draft = await loadOwnDraft(slug);
   if (!draft) notFound();
+  const draftArt = await resolveTemplateArt(draft.templateId);
 
   return (
     <>
       {/* preview, so a reply cannot be filed against an invitation nobody has
           been invited to yet — but live, so the music and the drift are the
           real ones. This is a rehearsal, not a mock-up. */}
-      <InvitationRenderer invitation={buildInvitationJson(draft)} preview live />
+      <InvitationRenderer invitation={buildInvitationJson(draft, draftArt)} preview live />
 
       <div className="draft-flag">
         <span>

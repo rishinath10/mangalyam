@@ -4,6 +4,7 @@ import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { splitHostNames } from "@/lib/format";
 import type { InvitationSource } from "@/lib/invitation/compose";
 import { slugify } from "@/lib/slugify";
+import type { TemplateArt } from "@/lib/templates/types";
 import { defaultTemplateFor, templatesForEvent } from "@/lib/templates/registry";
 
 /**
@@ -198,7 +199,11 @@ export function draftSlug(draft: InvitationDraft): string {
  * placeholders. They exist only here — the stored draft stays honestly empty,
  * so nothing invented on screen can be saved by accident.
  */
-export function draftToSource(draft: InvitationDraft): InvitationSource {
+export function draftToSource(
+  draft: InvitationDraft,
+  /** The chosen family's artwork, handed down from the server. */
+  art?: TemplateArt,
+): InvitationSource {
   return {
     // Not real ids: nothing is persisted yet. The preview never calls an API
     // with them — PreviewPane renders in preview mode, where the RSVP form is
@@ -217,6 +222,7 @@ export function draftToSource(draft: InvitationDraft): InvitationSource {
     // Frame artwork is not part of self-serve any more; it is applied for
     // bespoke work from the admin side.
     frameUrl: null,
+    art,
     description: draft.description,
     date: draft.date,
     startTime: draft.startTime,

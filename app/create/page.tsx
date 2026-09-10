@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { isPurchasable, priceLabel } from "@/lib/pricing";
 import { Particles } from "@/components/site/Particles";
 import { CreateWizard } from "@/components/create/CreateWizard";
+import { allTemplateArt } from "@/lib/templates/art-store";
 
 export const metadata = {
   title: "Create your invitation",
@@ -17,6 +18,9 @@ export const metadata = {
  */
 export default async function CreatePage() {
   const session = await auth();
+  // Every family's resolved artwork, handed down as data: the wizard previews
+  // whichever design the visitor is trying, and it cannot reach the database.
+  const art = await allTemplateArt();
 
   return (
     <div className="tone-dark wz-shell">
@@ -39,6 +43,7 @@ export default async function CreatePage() {
 
       <div className="wz-body-wrap">
         <CreateWizard
+          art={art}
           signedIn={Boolean(session?.user)}
           signedInEmail={session?.user?.email ?? null}
           purchasable={isPurchasable()}

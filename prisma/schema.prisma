@@ -287,6 +287,30 @@ model Template {
   @@map("templates")
 }
 
+/**
+ * Artwork for a drawn template family, uploaded from the admin side.
+ *
+ * Only the art lives here. A family's palette, its type scale and its section
+ * order are design decisions that belong in lib/templates/registry.ts, where
+ * they can be read next to each other and reviewed — choosing six accent hexes
+ * through a web form is worse than choosing them in code, not better. What
+ * genuinely wants a UI is swapping a border for a nicer one without a deploy,
+ * so that is what this is.
+ *
+ * A row overrides the manifest's own art piece by piece: a null column falls
+ * back to whatever the code ships, so a half-replaced set still renders.
+ */
+model TemplateArt {
+  templateId String   @id @map("template_id")
+  groundUrl  String?  @map("ground_url")
+  frameUrl   String?  @map("frame_url")
+  crestUrl   String?  @map("crest_url")
+  dividerUrl String?  @map("divider_url")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("template_art")
+}
+
 model Quote {
   id        String      @id @default(uuid()) @db.Uuid
   name      String

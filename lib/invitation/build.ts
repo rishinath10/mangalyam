@@ -10,6 +10,7 @@ import {
   type InvitationSource,
 } from "@/lib/invitation/compose";
 import type { InvitationJson } from "@/lib/invitation/types";
+import type { TemplateArt } from "@/lib/templates/types";
 
 export type InvitationWithRelations = Invitation & {
   event: Event;
@@ -34,7 +35,12 @@ const isoDate = (d: Date | null | undefined) =>
  * on a freshly imported row, so the defaults here are the same ones the schema
  * declares.
  */
-export function toInvitationSource(row: InvitationWithRelations): InvitationSource {
+export function toInvitationSource(
+  row: InvitationWithRelations,
+  /** Resolved by the caller through lib/templates/art-store — the pure mapping
+   *  here must stay free of database calls. */
+  art?: TemplateArt,
+): InvitationSource {
   const s = row.settings;
   return {
     invitationId: row.id,
@@ -49,6 +55,7 @@ export function toInvitationSource(row: InvitationWithRelations): InvitationSour
     hostNames: row.event.hostNames,
     coverPhotoUrl: row.coverPhotoUrl,
     frameUrl: row.frameUrl,
+    art,
     description: row.description,
     date: isoDate(row.date),
     startTime: row.startTime,
@@ -83,6 +90,9 @@ export function toInvitationSource(row: InvitationWithRelations): InvitationSour
   };
 }
 
-export function buildInvitationJson(row: InvitationWithRelations): InvitationJson {
-  return composeInvitationJson(toInvitationSource(row));
+export function buildInvitationJson(
+  row: InvitationWithRelations,
+  art?: TemplateArt,
+): InvitationJson {
+  return composeInvitationJson(toInvitationSource(row, art));
 }
