@@ -5,6 +5,7 @@ import { getManifest } from "@/lib/templates/registry";
 import type { TemplateProps } from "@/lib/templates/types";
 import { Couple } from "@/components/templates/sections/Couple";
 import { Gallery } from "@/components/templates/sections/Gallery";
+import { Blessings } from "@/components/templates/sections/Blessings";
 import { Greetings } from "@/components/templates/sections/Greetings";
 import { Rsvp } from "@/components/templates/sections/Rsvp";
 import { Schedule } from "@/components/templates/sections/Schedule";
@@ -46,6 +47,7 @@ export function DeepamTemplate({ invitation, preview = false }: TemplateProps) {
     gallery: <Gallery {...shared} />,
     greetings: <Greetings {...shared} />,
     rsvp: <Rsvp {...shared} />,
+    blessings: <Blessings {...shared} />,
   } as const;
 
   return (

@@ -1599,3 +1599,51 @@ header:has(> .inv-frame-stage){place-content:center}
   margin-top:.6rem;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
   color:var(--ds-accent);
 }
+
+/* Blessings — where guests send gift money.
+   The QR sits on its own white card whatever the family's ground is: a bank
+   QR is black on white, and a phone camera reading it off a cream or a dark
+   invitation is a scan that quietly never completes. */
+.bless{display:grid;gap:1.1rem;justify-items:stretch}
+.bless-qr{display:grid;gap:.55rem;justify-items:center}
+.bless-qr-tap{
+  cursor:zoom-in;padding:.85rem;border:1px solid var(--ds-rule);
+  border-radius:var(--ds-radius);background:#fff;line-height:0;
+  transition:opacity .2s;
+}
+.bless-qr-tap:hover{opacity:.9}
+.bless-qr-tap:focus-visible{outline:2px solid var(--ds-accent);outline-offset:3px}
+.bless-qr-tap img{width:min(212px,58vw);height:auto;display:block}
+.bless-qr p{
+  margin:0;font-size:.72rem;line-height:1.5;text-align:center;
+  color:var(--ds-ink-muted);max-width:20rem;
+}
+.bless-bank{
+  margin:0;display:grid;gap:.85rem;padding:1.05rem 1.15rem;
+  border:1px solid var(--ds-rule);border-radius:var(--ds-radius);
+  background:var(--ds-surface-alt);text-align:left;
+}
+.bless-bank div{display:grid;gap:.22rem}
+.bless-bank dt{
+  font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ds-ink-muted);
+}
+.bless-bank dd{
+  margin:0;font-size:.95rem;color:var(--ds-ink);
+  display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;
+}
+.bless-num{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-variant-numeric:lining-nums tabular-nums;letter-spacing:.06em;
+  /* Selectable on its own, so a guest whose browser refuses the clipboard
+     can still long-press the number itself. */
+  user-select:all;overflow-wrap:anywhere;
+}
+.bless-copy{
+  font:inherit;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;
+  padding:.34rem .7rem;border-radius:999px;cursor:pointer;
+  border:1px solid var(--ds-accent);background:transparent;color:var(--ds-accent);
+  transition:background .2s,color .2s;
+}
+.bless-copy:hover{background:var(--ds-accent);color:var(--ds-surface)}
+.bless-copy:focus-visible{outline:2px solid var(--ds-accent);outline-offset:2px}

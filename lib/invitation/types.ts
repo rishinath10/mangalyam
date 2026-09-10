@@ -65,6 +65,25 @@ export interface InvitationJson {
   opening: { style: OpeningStyle; text: string | null; autoScroll: boolean };
   /** The person guests ring about this occasion. */
   contact: { name: string | null; phone: string | null };
+  /**
+   * Where a guest sends gift money, when the host has chosen to show it.
+   *
+   * `enabled` is not the same as "has something to show": a host can turn the
+   * section on and not have filled it in yet, and the renderer must draw
+   * nothing rather than an empty heading over a blank space.
+   */
+  blessings: Blessings;
+}
+
+export interface Blessings {
+  enabled: boolean;
+  /** The host's own line of context, above the details. */
+  note: string | null;
+  /** A stored image, written only by the upload route. */
+  qr: string | null;
+  bankName: string | null;
+  accountName: string | null;
+  accountNumber: string | null;
 }
 
 export interface ScheduleEntry {

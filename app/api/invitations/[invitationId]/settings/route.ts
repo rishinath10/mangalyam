@@ -27,6 +27,11 @@ export async function PATCH(req: Request, { params }: Params) {
       autoScroll?: boolean;
       contactName?: string | null;
       contactPhone?: string | null;
+      giftsEnabled?: boolean;
+      giftNote?: string | null;
+      giftBankName?: string | null;
+      giftAccountName?: string | null;
+      giftAccountNumber?: string | null;
     } = {};
     if (input.musicEnabled !== undefined) data.musicEnabled = input.musicEnabled;
     if (input.musicUrl !== undefined) data.musicUrl = input.musicUrl ?? null;
@@ -46,6 +51,16 @@ export async function PATCH(req: Request, { params }: Params) {
     if (input.autoScroll !== undefined) data.autoScroll = input.autoScroll;
     if (input.contactName !== undefined) data.contactName = input.contactName || null;
     if (input.contactPhone !== undefined) data.contactPhone = input.contactPhone || null;
+
+    // Gift details. giftQrUrl is absent by design — the image is written only
+    // by the gift-qr route, which stores the file itself.
+    if (input.giftsEnabled !== undefined) data.giftsEnabled = input.giftsEnabled;
+    if (input.giftNote !== undefined) data.giftNote = input.giftNote || null;
+    if (input.giftBankName !== undefined) data.giftBankName = input.giftBankName || null;
+    if (input.giftAccountName !== undefined)
+      data.giftAccountName = input.giftAccountName || null;
+    if (input.giftAccountNumber !== undefined)
+      data.giftAccountNumber = input.giftAccountNumber || null;
 
     // Upsert rather than update: an invitation created before settings existed
     // (or by a future import path) must not 500 on its first settings save.

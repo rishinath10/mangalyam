@@ -67,6 +67,20 @@ const phone = z
   .max(24)
   .regex(/^\+?[0-9][0-9 ()-]*$/, "Use digits, spaces, brackets and dashes only");
 
+/**
+ * A bank account number as Malaysian banks print it: digits, sometimes broken
+ * up with spaces or dashes. Kept strict rather than free text because this
+ * string is displayed on a public page and offered to guests to copy — a
+ * number that arrives looking like anything else is a mistake worth catching
+ * while the host can still see the field they typed it into.
+ */
+const accountNumber = z
+  .string()
+  .trim()
+  .min(5, "That account number looks too short")
+  .max(34)
+  .regex(/^[0-9][0-9 -]*$/, "Use digits, spaces and dashes only");
+
 export const settingsUpdateSchema = z.object({
   musicEnabled: z.boolean().optional(),
   musicUrl: httpUrl.nullish(),
@@ -80,6 +94,15 @@ export const settingsUpdateSchema = z.object({
   autoScroll: z.boolean().optional(),
   contactName: z.string().trim().max(60).nullish(),
   contactPhone: phone.nullish(),
+
+  // Gift money. `giftQrUrl` is deliberately not here: the image is written
+  // only by the upload route, so no client can aim a public page's <img> at a
+  // host of its own choosing.
+  giftsEnabled: z.boolean().optional(),
+  giftNote: z.string().trim().max(240).nullish(),
+  giftBankName: z.string().trim().max(60).nullish(),
+  giftAccountName: z.string().trim().max(80).nullish(),
+  giftAccountNumber: accountNumber.nullish(),
 });
 
 export const scheduleItemSchema = z.object({

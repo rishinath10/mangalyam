@@ -232,7 +232,20 @@ export function draftToSource(
     mapLink: draft.mapLink,
     schedule: draft.schedule.filter((item) => item.title.trim() && item.time),
     photos: [],
-    settings: draft.settings,
+    settings: {
+      ...draft.settings,
+      // The wizard does not ask about gift money, and should not: it is a
+      // decision people make once the invitation is theirs and they are
+      // sitting in the editor, not while they are still deciding whether to
+      // build one at all. The preview shows what a fresh invitation shows —
+      // no blessings section.
+      giftsEnabled: false,
+      giftNote: null,
+      giftQrUrl: null,
+      giftBankName: null,
+      giftAccountName: null,
+      giftAccountNumber: null,
+    },
   };
 }
 

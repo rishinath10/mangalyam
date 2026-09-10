@@ -9,11 +9,12 @@ import { DetailsPanel } from "./DetailsPanel";
 import { SchedulePanel } from "./SchedulePanel";
 import { GalleryPanel, type GalleryPhoto } from "./GalleryPanel";
 import { SettingsPanel } from "./SettingsPanel";
+import { BlessingsPanel } from "./BlessingsPanel";
 import { RsvpPanel } from "./RsvpPanel";
 import { SharePanel } from "./SharePanel";
 import { PreviewPane } from "./PreviewPane";
 
-const TABS = ["Details", "Timeline", "Gallery", "Settings", "Share", "Replies"] as const;
+const TABS = ["Details", "Timeline", "Gallery", "Blessings", "Settings", "Share", "Replies"] as const;
 type Tab = (typeof TABS)[number];
 
 export function InvitationBuilder({
@@ -38,6 +39,7 @@ export function InvitationBuilder({
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [coverBusy, setCoverBusy] = useState(false);
+  const [qrBusy, setQrBusy] = useState(false);
   // On a phone the preview is a sheet rather than a column beside the fields.
   const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -89,6 +91,48 @@ export function InvitationBuilder({
     await fetch(`/api/invitations/${source.invitationId}/cover`, { method: "DELETE" });
     setSource((s) => ({ ...s, coverPhotoUrl: null }));
     setCoverBusy(false);
+  }
+
+  /**
+   * The payment QR, like the cover, is stored the moment it is chosen rather
+   * than waiting for Save — an upload that silently depends on a later button
+   * press is an upload people lose.
+   */
+  async function uploadGiftQr(file: File) {
+    setQrBusy(true);
+    setError(null);
+    const body = new FormData();
+    body.append("file", file);
+    try {
+      const res = await fetch(`/api/invitations/${source.invitationId}/gift-qr`, {
+        method: "POST",
+        body,
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        setError(payload.error ?? "Could not upload the QR image.");
+        return;
+      }
+      const updated = await res.json();
+      setSource((s) => ({
+        ...s,
+        settings: { ...s.settings, giftQrUrl: updated.giftQrUrl },
+      }));
+    } catch {
+      setError("The QR image did not reach us — check your connection and try again.");
+    } finally {
+      setQrBusy(false);
+    }
+  }
+
+  async function removeGiftQr() {
+    setQrBusy(true);
+    try {
+      await fetch(`/api/invitations/${source.invitationId}/gift-qr`, { method: "DELETE" });
+      setSource((s) => ({ ...s, settings: { ...s.settings, giftQrUrl: null } }));
+    } finally {
+      setQrBusy(false);
+    }
   }
 
   /**
@@ -233,6 +277,15 @@ export function InvitationBuilder({
                 invitationId={source.invitationId}
                 photos={photos}
                 onPhotosChange={setPhotos}
+              />
+            )}
+            {tab === "Blessings" && (
+              <BlessingsPanel
+                settings={source.settings}
+                onChange={(next) => patch({ settings: { ...source.settings, ...next } })}
+                onQrUpload={uploadGiftQr}
+                onQrRemove={removeGiftQr}
+                qrBusy={qrBusy}
               />
             )}
             {tab === "Settings" && (

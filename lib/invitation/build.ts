@@ -108,6 +108,12 @@ export function toInvitationSource(
       autoScroll: s?.autoScroll ?? true,
       contactName: s?.contactName ?? null,
       contactPhone: s?.contactPhone ?? null,
+      giftsEnabled: s?.giftsEnabled ?? false,
+      giftNote: s?.giftNote ?? null,
+      giftQrUrl: s?.giftQrUrl ?? null,
+      giftBankName: s?.giftBankName ?? null,
+      giftAccountName: s?.giftAccountName ?? null,
+      giftAccountNumber: s?.giftAccountNumber ?? null,
     },
   };
 }

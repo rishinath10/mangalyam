@@ -61,6 +61,12 @@ export interface InvitationSource {
     autoScroll: boolean;
     contactName: string | null;
     contactPhone: string | null;
+    giftsEnabled: boolean;
+    giftNote: string | null;
+    giftQrUrl: string | null;
+    giftBankName: string | null;
+    giftAccountName: string | null;
+    giftAccountNumber: string | null;
   };
 }
 
@@ -134,6 +140,14 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
     contact: {
       name: source.settings.contactName,
       phone: source.settings.contactPhone,
+    },
+    blessings: {
+      enabled: source.settings.giftsEnabled,
+      note: source.settings.giftNote,
+      qr: source.settings.giftQrUrl,
+      bankName: source.settings.giftBankName,
+      accountName: source.settings.giftAccountName,
+      accountNumber: source.settings.giftAccountNumber,
     },
   };
 }

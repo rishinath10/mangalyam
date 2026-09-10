@@ -10,7 +10,9 @@ export type SectionKey =
   | "gallery"
   /** The wall of what guests wrote when they replied. */
   | "greetings"
-  | "rsvp";
+  | "rsvp"
+  /** Where to send gift money, when the host has turned it on. */
+  | "blessings";
 
 /**
  * One swatch in a family's curated palette. The customer picks a key, never a

@@ -70,8 +70,9 @@ export async function POST(req: Request, { params }: Params) {
     try {
       stored = await storeImage(buffer, "gallery", `invitations/${invitation.id}`);
     } catch (err) {
-      // A storage outage is ours, not theirs: let it through as a 500
-      // rather than telling someone their file is broken when it is not.
+      // A storage outage is ours, not theirs: let it through to `handle`,
+      // which answers 503 and says so, rather than telling someone their
+      // file is broken when it is not.
       if (!(err instanceof UnreadableImageError)) throw err;
       throw badRequest("That file could not be read as an image");
     }

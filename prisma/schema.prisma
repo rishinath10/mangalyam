@@ -253,6 +253,27 @@ model InvitationSettings {
   contactName  String? @map("contact_name")
   contactPhone String? @map("contact_phone")
 
+  /**
+   * Where guests send gift money — "moi" at a wedding, a blessing at any other
+   * occasion. Off by default: a section asking for money must be something the
+   * host deliberately turned on, never something that appears on its own.
+   *
+   * `giftQrUrl` is written only by the upload route, which stores the image
+   * itself. It is deliberately absent from the settings schema so no client
+   * can point it at a URL of its own choosing — this ends up as the `src` of
+   * an image on a public page.
+   *
+   * These details are shown openly to anyone holding the link. That is the
+   * same reach as the WhatsApp group the link travels in, and it is the host's
+   * decision to make; the editor says so plainly next to the fields.
+   */
+  giftsEnabled      Boolean @default(false) @map("gifts_enabled")
+  giftNote          String? @map("gift_note")
+  giftQrUrl         String? @map("gift_qr_url")
+  giftBankName      String? @map("gift_bank_name")
+  giftAccountName   String? @map("gift_account_name")
+  giftAccountNumber String? @map("gift_account_number")
+
   invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 
   @@map("invitation_settings")

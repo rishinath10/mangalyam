@@ -47,7 +47,7 @@ export const ACCEPTED_IMAGE_TYPES = [
   "image/heif",
 ] as const;
 
-type Variant = "cover" | "gallery" | "frame" | "ground" | "crest" | "divider";
+type Variant = "cover" | "gallery" | "qr" | "frame" | "ground" | "crest" | "divider";
 
 /** The artwork variants: line work with an alpha channel that has to survive. */
 const ART_VARIANTS: Variant[] = ["frame", "crest", "divider"];
@@ -66,7 +66,27 @@ const VARIANTS: Record<Variant, { width: number; height: number; quality: number
   ground: { width: 900, height: 900, quality: 82 },
   crest: { width: 900, height: 560, quality: 90 },
   divider: { width: 1200, height: 160, quality: 90 },
+  // Quality is ignored for a QR — see LOSSLESS_VARIANTS below.
+  qr: { width: 1000, height: 1000, quality: 100 },
 };
+
+/**
+ * Variants stored byte-exact rather than re-encoded lossily.
+ *
+ * A payment QR is not a picture of a thing, it is data, and it is the one
+ * image on the page whose failure mode is silent: a guest whose bank app
+ * cannot resolve it gets no error, just a scan that never completes, and
+ * neither they nor the host ever finds out why the money did not arrive.
+ *
+ * To be straight about the tradeoff — lossy WebP at our photo quality did in
+ * fact still scan in every case tested here, including a QR screenshotted
+ * down to 170px and JPEG-compressed before it reached us. Lossless is kept
+ * anyway: it costs about 30KB once per invitation, and it removes a whole
+ * class of risk that a test with a software decoder cannot rule out — a real
+ * bank app reading a screen at an angle in bad light, on an old phone.
+ * Cheap insurance against a failure nobody would be able to report.
+ */
+const LOSSLESS_VARIANTS: Variant[] = ["qr"];
 
 export interface StoredImage {
   key: string;
@@ -87,13 +107,27 @@ export async function storeImage(
 ): Promise<StoredImage> {
   const { width, height, quality } = VARIANTS[variant];
 
-  const pipeline = sharp(input, { failOn: "error" })
+  let pipeline = sharp(input, { failOn: "error" })
     .rotate() // honour EXIF orientation before the tags are dropped
-    .resize({ width, height, fit: "inside", withoutEnlargement: true })
+    .resize({ width, height, fit: "inside", withoutEnlargement: true });
+
+  // A QR saved as a transparent PNG is black-on-nothing: it looks correct in
+  // the editor, where it sits on a white card, and disappears the moment a
+  // guest opens it full size over a dark backdrop. Giving it the white quiet
+  // zone it is supposed to have makes the image right wherever it lands.
+  if (variant === "qr") pipeline = pipeline.flatten({ background: "#ffffff" });
+
+  pipeline = pipeline
     // alphaQuality 100: a frame's transparent centre is the whole point, and
     // WebP's default lossy alpha softens the border's inner edge into a halo
     // over the cover behind it.
-    .webp(ART_VARIANTS.includes(variant) ? { quality, alphaQuality: 100 } : { quality });
+    .webp(
+      LOSSLESS_VARIANTS.includes(variant)
+        ? { lossless: true }
+        : ART_VARIANTS.includes(variant)
+          ? { quality, alphaQuality: 100 }
+          : { quality },
+    );
 
   let data: Buffer;
   let info: { width: number; height: number };
