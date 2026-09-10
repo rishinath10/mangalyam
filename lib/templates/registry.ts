@@ -33,6 +33,16 @@ const DEEPAM_ACCENTS: AccentSwatch[] = [
   { key: "teal", name: "Teal", hex: "#1E6E70" },
 ];
 
+/** Deep, saturated colours: this family is a printed card, not a wash. */
+const THANGA_ACCENTS: AccentSwatch[] = [
+  { key: "kumkum", name: "Kumkum", hex: "#9E1B2F" },
+  { key: "turmeric", name: "Turmeric", hex: "#D99A21" },
+  { key: "leaf", name: "Leaf", hex: "#2E6B3C" },
+  { key: "amethyst", name: "Amethyst", hex: "#6B2D74" },
+  { key: "sandal", name: "Sandal", hex: "#B9662B" },
+  { key: "midnight", name: "Midnight", hex: "#26406B" },
+];
+
 export const TEMPLATE_MANIFESTS: TemplateManifest[] = [
   {
     templateId: "mandapam-01",
@@ -95,6 +105,55 @@ export const TEMPLATE_MANIFESTS: TemplateManifest[] = [
       gold: "#B8912F",
       radius: "10px",
       motionIntensity: 0.9,
+    },
+    built: true,
+  },
+  {
+    templateId: "thanga-kolam-01",
+    name: "Thanga Kolam",
+    tagline: "A gold border, drawn the way a printed card is",
+    // Offered to everything: a border and a crest carry no wedding in them.
+    eventTypes: [...EVENT_TYPES] as EventType[],
+    sections: ["cover", "couple", "event", "schedule", "gallery", "rsvp"],
+    features: { music: true, countdown: true },
+    accents: THANGA_ACCENTS,
+    defaultAccentKey: "kumkum",
+    ceremonyAccentKeys: {
+      mehendi: "leaf",
+      haldi: "turmeric",
+      sangeet: "amethyst",
+      muhurtham: "kumkum",
+      nalangu: "sandal",
+      baraat: "kumkum",
+      reception: "midnight",
+      engagement: "sandal",
+    },
+    fontPairings: ["classic", "inscribed", "fine"],
+    defaultFontPairing: "classic",
+    tokens: {
+      surface: "#FDF9F0",
+      surfaceAlt: "#F5EDDC",
+      ink: "#2B1F14",
+      inkMuted: "#75634C",
+      rule: "#DCC79C",
+      brand: "#9E1B2F",
+      brandDeep: "#6E1020",
+      gold: "#B8912F",
+      radius: "4px",
+      motionIntensity: 1,
+    },
+    /**
+     * The first family with no component of its own — it is these four files
+     * and the manifest around them. Replacing the artwork replaces the design;
+     * copying this entry with a different folder adds another.
+     */
+    art: {
+      ground: "/templates/thanga-kolam/ground.svg",
+      groundFit: "tile",
+      groundVeil: 0.92,
+      frame: "/templates/thanga-kolam/frame.svg",
+      crest: "/templates/thanga-kolam/crest.svg",
+      divider: "/templates/thanga-kolam/divider.svg",
     },
     built: true,
   },

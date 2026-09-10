@@ -48,8 +48,46 @@ export interface TemplateManifest {
   fontPairings: FontPairingKey[];
   defaultFontPairing: FontPairingKey;
   tokens: DesignTokens;
+  /**
+   * Artwork, when the family is drawn rather than stroked.
+   *
+   * A family with `art` needs no component of its own: ArtTemplate lays these
+   * pieces out and prints live text over them, so adding a design is adding a
+   * folder and a manifest entry. That is the only way to get to a gallery —
+   * nobody hand-writes twelve React components.
+   *
+   * Absent, the family falls back to its own coded renderer, which is what the
+   * two original line-drawn families still use.
+   */
+  art?: TemplateArt;
   /** False until a renderer exists — the picker must never offer a blank page. */
   built: boolean;
+}
+
+/**
+ * The four pieces a drawn family is made of. Every one is optional: a design
+ * with only a frame is still a design, and a missing file must degrade to the
+ * plain ground rather than to a broken image.
+ *
+ * The hard rule for all of them: **no text baked in**. The names, the date and
+ * the venue are printed as live text over the centre, which is what makes the
+ * invitation personal, keeps the font pairings meaningful, keeps it readable
+ * to a screen reader, and lets someone change the venue after publishing. Art
+ * with a couple's names inside it is a picture, not a template.
+ */
+export interface TemplateArt {
+  /** Fills the whole invitation. A tileable texture, or a large soft image. */
+  ground?: string;
+  /** How the ground repeats. "tile" for a seamless texture, "cover" for a scene. */
+  groundFit?: "tile" | "cover";
+  /** A 3:4 border drawn around the cover, with a clear centre. */
+  frame?: string;
+  /** The ornament above the names on the cover. */
+  crest?: string;
+  /** The rule between sections, in place of a stroked band. */
+  divider?: string;
+  /** 0–1. How far to knock the ground back so text stays readable over it. */
+  groundVeil?: number;
 }
 
 /**

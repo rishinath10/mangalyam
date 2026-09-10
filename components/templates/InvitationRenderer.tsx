@@ -1,5 +1,6 @@
 "use client";
 
+import { ArtTemplate } from "@/components/templates/art/ArtTemplate";
 import { DeepamTemplate } from "@/components/templates/deepam";
 import { MandapamTemplate } from "@/components/templates/mandapam";
 import { InvitationShell } from "@/components/templates/shared/InvitationShell";
@@ -33,7 +34,10 @@ export function InvitationRenderer({
   live,
 }: TemplateProps & { live?: boolean }) {
   const manifest = getManifest(invitation.templateId);
-  const Template = TEMPLATES[manifest.templateId] ?? DeepamTemplate;
+  // A coded family uses its own component; a drawn one needs no component at
+  // all, which is what lets a design be a folder of art and a manifest entry.
+  const Template =
+    TEMPLATES[manifest.templateId] ?? (manifest.art ? ArtTemplate : DeepamTemplate);
 
   return (
     <div style={designSystemStyle(manifest, invitation.accentColor, invitation.fontPairing)}>
