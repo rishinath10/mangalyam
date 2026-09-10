@@ -28,7 +28,7 @@ export const STEPS: WizardStep[] = [
     blurb: "Pick the day. Everything after this is shaped around it.",
     blocker: (draft) => {
       // A wedding needs both halves named — the cover sets them as a pair, and
-      // "Rishi &" on its own is worse than no cover at all.
+      // "Ashwin &" on its own is worse than no cover at all.
       if (draft.eventType === "wedding") {
         if (!draft.groomName.trim() && !draft.brideName.trim())
           return "Tell us who is getting married.";

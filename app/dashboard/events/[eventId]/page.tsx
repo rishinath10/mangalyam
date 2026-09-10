@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { ApiError } from "@/lib/api";
+import { isAdmin } from "@/lib/auth/admin";
 import { requireEvent } from "@/lib/auth/ownership";
 import { CONTACT_MESSAGE, invitationUsage } from "@/lib/entitlements";
 import { ceremonyLabel } from "@/lib/ceremonies";
@@ -33,6 +34,7 @@ export default async function EventPage({ params, searchParams }: Params) {
   }
 
   const usage = await invitationUsage(event.id, event.entitlement);
+  const admin = await isAdmin();
   const invitations = await db.invitation.findMany({
     where: { eventId: event.id },
     orderBy: [{ date: "asc" }, { createdAt: "asc" }],
@@ -78,6 +80,15 @@ export default async function EventPage({ params, searchParams }: Params) {
             You can build and preview without paying. Payment is what lets you publish and
             share — one payment for this event, no subscription.
           </p>
+          {/* An admin can publish this already. The checkout stays on the page
+              rather than being hidden, because testing it is the other half of
+              why the account exists. */}
+          {admin && (
+            <p className="notice notice-good" style={{ marginBottom: "1.2rem" }}>
+              Publishing is unlocked on this account, so you can go live without paying.
+              Checkout below still works if you want to test it end to end.
+            </p>
+          )}
           <PurchasePanel eventId={event.id} purchasable={isPurchasable()} />
         </section>
       )}

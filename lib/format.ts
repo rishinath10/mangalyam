@@ -57,7 +57,7 @@ export function formatTimeRange(start: string | null, end: string | null): strin
 }
 
 /**
- * Splits "Rishi & Gaayathri" into its two names so a wedding template can
+ * Splits "Ashwin & Kalyani" into its two names so a wedding template can
  * style the ampersand between them; "The Kumar Family" or a single name has
  * no " & " to find and comes back as one part. Templates for occasions that
  * are never a pair (a housewarming, a birthday) should just render the whole

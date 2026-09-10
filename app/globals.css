@@ -174,15 +174,9 @@ section[id],header[id]{scroll-margin-top:112px}
      were two more full-width slabs to scroll past before the headline. They
      are named individually because .c4 and .c3 are shared with the ceremony,
      step and pillar tiles, which must keep their own full width. */
+  /* The tiles pair up here; how they look on a phone lives with the rest of
+     the hero-tile rules further down, after .t has had its say. */
   .hero-stat,.hero-price{grid-column:span 1}
-  .hero-stat,.hero-price{padding:1.05rem .95rem}
-  /* Half the width means half the room, so the supporting lines step down
-     rather than wrapping into a wall. Direct children only: withFigures wraps
-     every digit run in its own <span class="num">, and a descendant selector
-     here shrinks the 108 itself along with the sentence under it. */
-  .hero-stat > span{font-size:var(--t-xs);line-height:1.45}
-  .hero-price > h3{font-size:var(--t-md)}
-  .hero-price > p{font-size:var(--t-xs)}
 }
 
 /* ---------- glass ---------- */
@@ -339,6 +333,41 @@ section[id],header[id]{scroll-margin-top:112px}
 
 .page-shell{padding-top:98px;position:relative;z-index:1;isolation:isolate}
 .hero-bento{padding-block:clamp(1rem,2.5vw,2rem) var(--sec)}
+
+/* The two reassurance tiles under the hero photograph. */
+.hero-stat .hero-fig{
+  font-family:var(--serif);font-weight:400;font-size:clamp(2.4rem,4vw,3.2rem);
+  line-height:1;color:var(--head);
+}
+.hero-note{font-size:var(--t-sm);margin-top:.3rem}
+.hero-price .hero-fig{margin:0}
+.hero-price .hero-note{margin-top:.5rem}
+.hero-price-h{
+  display:block;font-family:var(--serif);font-weight:400;font-size:var(--t-lg);
+  color:var(--head);margin-bottom:.4rem;
+}
+/* The short forms only exist for the phone; the long ones only for everywhere
+   else. Both are in the markup so the swap is a media query rather than a
+   width read in JavaScript, which would differ between the server render and
+   the first paint. */
+.on-narrow{display:none}
+
+/* Pills, not cards: the claim and nothing else, on a shape that reads as one
+   glance rather than a paragraph to work through — about a third of the height
+   they had. This block sits after .t deliberately; the two carry the same
+   specificity, so whichever is written last is the one that applies. */
+@media(max-width:560px){
+  .on-wide{display:none}
+  .on-narrow{display:inline}
+  .hero-stat,.hero-price{
+    flex-direction:row;align-items:center;justify-content:center;
+    gap:.4rem;flex-wrap:wrap;
+    padding:.7rem .85rem;border-radius:100px;text-align:center;
+  }
+  .hero-stat .hero-fig{font-size:1.25rem;line-height:1.1}
+  .hero-price .hero-fig{font-size:var(--t-xs);letter-spacing:.14em;line-height:1.1}
+  .hero-note{font-size:var(--t-xs);margin:0;line-height:1.2}
+}
 
 /* On a phone the nav sits 14px from the top and is 60px tall, so 98px of shell
    padding plus the hero's own top padding left 40px of nothing between the bar
@@ -554,10 +583,15 @@ section[id],header[id]{scroll-margin-top:112px}
 .builder-actions{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
 
 .builder-grid{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:clamp(1rem,2vw,1.8rem);align-items:start}
-@media(max-width:1080px){.builder-grid{grid-template-columns:1fr}}
+/* minmax(0,1fr), not 1fr: a bare 1fr track takes its minimum from the widest
+   item's min-content, and the phone frame inside is 390px wide — which pushed
+   the whole editor past the viewport and left the page scrolling sideways. */
+@media(max-width:1080px){.builder-grid{grid-template-columns:minmax(0,1fr)}}
 .builder-preview{position:sticky;top:90px}
+.builder-peek{display:none}
 
 .tabs{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:1.4rem}
+.tabs button{white-space:nowrap}
 .tabs button{
   font-family:var(--ui);font-size:var(--t-sm);color:var(--ink-2);cursor:pointer;
   padding:.5rem 1rem;border-radius:100px;background:transparent;border:1px solid transparent;transition:.2s;
@@ -592,7 +626,7 @@ section[id],header[id]{scroll-margin-top:112px}
   padding:.5rem 1rem;border-radius:100px;border:0;background:var(--gold);color:#2C1B04;font-weight:500;
 }
 
-.phone{max-width:390px;margin-inline:auto}
+.phone{width:100%;max-width:390px;margin-inline:auto}
 .phone-screen{
   border-radius:26px;overflow:hidden;border:8px solid #140409;background:#fff;
   box-shadow:0 24px 60px -26px rgba(0,0,0,.85);
@@ -1159,13 +1193,14 @@ header:has(> .inv-frame-stage){place-content:center}
   }
   .wz-preview[data-open]{display:block}
   .wz-preview-in{max-width:390px;margin-inline:auto}
-  .wz-body-wrap{padding-bottom:5.5rem}
+  .wz-body-wrap{padding-bottom:7.5rem}
   .wz-peek{
-    display:block;position:fixed;inset:auto 0 0;z-index:90;
-    padding:.9rem 1.1rem calc(.9rem + env(safe-area-inset-bottom));
+    display:flex;align-items:center;justify-content:center;
+    position:fixed;inset:auto 0 0;z-index:90;
+    height:calc(68px + env(safe-area-inset-bottom));
+    padding:0 1.1rem env(safe-area-inset-bottom);
     background:rgba(22,5,11,.92);border-top:1px solid var(--edge);
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-    font-size:var(--t-sm);letter-spacing:.06em;color:var(--gold-lt);
   }
 }
 .wz-replay{
@@ -1249,3 +1284,170 @@ header:has(> .inv-frame-stage){place-content:center}
 .cn[data-quiet] .cn-sub{opacity:1}
 .cn[data-quiet] .cn-line,
 .cn[data-quiet] .cn-bridge{stroke-dashoffset:0}
+
+/* ---------- the editor on a phone ----------
+   Same problem the wizard has: the preview cannot sit beside the questions, and
+   parked underneath them it was two thousand pixels below the fold — which is
+   to say, not there at all. It becomes a sheet, and the save button stops
+   scrolling away from the edits it applies to. */
+@media(max-width:1080px){
+  /* The save bar stacks directly on top of the peek bar, so its offset has to
+     be the peek bar's height. Declared rather than derived from padding: the
+     two drifted apart the moment the label became a pill, and a six-pixel
+     overlap is exactly the kind of thing nobody notices until it ships. */
+  .dash-shell{--peek-h:68px}
+  .builder-preview{
+    position:fixed;inset:70px 0 0;z-index:80;display:none;
+    background:var(--wine-950);overflow-y:auto;padding:1.4rem 1.1rem 5.5rem;
+  }
+  .builder-preview[data-open]{display:block}
+  .builder-preview .phone{max-width:390px}
+  /* The sheet is the app's own dark chrome even though the editor around it is
+     the cream workspace, so its caption has to be read against that. */
+  .builder-preview .phone-cap{color:#8B7660}
+
+  /* Height declared, not left to fall out of padding: the save bar is pinned
+     directly on top of this one, so its offset has to be this exact number.
+     They drifted the moment the label became a pill, and the bars overlapped
+     by a few pixels — the kind of thing nobody sees until it has shipped. */
+  .builder-peek{
+    display:flex;align-items:center;justify-content:center;
+    position:fixed;inset:auto 0 0;z-index:90;
+    height:calc(var(--peek-h) + env(safe-area-inset-bottom));
+    padding:0 1.1rem env(safe-area-inset-bottom);
+    background:rgba(22,5,11,.94);border-top:1px solid rgba(235,215,155,.16);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  }
+  .dash-body{padding-bottom:calc(var(--peek-h) + 4.5rem)}
+}
+
+@media(max-width:720px){
+  .builder-light{border-radius:20px;padding:1.1rem .9rem 1.8rem}
+  .builder-head{margin:.8rem 0 1.2rem;gap:.7rem}
+  .builder-head h1{font-size:var(--t-xl)}
+
+  /* One row that scrolls, rather than three rows of chips that push every
+     answer further down the page before the editing even starts. */
+  .tabs{
+    flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;
+    scrollbar-width:none;margin-inline:-.9rem;padding-inline:.9rem;
+    margin-bottom:1.1rem;
+    /* The last tabs sit off the right edge with nothing to say so. Fading the
+       edge is the whole affordance: content that stops mid-fade is content
+       that continues. */
+    mask-image:linear-gradient(90deg,#000 88%,transparent);
+    -webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);
+  }
+  .tabs::-webkit-scrollbar{display:none}
+
+  /* Save follows the edits down the page. Sticking to the top of the workspace
+     rather than the bottom of the screen keeps it clear of the preview bar. */
+  /* Save comes to the edits rather than the other way round.
+     Not sticky: .builder-actions is a flex child of .builder-head, and a
+     sticky element cannot outlive its parent's box — once the short header
+     scrolls away it takes the button with it. Fixed, and only while there is
+     something to save, so a clean editor carries no permanent furniture. */
+  .builder-actions{display:none}
+  .builder-actions[data-dirty]{
+    display:flex;align-items:center;gap:.7rem;
+    position:fixed;inset:auto 0 calc(var(--peek-h) + env(safe-area-inset-bottom));
+    z-index:85;padding:.7rem 1rem;
+    background:rgba(250,245,234,.94);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+    border-top:1px solid var(--edge);
+  }
+  .builder-actions[data-dirty] .btn{flex:1;justify-content:center}
+
+  /* A time column fixed at 8rem leaves nothing for the title beside it. */
+  .tl-item .form-grid{grid-template-columns:1fr!important}
+}
+
+/* The draft's own link, offered in the Share tab. Deliberately not styled as a
+   warning: opening it is the last thing most people do before paying. */
+.try-strip{
+  display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+  padding:1rem 1.1rem;border-radius:16px;
+  border:1px solid var(--edge);background:var(--glass);
+}
+.try-strip > div{flex:1;min-width:14rem}
+.try-strip b{display:block;font-family:var(--serif);font-size:var(--t-md);font-weight:500;color:var(--head)}
+.try-strip span{display:block;font-size:var(--t-xs);color:var(--ink-3);margin-top:.3rem;line-height:1.5}
+
+/* The banner over an owner's draft preview: enough to say "not live yet",
+   not so much that it covers the invitation it is describing. */
+.draft-flag{
+  position:fixed;inset:auto 0 0;z-index:60;
+  display:flex;align-items:center;justify-content:center;gap:.9rem;flex-wrap:wrap;
+  padding:.7rem 1rem calc(.7rem + env(safe-area-inset-bottom));
+  background:rgba(22,5,11,.93);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-top:1px solid rgba(235,215,155,.2);
+  font-size:.74rem;color:#BFA98B;text-align:center;
+}
+.draft-flag b{color:#EBD79B;font-weight:500;letter-spacing:.1em;text-transform:uppercase;font-size:.66rem}
+.draft-flag a{color:#EBD79B;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+
+/* The full-width bar stays the tap target — on a phone that is the easiest
+   thing in the world to hit — but a line of text pinned to the bottom edge
+   reads as a caption. The label wears a pill so it reads as a button. */
+.wz-peek > span,
+.builder-peek > span{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  padding:.55rem 1.4rem;border-radius:100px;
+  border:1px solid rgba(235,215,155,.42);background:rgba(255,255,255,.06);
+  font-size:var(--t-sm);letter-spacing:.06em;color:#EBD79B;
+  transition:background .2s,border-color .2s;
+}
+.wz-peek:hover > span,
+.builder-peek:hover > span{background:rgba(255,255,255,.11);border-color:var(--gold)}
+
+/* Sits with the sign-out button rather than inside the nav list. */
+.admin-leave{margin-left:auto}
+@media(max-width:860px){.admin-leave{display:none}}
+
+/* ==========================================================
+   MOBILE TYPOGRAPHY
+   ==========================================================
+   The scale was drawn on a desktop, where .7rem next to a 3.7rem heading reads
+   as a deliberately quiet caption. On a phone the heading shrinks and the
+   caption does not, so the same ratio just reads as 11px of unreadable text.
+   Everything below the body size steps up to what a phone actually wants:
+   ~16px for anything read as prose, ~13px as the floor for a label.
+
+   --t-base at 1rem is not only comfort. iOS zooms the whole page in when a
+   focused input is under 16px, and every field in the app is set in --t-base —
+   so the editor was literally jumping about under the customer's thumb. */
+@media(max-width:720px){
+  :root{
+    --t-xs:.8rem;      /* 12.8px — uppercase labels, the smallest thing we set */
+    --t-sm:.925rem;    /* 14.8px — secondary and supporting lines */
+    --t-base:1rem;     /* 16px — body, and every form field */
+    --t-md:1.12rem;
+  }
+
+  /* Hardcoded micro-sizes, raised in the same spirit. These are all letterspaced
+     uppercase, which is why they were set so small to begin with — tracking
+     makes short text look bigger than it measures. */
+  .nav-brand .tg{font-size:.58rem;letter-spacing:.2em}
+  .dsn-ct{font-size:.66rem}
+  .dsn-name{font-size:.66rem}
+  .cer-tile span{font-size:.76rem;letter-spacing:.1em}
+  .quote-tile .steps{font-size:.74rem;letter-spacing:.2em}
+  .tier .flag{font-size:.68rem}
+  .foot-btm > div{font-size:var(--t-xs)}
+  .filedrop::file-selector-button{font-size:.8rem}
+  .wz-rail button i{font-size:.72rem;width:22px;height:22px}
+  .draft-flag{font-size:.82rem}
+  .draft-flag b{font-size:.72rem}
+
+  /* Inside the invitation itself. A guest reads this on the same phone, and a
+     9px form label is no more readable there than anywhere else. */
+  .rsvp-field span{font-size:.72rem;letter-spacing:.18em}
+  .rsvp-field input,.rsvp-field textarea,.rsvp-field select{font-size:1rem}
+  .rsvp-choice button{font-size:.95rem}
+  .rsvp-submit{font-size:.82rem}
+  .rsvp-error{font-size:.9rem}
+  .rsvp-preview-note{font-size:.8rem}
+  .inv-seal-cta{font-size:.7rem}
+  .inv-bar-btn{font-size:.66rem}
+}

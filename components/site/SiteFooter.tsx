@@ -24,8 +24,9 @@ export function SiteFooter() {
             <span className="tg">Celebrations that last a lifetime</span>
           </Link>
           <p>
-            Digital invitations for Malaysian Indian families — weddings, housewarmings,
-            naming ceremonies and every auspicious day between.
+            E-invitations for Malaysian Indian families — weddings, naming
+            ceremonies, housewarmings, temple consecrations and the community
+            celebrations in between.
           </p>
         </div>
 

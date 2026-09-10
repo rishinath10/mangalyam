@@ -82,7 +82,7 @@ export function SettingsPanel({
       <Input
         id="contactName"
         label="Who guests should contact"
-        placeholder="Rishi"
+        placeholder="Ashwin"
         value={settings.contactName ?? ""}
         onChange={(e) => onChange({ contactName: e.target.value || null })}
       />

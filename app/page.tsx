@@ -73,7 +73,7 @@ const FAQ = [
   },
 ];
 
-const SAMPLE_COUPLE = "Rishi & Gaayathri";
+const SAMPLE_COUPLE = "Ashwin & Kalyani";
 const SAMPLE_HOST = "The Kumar Family";
 const [weddingFamily, generalFamily] = TEMPLATE_MANIFESTS;
 
@@ -117,18 +117,18 @@ export default async function HomePage() {
           <div className="wrap bento hero-bento">
             <div className="t t--lit t--center rv c7 r2 hero-copy">
               <p className="kick">
-                Traditions meet tomorrow<span className="dash" />
+                E-invitations for Malaysian Indian families<span className="dash" />
               </p>
               <h1 style={{ fontSize: "var(--t-3xl)", marginTop: "1.3rem" }}>
-                Every Occasion Deserves
+                An E-Invitation for
                 <em style={{ display: "block", fontStyle: "italic", color: "var(--accent-soft)" }}>
-                  Its Own Invitation
+                  Every Event You Hold
                 </em>
               </h1>
-              <p className="muted" style={{ fontSize: "var(--t-md)", maxWidth: "44ch", marginTop: "1.2rem" }}>
-                Mangalyam means auspicious, not wedding. A housewarming, a naming
-                ceremony, a sixtieth, a wedding — each gets an invitation drawn for
-                the occasion, its own link, and its own RSVP.
+              <p className="muted" style={{ fontSize: "var(--t-md)", maxWidth: "46ch", marginTop: "1.2rem" }}>
+                From weddings and naming ceremonies to temple consecrations and
+                community open houses — one link, sent on WhatsApp, opening to an
+                invitation drawn for the occasion, with RSVPs that count themselves.
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: ".7rem", marginTop: "1.8rem" }}>
                 <Link className="btn btn-gold" href="#designs">
@@ -151,23 +151,31 @@ export default async function HomePage() {
               />
             </div>
 
+            {/* Two reassurances under the photograph. On a desktop they are cards
+                with room to explain themselves; on a phone they shrink to a pair
+                of pills with the claim alone, because four lines of specification
+                is not what anyone reads on the way to the headline. */}
             <div className="t t--2 t--lift t--center rv c4 hero-stat" data-delay="200">
-              <b style={{ fontFamily: "var(--serif)", fontWeight: 400, fontSize: "clamp(2.4rem,4vw,3.2rem)", lineHeight: 1, color: "var(--head)" }}>
-                {withFigures(String(DISTINCT_LOOKS))}
-              </b>
-              <span className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".3rem" }}>
-                distinct looks — {withFigures("2")} families, {withFigures("6")} palette
-                colours, {withFigures("3")} letterings and {withFigures("3")} ways to open,
-                before you add a photograph.
+              <b className="hero-fig">{withFigures(String(DISTINCT_LOOKS))}</b>
+              <span className="muted hero-note">
+                <span className="on-wide">
+                  distinct looks — {withFigures("2")} families, {withFigures("6")} palette
+                  colours, {withFigures("3")} letterings and {withFigures("3")} ways to open,
+                  before you add a photograph.
+                </span>
+                <span className="on-narrow">distinct looks</span>
               </span>
             </div>
 
             <div className="t t--2 t--lift t--center rv c3 hero-price" data-delay="260">
-              <p className="kick">Pay once</p>
-              <h3 style={{ fontSize: "var(--t-lg)", marginTop: ".5rem" }}>No subscription, ever</h3>
-              <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".4rem" }}>
-                One payment, one invitation.
-              </p>
+              <p className="kick hero-fig">Pay once</p>
+              <span className="muted hero-note">
+                <span className="on-wide">
+                  <b className="hero-price-h">No subscription, ever</b>
+                  One payment, one invitation.
+                </span>
+                <span className="on-narrow">no subscription</span>
+              </span>
             </div>
           </div>
         </header>
@@ -187,11 +195,12 @@ export default async function HomePage() {
         <section className="sec tone-cream" id="ceremonies">
           <div className="wrap">
             <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
-              <p className="kick">Explore by occasion</p>
-              <h2>An invitation drawn for the day</h2>
+              <p className="kick">Every event, not only weddings</p>
+              <h2>From weddings to temple ceremonies</h2>
               <p>
-                A housewarming is not a wedding and should not look like one. Each
-                occasion carries its own words, its own colour and its own headcount.
+                A naming ceremony is not a wedding and a Deepavali open house is
+                neither, so none of them share an invitation. Each occasion gets its
+                own words, its own colour, its own link and its own headcount.
               </p>
             </div>
             <div className="bento">
@@ -437,14 +446,15 @@ export default async function HomePage() {
               <div className="ov">
                 <div>
                   <h2>
-                    Your first invitation is{" "}
+                    Send your next event as{" "}
                     <em style={{ fontStyle: "italic", color: "var(--gold-lt)" }}>
-                      twenty minutes away
+                      one beautiful link
                     </em>
                   </h2>
                   <p>
-                    Start with the names and the occasion. Everything else can be decided
-                    later, and changed after you publish.
+                    Wedding, naming ceremony, housewarming, temple consecration or an
+                    open house — build it free, see it working on your own phone, and
+                    pay only when you are ready to send it.
                   </p>
                   <Link className="btn btn-gold" href="/create">
                     Create your invitation <Arrow />

@@ -36,8 +36,8 @@ export default async function DashboardPage() {
         <div className="t empty">
           <h2>Nothing here yet</h2>
           <p>
-            Your first invitation takes about twenty minutes, and you can see it
-            working before you decide anything.
+            Build an e-invitation for any event you are holding — see it working
+            on your own phone before you decide anything.
           </p>
           <div style={{ marginTop: "1.6rem" }}>
             <Link className="btn btn-gold" href="/create">

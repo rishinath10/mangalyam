@@ -38,8 +38,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link href="/admin">Overview</Link>
             <Link href="/admin/customers">Customers</Link>
             <Link href="/admin/quotes">Quotes</Link>
-            <Link href="/dashboard">My dashboard</Link>
           </nav>
+          {/* Out of the nav: this leaves the admin area rather than moving
+              around inside it, so it is a button and not a fourth tab. */}
+          <Link href="/dashboard" className="btn btn-line btn-sm admin-leave">
+            My dashboard
+          </Link>
           <span className="dim dash-email">{email}</span>
           <SignOutButton />
         </div>

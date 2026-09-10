@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { ApiError } from "@/lib/api";
+import { isAdmin } from "@/lib/auth/admin";
 import { requireInvitation } from "@/lib/auth/ownership";
 import { invitationInclude, toInvitationSource } from "@/lib/invitation/build";
 import { InvitationBuilder } from "@/components/builder/InvitationBuilder";
@@ -47,9 +48,10 @@ export default async function InvitationBuilderPage({ params }: Params) {
           sortOrder: photo.sortOrder,
         }))}
         status={row.status}
-        // From the ownership guard's own include, so the Share tab can say why
-        // publishing is refused instead of only failing when it is tried.
-        paid={Boolean(owned.event.entitlement)}
+        // The same two conditions assertCanPublish checks, so the Share tab can
+        // say why publishing is refused instead of only failing when it is
+        // tried. The server still decides; this only picks the button.
+        canPublish={Boolean(owned.event.entitlement) || (await isAdmin())}
       />
     </div>
   );

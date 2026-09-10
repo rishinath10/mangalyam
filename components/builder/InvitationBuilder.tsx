@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { InvitationStatus } from "@prisma/client";
 import { Button } from "@/components/ui/Button";
@@ -20,13 +20,13 @@ export function InvitationBuilder({
   initialSource,
   initialPhotos,
   status: initialStatus,
-  paid,
+  canPublish,
 }: {
   initialSource: InvitationSource;
   initialPhotos: GalleryPhoto[];
   status: InvitationStatus;
-  /** Whether the event above this invitation has been paid for. */
-  paid: boolean;
+  /** Whether the publish route will accept this invitation: paid, or admin. */
+  canPublish: boolean;
 }) {
   const [status, setStatus] = useState(initialStatus);
   const router = useRouter();
@@ -37,6 +37,8 @@ export function InvitationBuilder({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [coverBusy, setCoverBusy] = useState(false);
+  // On a phone the preview is a sheet rather than a column beside the fields.
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   /**
    * The preview is derived from local state through the same composer the
@@ -47,6 +49,15 @@ export function InvitationBuilder({
     () => composeInvitationJson({ ...source, photos }),
     [source, photos],
   );
+
+  // A sheet that covers the page must not leave the page scrolling behind it.
+  useEffect(() => {
+    if (!previewOpen) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [previewOpen]);
 
   function patch(next: Partial<InvitationSource>) {
     setSource((s) => ({ ...s, ...next }));
@@ -148,7 +159,7 @@ export function InvitationBuilder({
             <span>/i/{source.slug}</span>
           </div>
         </div>
-        <div className="builder-actions">
+        <div className="builder-actions" data-dirty={dirty ? "" : undefined}>
           {dirty && <span style={{ fontSize: "var(--t-xs)", color: "var(--accent)" }}>Unsaved changes</span>}
           <Button type="button" onClick={save} disabled={saving || !dirty}>
             {saving ? "Saving…" : "Save changes"}
@@ -213,7 +224,7 @@ export function InvitationBuilder({
               <SharePanel
                 eventId={source.eventId}
                 invitationId={source.invitationId}
-                paid={paid}
+                canPublish={canPublish}
                 slug={source.slug}
                 status={status}
                 coupleLine={source.hostNames}
@@ -235,10 +246,19 @@ export function InvitationBuilder({
           </div>
         </div>
 
-        <div className="builder-preview">
+        <div className="builder-preview" data-open={previewOpen ? "" : undefined}>
           <PreviewPane invitation={previewJson} slug={source.slug} />
         </div>
       </div>
+
+      <button
+        type="button"
+        className="builder-peek"
+        onClick={() => setPreviewOpen((open) => !open)}
+        aria-expanded={previewOpen}
+      >
+        <span>{previewOpen ? "Back to the editor" : "Preview my invitation"}</span>
+      </button>
     </div>
   );
 }

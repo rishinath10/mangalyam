@@ -20,17 +20,24 @@ const TEMPLATES: Record<string, (props: TemplateProps) => React.ReactNode> = {
  * component with the same invitation JSON. There is deliberately no second
  * rendering path — if you find yourself wanting one, change this instead.
  *
- * `preview` only gates side effects (audio autoplay, the page drifting under
- * the editor), never layout or content: what the customer sees while editing
- * is what the guest gets — the opening sequence included.
+ * `preview` and `live` only gate side effects (audio autoplay, the page
+ * drifting under the editor, whether the RSVP can be submitted), never layout
+ * or content: what the customer sees while editing is what the guest gets —
+ * the opening sequence included. `live` defaults to the opposite of `preview`,
+ * so the only caller that has to think about it is the owner's draft preview,
+ * which wants the real behaviour with the replies still held back.
  */
-export function InvitationRenderer({ invitation, preview = false }: TemplateProps) {
+export function InvitationRenderer({
+  invitation,
+  preview = false,
+  live,
+}: TemplateProps & { live?: boolean }) {
   const manifest = getManifest(invitation.templateId);
   const Template = TEMPLATES[manifest.templateId] ?? DeepamTemplate;
 
   return (
     <div style={designSystemStyle(manifest, invitation.accentColor, invitation.fontPairing)}>
-      <InvitationShell invitation={invitation} preview={preview}>
+      <InvitationShell invitation={invitation} preview={preview} live={live}>
         <Template invitation={invitation} preview={preview} />
       </InvitationShell>
     </div>

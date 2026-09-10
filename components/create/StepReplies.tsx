@@ -138,7 +138,7 @@ export function StepReplies({
         <Input
           id="contactName"
           label="Who guests should call"
-          placeholder="Rishi"
+          placeholder="Ashwin"
           maxLength={60}
           value={settings.contactName ?? ""}
           onChange={(e) => set({ contactName: e.target.value || null })}

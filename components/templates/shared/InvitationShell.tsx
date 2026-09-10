@@ -44,16 +44,24 @@ function findScroller(from: HTMLElement | null): HTMLElement | null {
  *
  * It sits in the renderer rather than in a template so all six designs get the
  * same behaviour and rule #3 still holds — preview and published mount this
- * identical component. `preview` suppresses only side effects the builder
- * should not have (audio, the page drifting under the editor).
+ * identical component.
+ *
+ * Two separate facts, because the owner previewing their own unpublished draft
+ * needs one of each: `preview` says replies cannot be submitted yet, and
+ * `live` says the side effects — audio, the page drifting on its own — should
+ * run. Inside the builder both are off; on a published page both are on; on a
+ * draft the owner opens on their phone, the drift and the music are real and
+ * only the RSVP is held back.
  */
 export function InvitationShell({
   invitation,
   preview = false,
+  live = !preview,
   children,
 }: {
   invitation: InvitationJson;
   preview?: boolean;
+  live?: boolean;
   children: React.ReactNode;
 }) {
   const [opened, setOpened] = useState(false);
@@ -63,7 +71,7 @@ export function InvitationShell({
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const musicAvailable =
-    invitation.music.enabled && Boolean(invitation.music.url) && !preview;
+    invitation.music.enabled && Boolean(invitation.music.url) && live;
 
   const open = useCallback(() => {
     setOpened((was) => {
@@ -88,7 +96,7 @@ export function InvitationShell({
 
   // The drift. Any deliberate input hands control straight back to the guest.
   useEffect(() => {
-    if (!opened || preview) return;
+    if (!opened || !live) return;
     if (!invitation.opening.autoScroll) return;
     if (prefersReducedMotion()) return;
 
@@ -142,7 +150,7 @@ export function InvitationShell({
       clearTimeout(begin);
       stop();
     };
-  }, [opened, preview, invitation.opening.autoScroll]);
+  }, [opened, live, invitation.opening.autoScroll]);
 
   function toggleMusic() {
     const audio = audioRef.current;

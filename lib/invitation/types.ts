@@ -28,7 +28,7 @@ export interface InvitationJson {
    */
   frame: string | null;
   couple: {
-    /** "Rishi & Gaayathri", "The Kumar Family", or a single name. */
+    /** "Ashwin & Kalyani", "The Kumar Family", or a single name. */
     hostNames: string;
     coverPhoto: string | null;
     message: string | null;

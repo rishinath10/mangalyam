@@ -1,6 +1,7 @@
 import type { Entitlement } from "@prisma/client";
 import { db } from "@/lib/db";
 import { forbidden } from "@/lib/api";
+import { isAdmin } from "@/lib/auth/admin";
 
 /**
  * Self-serve is always exactly one invitation (CLAUDE.md Section 8) — there
@@ -48,6 +49,13 @@ export async function assertCanPublish(
   eventId: string,
   entitlement: Entitlement | null,
 ): Promise<void> {
+  // The owner's own account publishes without paying, so the whole flow can be
+  // walked end to end — including the published page and a real RSVP — without
+  // putting a live charge through the gateway to do it. The allowlist is an
+  // environment variable and no row in the database grants it, so this cannot
+  // be reached by anyone who is not already deploying the app.
+  if (await isAdmin()) return;
+
   if (!entitlement) {
     throw forbidden("Complete your purchase to publish this invitation.");
   }

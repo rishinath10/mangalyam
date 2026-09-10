@@ -7,7 +7,7 @@ import { CreateWizard } from "@/components/create/CreateWizard";
 export const metadata = {
   title: "Create your invitation",
   description:
-    "Build your invitation and see it working before you sign up. Pay only when you are ready to publish.",
+    "Build your e-invitation for any event — wedding, naming ceremony, housewarming, temple consecration — and see it working before you sign up. Pay only when you are ready to send it.",
 };
 
 /**
@@ -30,7 +30,7 @@ export default async function CreatePage() {
           </Link>
           <Link
             href={session?.user ? "/dashboard" : "/login"}
-            className="btn btn-quiet btn-sm wz-bar-alt"
+            className="btn btn-line btn-sm wz-bar-alt"
           >
             {session?.user ? "My dashboard" : "Sign in"}
           </Link>

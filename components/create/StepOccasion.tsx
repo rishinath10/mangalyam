@@ -52,7 +52,7 @@ export function StepOccasion({
             <Input
               id="groomName"
               label="Groom"
-              placeholder="Rishi"
+              placeholder="Ashwin"
               maxLength={120}
               autoComplete="off"
               value={draft.groomName}
@@ -64,7 +64,7 @@ export function StepOccasion({
             <Input
               id="brideName"
               label="Bride"
-              placeholder="Gaayathri"
+              placeholder="Kalyani"
               maxLength={120}
               autoComplete="off"
               value={draft.brideName}

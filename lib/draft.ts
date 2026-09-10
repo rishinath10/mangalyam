@@ -27,7 +27,7 @@ export interface InvitationDraft {
   /**
    * Who the celebration is for, on every occasion except a wedding. A wedding
    * asks for the two names separately below, because one box cannot say which
-   * half of "Rishi & Gaayathri" is which — and the cover sets them as a pair.
+   * half of "Ashwin & Kalyani" is which — and the cover sets them as a pair.
    */
   hostNames: string;
   groomName: string;
@@ -132,7 +132,7 @@ export function emptyDraft(): InvitationDraft {
  * which form the answer arrived in.
  *
  * A half-filled pair composes to just the name that is there rather than to
- * "Rishi &", so the preview never shows a dangling ampersand while someone is
+ * "Ashwin &", so the preview never shows a dangling ampersand while someone is
  * still typing the second name.
  */
 export function draftHostNames(draft: InvitationDraft): string {

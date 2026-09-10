@@ -282,7 +282,7 @@ export function CreateWizard({
         onClick={() => setPreviewOpen((open) => !open)}
         aria-expanded={previewOpen}
       >
-        {previewOpen ? "Back to the questions" : "Preview my invitation"}
+        <span>{previewOpen ? "Back to the questions" : "Preview my invitation"}</span>
       </button>
     </div>
   );

@@ -10,7 +10,7 @@ export function SharePanel({
   invitationId,
   slug,
   status,
-  paid,
+  canPublish,
   coupleLine,
   ceremonyLabel,
   onSlugChange,
@@ -20,8 +20,12 @@ export function SharePanel({
   invitationId: string;
   slug: string;
   status: InvitationStatus;
-  /** Whether this event has an entitlement. Publishing is refused without one. */
-  paid: boolean;
+  /**
+   * Whether the publish route will actually accept this — an entitlement on the
+   * event, or an admin account. Purely so the panel offers the right button;
+   * the refusal itself lives server-side in assertCanPublish.
+   */
+  canPublish: boolean;
   coupleLine: string;
   ceremonyLabel: string;
   onSlugChange: (slug: string) => void;
@@ -102,7 +106,7 @@ export function SharePanel({
           </span>
           {/* Unpaid, the button becomes the way to pay: hiding it would leave
               the customer looking for the thing they already decided to do. */}
-          {!published && !paid ? (
+          {!published && !canPublish ? (
             <ButtonLink variant="gold" href={`/dashboard/events/${eventId}`}>
               Pay to publish
             </ButtonLink>
@@ -124,7 +128,7 @@ export function SharePanel({
         <p className="dim" style={{ fontSize: "var(--t-xs)", marginTop: ".7rem" }}>
           {published
             ? "Guests can open this link and reply. Edits you save appear immediately — the link never changes."
-            : paid
+            : canPublish
               ? "Drafts are private. Publishing needs a date and a venue."
               : "Drafts are private, and stay editable for as long as you like. One payment is what puts this link in front of your guests."}
         </p>
@@ -158,6 +162,25 @@ export function SharePanel({
         </p>
       )}
 
+      {/* A phone frame in the editor is not the thing itself. This is the real
+          page at the real address — it just 404s for everyone but you until it
+          is published, which is what keeps it from being a free way to reach
+          guests. */}
+      {!published && (
+        <div className="try-strip">
+          <div>
+            <b>Try it on your phone</b>
+            <span>
+              Opens the real invitation, full screen, at the link above. Only you
+              can see it while it is a draft — anyone else gets a not-found page.
+            </span>
+          </div>
+          <a className="btn btn-line btn-sm" href={`/i/${slug}`} target="_blank" rel="noopener noreferrer">
+            Open the draft
+          </a>
+        </div>
+      )}
+
       <div>
         <span className="field-label">Share</span>
         <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap" }}>
@@ -184,13 +207,18 @@ export function SharePanel({
               Share…
             </Button>
           )}
-          <a className="btn btn-quiet btn-sm" href={`/i/${slug}`} target="_blank" rel="noopener noreferrer">
-            Open it
-          </a>
+          {/* Only once published: while it is a draft the strip above already
+              offers this link, with the explanation that goes with it. */}
+          {published && (
+            <a className="btn btn-quiet btn-sm" href={`/i/${slug}`} target="_blank" rel="noopener noreferrer">
+              Open it
+            </a>
+          )}
         </div>
         {!published && (
           <p className="dim" style={{ fontSize: "var(--t-xs)", marginTop: ".7rem" }}>
-            Publish first — a draft link shows a not-found page to your guests.
+            Publish first — until then this link shows a not-found page to
+            everyone except you.
           </p>
         )}
       </div>

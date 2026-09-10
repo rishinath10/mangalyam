@@ -59,7 +59,7 @@ Unowned resources return 404, not 403, so the API doesn't leak which ids exist.
 
 **`Event` is the top-level billed entity, not `Wedding`.** Mangalyam covers
 every Malaysian Indian celebration, not only weddings — `hostNames` is a
-flexible display string ("Rishi & Gaayathri", "The Kumar Family", one name),
+flexible display string ("Ashwin & Kalyani", "The Kumar Family", one name),
 and `EventType` decides which occasion it is. Only `wedding` has sub-ceremonies
 (`CeremonyType`, wedding-only and nullable); every other occasion's single
 invitation carries `ceremonyType: null` and is labelled from `EVENT_TYPE_LABELS`
