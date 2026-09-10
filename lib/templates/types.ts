@@ -8,6 +8,8 @@ export type SectionKey =
   | "event"
   | "schedule"
   | "gallery"
+  /** The wall of what guests wrote when they replied. */
+  | "greetings"
   | "rsvp";
 
 /**

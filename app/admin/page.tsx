@@ -2,15 +2,21 @@ import Link from "next/link";
 import { activity, overview, recentPurchases } from "@/lib/admin/queries";
 import { humanise, ringgit, shortDate } from "@/lib/admin/format";
 import { isPurchasable } from "@/lib/pricing";
+import { checkStorage } from "@/lib/storage";
 
 // Money and signups must never be served from a cached render.
 export const dynamic = "force-dynamic";
 
 export default async function AdminOverview() {
-  const [stats, purchases, days] = await Promise.all([
+  const [stats, purchases, days, storage] = await Promise.all([
     overview(),
     recentPurchases(15),
     activity(30),
+    // A live write-and-delete, not a settings check: credentials can be
+    // present and wrong, and an upload failing is otherwise the first anyone
+    // hears about it — by which time it looks to the customer like their
+    // photograph is broken.
+    checkStorage(),
   ]);
 
   const peak = Math.max(1, ...days.map((d) => d.signups + d.published + d.rsvps));
@@ -21,6 +27,21 @@ export default async function AdminOverview() {
         <h1>Overview</h1>
         <p className="muted">Everything across every customer.</p>
       </div>
+
+      {!storage.ok && (
+        <div className="notice notice-bad" style={{ marginBottom: "1.4rem" }}>
+          <b>Image uploads are failing.</b> Cover photos, gallery images and
+          template artwork cannot be saved until this is fixed.
+          <div className="store-why">{storage.problem}</div>
+          <div className="store-keys">
+            {Object.entries(storage.configured).map(([name, set]) => (
+              <span key={name} data-set={set ? "" : undefined}>
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {!isPurchasable() && (
         <p className="notice notice-bad" style={{ marginBottom: "1.4rem" }}>

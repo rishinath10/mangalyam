@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ZodError, type ZodType } from "zod";
+import { StorageUnavailableError } from "@/lib/storage-errors";
 
 export class ApiError extends Error {
   constructor(
@@ -41,6 +42,18 @@ export function handle<T>(fn: () => Promise<T>) {
         return NextResponse.json(
           { error: "Invalid input", details: err.flatten().fieldErrors },
           { status: 400 },
+        );
+      }
+      if (err instanceof StorageUnavailableError) {
+        // The operator needs the real cause; the customer needs to know it is
+        // not their file and not their fault.
+        console.error("Image storage failed:", err.cause);
+        return NextResponse.json(
+          {
+            error:
+              "Image storage is not reachable right now, so the upload could not be saved. Nothing is wrong with your photo.",
+          },
+          { status: 503 },
         );
       }
       console.error("Unhandled API error:", err);

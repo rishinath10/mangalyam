@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 
+/** Mirrors the route's own cap, so the picker closes before a refusal. */
+export const MAX_GALLERY_PHOTOS = 4;
+
 export interface GalleryPhoto {
   id: string;
   url: string;
@@ -82,8 +85,10 @@ export function GalleryPanel({
   return (
     <div style={{ display: "grid", gap: "1rem" }}>
       <p className="muted" style={{ fontSize: "var(--t-sm)" }}>
-        Images are resized and converted to WebP on upload, so guests on slow
-        connections still load the page quickly.
+        Up to {MAX_GALLERY_PHOTOS} photos — a glance before the day, not the
+        album after it. Guests tap one to see it full size. Images are resized
+        and converted to WebP on upload, so a slow hall connection still loads
+        the page quickly.
       </p>
 
       {error && (
@@ -133,18 +138,24 @@ export function GalleryPanel({
         </div>
       )}
 
-      <input
-        type="file"
-        accept="image/*"
-        disabled={busy}
-        className="filedrop"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) upload(file);
-          // reset so re-picking the same file fires change again
-          e.target.value = "";
-        }}
-      />
+      {photos.length < MAX_GALLERY_PHOTOS ? (
+        <input
+          type="file"
+          accept="image/*"
+          disabled={busy}
+          className="filedrop"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) upload(file);
+            // reset so re-picking the same file fires change again
+            e.target.value = "";
+          }}
+        />
+      ) : (
+        <p className="dim" style={{ fontSize: "var(--t-sm)" }}>
+          That is all {MAX_GALLERY_PHOTOS}. Remove one to swap it for another.
+        </p>
+      )}
       {busy && <p className="dim" style={{ fontSize: "var(--t-xs)" }}>Uploading…</p>}
     </div>
   );

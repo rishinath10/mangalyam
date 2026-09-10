@@ -134,7 +134,9 @@ export function RsvpForm({
       )}
 
       <label className="rsvp-field">
-        <span>A message for the couple</span>
+        {/* Said before they write it, not after: a note meant to be private
+            and a note meant for the page are not the same note. */}
+        <span>A message for the couple — shown on this page</span>
         <textarea
           rows={3}
           maxLength={500}

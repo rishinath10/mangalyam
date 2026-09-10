@@ -1,6 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { PutObjectCommand, DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import sharp from "sharp";
+import { StorageUnavailableError, UnreadableImageError } from "@/lib/storage-errors";
+
+// Re-exported so callers keep importing one module for uploads.
+export { StorageUnavailableError, UnreadableImageError };
 
 /**
  * Object storage is MinIO (S3-compatible) on the builder's own Coolify box.
@@ -64,22 +68,6 @@ const VARIANTS: Record<Variant, { width: number; height: number; quality: number
   divider: { width: 1200, height: 160, quality: 90 },
 };
 
-/**
- * The file itself was not an image, or was one sharp refuses to decode.
- *
- * Distinct from a storage failure on purpose. Both used to surface to the
- * caller as one catch-all, so an unreachable bucket told the customer their
- * photograph was corrupt — sending them off to re-export a file that was
- * always fine, while the actual outage went unreported. Whose fault it is
- * decides both the message and the status code.
- */
-export class UnreadableImageError extends Error {
-  constructor() {
-    super("Unreadable image");
-    this.name = "UnreadableImageError";
-  }
-}
-
 export interface StoredImage {
   key: string;
   url: string;
@@ -117,18 +105,26 @@ export async function storeImage(
     throw new UnreadableImageError();
   }
 
-  const bucket = required("S3_BUCKET");
   const key = `${prefix}/${randomUUID()}.webp`;
 
-  await s3().send(
-    new PutObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      Body: data,
-      ContentType: "image/webp",
-      CacheControl: "public, max-age=31536000, immutable",
-    }),
-  );
+  try {
+    const bucket = required("S3_BUCKET");
+    await s3().send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: data,
+        ContentType: "image/webp",
+        CacheControl: "public, max-age=31536000, immutable",
+      }),
+    );
+    // Inside the try as well: an unset public URL is a configuration fault
+    // like any other, and it used to surface as a bare 500 after the object
+    // had already been written.
+    required("S3_PUBLIC_URL");
+  } catch (err) {
+    throw new StorageUnavailableError(err);
+  }
 
   return {
     key,
@@ -150,4 +146,67 @@ export async function deleteImage(url: string): Promise<void> {
   } catch (err) {
     console.error("Failed to delete object from storage:", key, err);
   }
+}
+
+export interface StorageHealth {
+  ok: boolean;
+  /** Which settings are present. Never the values — this is rendered in a page. */
+  configured: Record<string, boolean>;
+  /** The failure, in the operator's words. Null when everything worked. */
+  problem: string | null;
+}
+
+/**
+ * Can we actually store a file right now?
+ *
+ * Writes a tiny object and deletes it again, which is the only honest way to
+ * answer: credentials can be present and wrong, a bucket can exist and refuse
+ * writes, and a host can resolve and not be listening. An upload failing is
+ * the first anyone hears about any of that, and by then it looks to the
+ * customer like their photograph is broken.
+ *
+ * Names which settings are missing, never their values.
+ */
+export async function checkStorage(): Promise<StorageHealth> {
+  const names = [
+    "S3_ENDPOINT",
+    "S3_BUCKET",
+    "S3_ACCESS_KEY_ID",
+    "S3_SECRET_ACCESS_KEY",
+    "S3_PUBLIC_URL",
+  ];
+  const configured = Object.fromEntries(names.map((n) => [n, Boolean(process.env[n])]));
+  const missing = names.filter((n) => !process.env[n]);
+  if (missing.length) {
+    return { ok: false, configured, problem: `Not set: ${missing.join(", ")}` };
+  }
+
+  const key = `healthcheck/${randomUUID()}.txt`;
+  try {
+    await s3().send(
+      new PutObjectCommand({
+        Bucket: required("S3_BUCKET"),
+        Key: key,
+        Body: Buffer.from("ok"),
+        ContentType: "text/plain",
+      }),
+    );
+  } catch (err) {
+    return {
+      ok: false,
+      configured,
+      problem: err instanceof Error ? err.message : String(err),
+    };
+  }
+
+  // Best effort: a bucket that accepts writes and refuses deletes is still a
+  // working bucket for our purposes, and leaving one probe file behind is
+  // better than reporting a failure that would not affect an upload.
+  try {
+    await s3().send(new DeleteObjectCommand({ Bucket: required("S3_BUCKET"), Key: key }));
+  } catch {
+    /* ignore */
+  }
+
+  return { ok: true, configured, problem: null };
 }

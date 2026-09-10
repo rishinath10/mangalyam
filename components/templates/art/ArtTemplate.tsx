@@ -3,6 +3,7 @@
 import { FadeIn, ScaleIn } from "@/components/motion/primitives";
 import { Couple } from "@/components/templates/sections/Couple";
 import { Gallery } from "@/components/templates/sections/Gallery";
+import { Greetings } from "@/components/templates/sections/Greetings";
 import { Rsvp } from "@/components/templates/sections/Rsvp";
 import { Schedule } from "@/components/templates/sections/Schedule";
 import { CoverFrame } from "@/components/templates/shared/CoverFrame";
@@ -162,6 +163,7 @@ export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
     event: eventSection,
     schedule: <Schedule {...shared} />,
     gallery: <Gallery {...shared} />,
+    greetings: <Greetings {...shared} />,
     rsvp: <Rsvp {...shared} />,
   } as const;
 

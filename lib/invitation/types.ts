@@ -51,6 +51,14 @@ export interface InvitationJson {
   schedule: ScheduleEntry[];
   gallery: GalleryEntry[];
   rsvp: { enabled: boolean; askMealPreference: boolean; closeDate: string | null };
+  /**
+   * What guests wrote when they replied, shown back on the page.
+   *
+   * Only ever the name and the message — never whether someone is coming, how
+   * many they are bringing or what they eat. That is the host's list, and a
+   * guest opening the link should not be able to read the headcount off it.
+   */
+  greetings: Greeting[];
   music: { enabled: boolean; url: string | null };
   countdown: { enabled: boolean };
   /** The cover a guest taps before the invitation is revealed. */
@@ -63,6 +71,13 @@ export interface ScheduleEntry {
   time: string;
   title: string;
   description: string;
+}
+
+export interface Greeting {
+  guestName: string;
+  message: string;
+  /** ISO date. The wall reads newest first. */
+  at: string;
 }
 
 export interface GalleryEntry {

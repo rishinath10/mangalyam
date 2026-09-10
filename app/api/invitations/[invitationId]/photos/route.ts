@@ -14,7 +14,15 @@ type Params = { params: Promise<{ invitationId: string }> };
 // sharp is a native module; this route cannot run on the edge runtime.
 export const runtime = "nodejs";
 
-const MAX_PHOTOS_PER_INVITATION = 30;
+/**
+ * Four, deliberately.
+ *
+ * A gallery on an invitation is a glance, not an album — the photographs come
+ * after the day, and a guest reading this on a phone before it is scrolling
+ * past the venue to get through them. Four fits two rows on any screen and
+ * keeps the page light on a wedding-hall connection.
+ */
+const MAX_PHOTOS_PER_INVITATION = 4;
 
 export async function GET(_req: Request, { params }: Params) {
   return handle(async () => {
@@ -50,7 +58,9 @@ export async function POST(req: Request, { params }: Params) {
       where: { invitationId: invitation.id },
     });
     if (count >= MAX_PHOTOS_PER_INVITATION) {
-      throw badRequest(`A gallery holds up to ${MAX_PHOTOS_PER_INVITATION} photos`);
+      throw badRequest(
+        `A gallery holds up to ${MAX_PHOTOS_PER_INVITATION} photos. Remove one to add another.`,
+      );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());

@@ -46,6 +46,8 @@ export interface InvitationSource {
   mapLink: string | null;
   schedule: { time: string; title: string; description: string | null }[];
   photos: { url: string; caption: string | null; sortOrder: number }[];
+  /** Resolved by the server; the builder preview shows the real ones too. */
+  greetings?: { guestName: string; message: string; at: string }[];
   settings: {
     musicEnabled: boolean;
     musicUrl: string | null;
@@ -113,6 +115,7 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
           order: photo.sortOrder,
         }))
       : [],
+    greetings: source.greetings ?? [],
     rsvp: {
       enabled: source.settings.rsvpEnabled,
       askMealPreference: source.settings.askMealPreference,

@@ -49,7 +49,7 @@ export const TEMPLATE_MANIFESTS: TemplateManifest[] = [
     name: "Mandapam",
     tagline: "The pavilion the ceremony happens under",
     eventTypes: ["wedding"],
-    sections: ["cover", "couple", "event", "schedule", "gallery", "rsvp"],
+    sections: ["cover", "couple", "event", "schedule", "gallery", "greetings", "rsvp"],
     features: { music: true, countdown: true },
     accents: MANDAPAM_ACCENTS,
     defaultAccentKey: "kumkum",
@@ -87,7 +87,7 @@ export const TEMPLATE_MANIFESTS: TemplateManifest[] = [
     // The general family: everything that is not specifically a wedding, and
     // weddings too for anyone who wants the quieter of the two.
     eventTypes: [...EVENT_TYPES] as EventType[],
-    sections: ["cover", "couple", "event", "schedule", "gallery", "rsvp"],
+    sections: ["cover", "couple", "event", "schedule", "gallery", "greetings", "rsvp"],
     features: { music: true, countdown: true },
     accents: DEEPAM_ACCENTS,
     defaultAccentKey: "brass",
@@ -114,7 +114,7 @@ export const TEMPLATE_MANIFESTS: TemplateManifest[] = [
     tagline: "A gold border, drawn the way a printed card is",
     // Offered to everything: a border and a crest carry no wedding in them.
     eventTypes: [...EVENT_TYPES] as EventType[],
-    sections: ["cover", "couple", "event", "schedule", "gallery", "rsvp"],
+    sections: ["cover", "couple", "event", "schedule", "gallery", "greetings", "rsvp"],
     features: { music: true, countdown: true },
     accents: THANGA_ACCENTS,
     defaultAccentKey: "kumkum",

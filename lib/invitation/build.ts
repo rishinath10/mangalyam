@@ -17,6 +17,8 @@ export type InvitationWithRelations = Invitation & {
   scheduleItems: InvitationScheduleItem[];
   photos: InvitationPhoto[];
   settings: InvitationSettings | null;
+  /** Only the two public columns — see invitationInclude. */
+  rsvps: { guestName: string; message: string | null; createdAt: Date }[];
 };
 
 /** Prisma include that produces exactly `InvitationWithRelations`. */
@@ -25,6 +27,21 @@ export const invitationInclude = {
   scheduleItems: { orderBy: { sortOrder: "asc" } },
   photos: { orderBy: { sortOrder: "asc" } },
   settings: true,
+  /**
+   * Greetings for the public wall.
+   *
+   * `rsvps` is owner-only-read (rule #4) and stays that way: only two columns
+   * are selected, and neither says whether anyone is coming, how many they are
+   * bringing or what they eat. A guest with the link can read what other
+   * guests wrote to the couple; they still cannot read the headcount off the
+   * page. Rows with no message never appear.
+   */
+  rsvps: {
+    where: { message: { not: null } },
+    select: { guestName: true, message: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+    take: 60,
+  },
 } as const;
 
 const isoDate = (d: Date | null | undefined) =>
@@ -72,6 +89,11 @@ export function toInvitationSource(
       url: photo.url,
       caption: photo.caption,
       sortOrder: photo.sortOrder,
+    })),
+    greetings: row.rsvps.map((r) => ({
+      guestName: r.guestName,
+      message: r.message ?? "",
+      at: r.createdAt.toISOString(),
     })),
     settings: {
       musicEnabled: s?.musicEnabled ?? false,

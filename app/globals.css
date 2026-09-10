@@ -1521,3 +1521,81 @@ header:has(> .inv-frame-stage){place-content:center}
   .art-slot{flex-direction:column}
   .art-chip{width:88px;height:116px}
 }
+
+/* The storage check on the admin overview. Names which settings are present,
+   never their values — this renders in a page. */
+.store-why{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;
+  margin-top:.6rem;padding:.55rem .7rem;border-radius:10px;
+  background:rgba(0,0,0,.22);color:#F0B4B4;word-break:break-word;
+}
+.store-keys{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
+.store-keys span{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.68rem;
+  padding:.2rem .5rem;border-radius:100px;
+  border:1px solid rgba(190,70,70,.4);color:#E7A9A9;
+}
+.store-keys span[data-set]{border-color:rgba(60,150,110,.4);color:#8FD5B4}
+
+/* ---------- the guest's lightbox ---------- */
+.gal-tile{cursor:zoom-in;background:none;padding:0;transition:opacity .2s}
+.gal-tile:hover{opacity:.88}
+.gal-tile:focus-visible{outline:2px solid var(--ds-accent);outline-offset:3px}
+
+.lb{
+  position:fixed;inset:0;z-index:120;display:grid;place-items:center;
+  padding:clamp(.8rem,4vw,2.5rem);
+  background:rgba(10,4,6,.94);
+  animation:lb-in .22s ease both;
+}
+@keyframes lb-in{from{opacity:0}to{opacity:1}}
+
+.lb-stage{margin:0;display:grid;gap:.8rem;justify-items:center;max-width:min(100%,900px)}
+.lb-stage img{
+  display:block;max-width:100%;max-height:76svh;width:auto;height:auto;
+  border-radius:6px;box-shadow:0 30px 70px -30px rgba(0,0,0,.9);
+}
+.lb-stage figcaption{display:flex;gap:.9rem;align-items:baseline;flex-wrap:wrap;justify-content:center}
+.lb-cap{font-size:.86rem;color:#E8DCC6;text-align:center}
+.lb-count{
+  font-size:.68rem;letter-spacing:.2em;color:#9A8A70;
+}
+
+.lb-x,.lb-arrow{
+  position:absolute;display:grid;place-items:center;cursor:pointer;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(235,215,155,.24);
+  color:#EBD79B;transition:background .2s,border-color .2s;
+}
+.lb-x:hover,.lb-arrow:hover{background:rgba(255,255,255,.16);border-color:var(--gold)}
+.lb-x:focus-visible,.lb-arrow:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.lb-x svg,.lb-arrow svg{width:20px;height:20px}
+.lb-x{top:max(.8rem,env(safe-area-inset-top));right:.8rem}
+.lb-arrow{top:50%;transform:translateY(-50%)}
+.lb-prev{left:.6rem}
+.lb-next{right:.6rem}
+
+@media(max-width:560px){
+  /* Thumb reach: on a phone the arrows belong at the bottom, not at the sides
+     where they sit over the photograph and under nobody's thumb. */
+  .lb-arrow{top:auto;bottom:calc(1rem + env(safe-area-inset-bottom));transform:none}
+  .lb-prev{left:22%}
+  .lb-next{right:22%}
+  .lb-stage img{max-height:66svh}
+}
+
+/* The wall of guest wishes on the invitation. Set in the design system's own
+   tokens, like every other section inside a card. */
+.greet{
+  margin:0;padding:1rem 1.1rem;
+  border:1px solid var(--ds-rule);border-radius:var(--ds-radius);
+  background:var(--ds-surface-alt);
+}
+.greet blockquote{
+  margin:0;font-size:.92rem;line-height:1.6;color:var(--ds-ink);
+  white-space:pre-line;overflow-wrap:anywhere;
+}
+.greet figcaption{
+  margin-top:.6rem;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ds-accent);
+}
