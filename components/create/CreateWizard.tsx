@@ -13,6 +13,7 @@ import { StepDetails } from "./StepDetails";
 import { StepMoments } from "./StepMoments";
 import { StepReplies } from "./StepReplies";
 import { StepFinish } from "./StepFinish";
+import { CoupleConstellation } from "./CoupleConstellation";
 
 /**
  * The create flow: six steps, one preview, no account until the last one.
@@ -39,6 +40,8 @@ export function CreateWizard({
   const [resumed, setResumed] = useState(false);
   // Once the draft is rows, there is nothing left in this wizard to go back to.
   const [saved, setSaved] = useState(false);
+  // Set while the couple's constellation is on screen; advancing waits for it.
+  const [celebrating, setCelebrating] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   // Bumping this remounts the preview, which re-seals the cover so the opening
   // can be watched again. Choosing between three openings is impossible once
@@ -90,13 +93,32 @@ export function CreateWizard({
     panel.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  /**
+   * Leaving the first step with a wedding's two names is the one place in the
+   * wizard worth stopping for: it is the moment the invitation stops being a
+   * form and becomes about two specific people. Once per draft only.
+   */
+  function shouldCelebrate() {
+    return (
+      current.id === "occasion" &&
+      draft.eventType === "wedding" &&
+      !draft.celebrated &&
+      Boolean(draft.groomName.trim() && draft.brideName.trim())
+    );
+  }
+
   function next() {
     const problem = current.blocker(draft);
     if (problem) {
       setBlocker(problem);
       return;
     }
-    if (!last) go(step + 1);
+    if (last) return;
+    if (shouldCelebrate()) {
+      setCelebrating(true);
+      return;
+    }
+    go(step + 1);
   }
 
   /**
@@ -237,6 +259,20 @@ export function CreateWizard({
           </div>
         </aside>
       </div>
+
+      {celebrating && (
+        <CoupleConstellation
+          groom={draft.groomName.trim()}
+          bride={draft.brideName.trim()}
+          onDone={() => {
+            setCelebrating(false);
+            // Marked on the draft, not in component state, so a reload does not
+            // hand them the same three seconds again.
+            setDraft((d) => ({ ...d, celebrated: true }));
+            go(step + 1);
+          }}
+        />
+      )}
 
       {/* On a phone the preview cannot sit beside the questions, so it becomes
           a sheet the visitor pulls up whenever they want to look. */}

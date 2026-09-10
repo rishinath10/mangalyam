@@ -42,20 +42,51 @@ export function StepOccasion({
         </div>
       </div>
 
-      <Input
-        id="hostNames"
-        label={wedding ? "The couple" : "Who it is for"}
-        placeholder={wedding ? "Rishi & Gaayathri" : "The Kumar Family"}
-        maxLength={120}
-        autoComplete="off"
-        value={draft.hostNames}
-        onChange={(e) => onDraft({ ...draft, hostNames: e.target.value })}
-        hint={
-          wedding
-            ? "Two names either side of an “&” are set as a pair on the cover."
-            : "A family, a committee or a single name — it is printed as you write it."
-        }
-      />
+      {/* A wedding is the one occasion with two people in it, and one box
+          cannot say which name is whose. Two boxes also let the cover set them
+          as a pair without having to guess where the join is. */}
+      {wedding ? (
+        <div>
+          <span className="field-label">The couple</span>
+          <div className="couple-pair">
+            <Input
+              id="groomName"
+              label="Groom"
+              placeholder="Rishi"
+              maxLength={120}
+              autoComplete="off"
+              value={draft.groomName}
+              onChange={(e) => onDraft({ ...draft, groomName: e.target.value })}
+            />
+            <span className="couple-amp" aria-hidden="true">
+              &amp;
+            </span>
+            <Input
+              id="brideName"
+              label="Bride"
+              placeholder="Gaayathri"
+              maxLength={120}
+              autoComplete="off"
+              value={draft.brideName}
+              onChange={(e) => onDraft({ ...draft, brideName: e.target.value })}
+            />
+          </div>
+          <p className="dim wz-hint">
+            Both names are set as a pair on the cover, in this order.
+          </p>
+        </div>
+      ) : (
+        <Input
+          id="hostNames"
+          label="Who it is for"
+          placeholder="The Kumar Family"
+          maxLength={120}
+          autoComplete="off"
+          value={draft.hostNames}
+          onChange={(e) => onDraft({ ...draft, hostNames: e.target.value })}
+          hint="A family, a committee or a single name — it is printed as you write it."
+        />
+      )}
     </div>
   );
 }

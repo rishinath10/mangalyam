@@ -1,4 +1,4 @@
-import type { InvitationDraft } from "@/lib/draft";
+import { draftHostNames, type InvitationDraft } from "@/lib/draft";
 
 /**
  * The wizard's spine. Each step declares what it is called, the one-line
@@ -26,8 +26,18 @@ export const STEPS: WizardStep[] = [
     name: "Occasion",
     heading: "What are we celebrating?",
     blurb: "Pick the day. Everything after this is shaped around it.",
-    blocker: (draft) =>
-      draft.hostNames.trim() ? null : "Tell us whose celebration this is.",
+    blocker: (draft) => {
+      // A wedding needs both halves named — the cover sets them as a pair, and
+      // "Rishi &" on its own is worse than no cover at all.
+      if (draft.eventType === "wedding") {
+        if (!draft.groomName.trim() && !draft.brideName.trim())
+          return "Tell us who is getting married.";
+        if (!draft.groomName.trim()) return "Add the groom's name.";
+        if (!draft.brideName.trim()) return "Add the bride's name.";
+        return null;
+      }
+      return draftHostNames(draft) ? null : "Tell us whose celebration this is.";
+    },
   },
   {
     id: "design",

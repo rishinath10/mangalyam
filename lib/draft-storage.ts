@@ -57,6 +57,8 @@ function normalise(raw: unknown): InvitationDraft | null {
     version: 1,
     eventType,
     hostNames: str(input.hostNames, 120) ?? "",
+    groomName: wedding ? (str(input.groomName, 120) ?? "") : "",
+    brideName: wedding ? (str(input.brideName, 120) ?? "") : "",
     ceremonyType:
       wedding && CEREMONY_TYPES.includes(input.ceremonyType as never)
         ? (input.ceremonyType as InvitationDraft["ceremonyType"])
@@ -117,6 +119,7 @@ function normalise(raw: unknown): InvitationDraft | null {
       typeof input.coverPhoto === "string" && input.coverPhoto.startsWith("data:image/")
         ? input.coverPhoto
         : null,
+    celebrated: bool(input.celebrated, false),
   };
 }
 

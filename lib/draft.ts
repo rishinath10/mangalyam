@@ -1,6 +1,7 @@
 import type { CeremonyType, EventType, OpeningStyle } from "@prisma/client";
 import { ceremonyLabel } from "@/lib/ceremonies";
 import { EVENT_TYPE_LABELS } from "@/lib/events";
+import { splitHostNames } from "@/lib/format";
 import type { InvitationSource } from "@/lib/invitation/compose";
 import { slugify } from "@/lib/slugify";
 import { defaultTemplateFor, templatesForEvent } from "@/lib/templates/registry";
@@ -23,7 +24,14 @@ export interface InvitationDraft {
   /** Bumped when the shape changes; a draft from an older version is dropped. */
   version: 1;
   eventType: EventType;
+  /**
+   * Who the celebration is for, on every occasion except a wedding. A wedding
+   * asks for the two names separately below, because one box cannot say which
+   * half of "Rishi & Gaayathri" is which — and the cover sets them as a pair.
+   */
   hostNames: string;
+  groomName: string;
+  brideName: string;
   ceremonyType: CeremonyType | null;
   customCeremonyName: string | null;
   templateId: string;
@@ -62,6 +70,12 @@ export interface InvitationDraft {
    * upload and applies its normal limits.
    */
   coverPhoto: string | null;
+  /**
+   * Whether the couple has already been congratulated. The constellation is a
+   * moment, and a moment that replays every time someone steps backwards is a
+   * loading screen.
+   */
+  celebrated: boolean;
 }
 
 export const DRAFT_STORAGE_KEY = "mangalyam.draft.v1";
@@ -75,6 +89,8 @@ export function emptyDraft(): InvitationDraft {
     version: 1,
     eventType: "wedding",
     hostNames: "",
+    groomName: "",
+    brideName: "",
     ceremonyType: "muhurtham",
     customCeremonyName: null,
     templateId: defaultTemplateFor("wedding"),
@@ -103,7 +119,25 @@ export function emptyDraft(): InvitationDraft {
       contactPhone: null,
     },
     coverPhoto: null,
+    celebrated: false,
   };
+}
+
+/**
+ * The one display string, however it was collected.
+ *
+ * A wedding is asked for two names and every other occasion for one, but the
+ * database, the templates and the slug all take a single `hostNames` — so this
+ * is the only place the two shapes meet, and nothing downstream has to know
+ * which form the answer arrived in.
+ *
+ * A half-filled pair composes to just the name that is there rather than to
+ * "Rishi &", so the preview never shows a dangling ampersand while someone is
+ * still typing the second name.
+ */
+export function draftHostNames(draft: InvitationDraft): string {
+  if (draft.eventType !== "wedding") return draft.hostNames.trim();
+  return [draft.groomName.trim(), draft.brideName.trim()].filter(Boolean).join(" & ");
 }
 
 /**
@@ -118,8 +152,22 @@ export function withEventType(
   if (draft.eventType === eventType) return draft;
   const families = templatesForEvent(eventType);
   const keepsFamily = families.some((f) => f.templateId === draft.templateId);
+
+  // Names carry across the switch rather than being retyped: a wedding's two
+  // boxes join into the single line every other occasion uses, and a single
+  // line already written as "A & B" splits back into the pair.
+  const becomingWedding = eventType === "wedding";
+  const [first, second] = splitHostNames(draft.hostNames);
+  const carried = becomingWedding
+    ? {
+        groomName: draft.groomName || (second ? first : draft.hostNames),
+        brideName: draft.brideName || (second ?? ""),
+      }
+    : { hostNames: draft.hostNames || draftHostNames(draft) };
+
   return {
     ...draft,
+    ...carried,
     eventType,
     ceremonyType: eventType === "wedding" ? (draft.ceremonyType ?? "muhurtham") : null,
     customCeremonyName: eventType === "wedding" ? draft.customCeremonyName : null,
@@ -138,7 +186,7 @@ export function draftLabel(draft: InvitationDraft): string {
 
 /** The link the invitation would get, shown under the preview. */
 export function draftSlug(draft: InvitationDraft): string {
-  return slugify(`${draft.hostNames} ${draftLabel(draft)}`) || "your-invitation";
+  return slugify(`${draftHostNames(draft)} ${draftLabel(draft)}`) || "your-invitation";
 }
 
 /**
@@ -164,7 +212,7 @@ export function draftToSource(draft: InvitationDraft): InvitationSource {
     templateId: draft.templateId,
     accentKey: draft.accentKey,
     fontPairing: draft.fontPairing,
-    hostNames: draft.hostNames.trim() || "Your names",
+    hostNames: draftHostNames(draft) || "Your names",
     coverPhotoUrl: draft.coverPhoto,
     // Frame artwork is not part of self-serve any more; it is applied for
     // bespoke work from the admin side.
@@ -185,7 +233,7 @@ export function draftToSource(draft: InvitationDraft): InvitationSource {
 /** The fields without which there is nothing to publish. */
 export function draftIssues(draft: InvitationDraft): string[] {
   const issues: string[] = [];
-  if (!draft.hostNames.trim()) issues.push("Add who the invitation is from.");
+  if (!draftHostNames(draft)) issues.push("Add who the invitation is from.");
   if (!draft.date) issues.push("Add the date.");
   if (!draft.venueName?.trim()) issues.push("Add the venue.");
   if (draft.ceremonyType === "custom" && !draft.customCeremonyName?.trim())
@@ -202,7 +250,7 @@ export function claimPayload(draft: InvitationDraft) {
   const wedding = draft.eventType === "wedding";
   return {
     eventType: draft.eventType,
-    hostNames: draft.hostNames.trim(),
+    hostNames: draftHostNames(draft),
     ceremonyType: wedding ? draft.ceremonyType : null,
     customCeremonyName: wedding ? draft.customCeremonyName : null,
     templateId: draft.templateId,
