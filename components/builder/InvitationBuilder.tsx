@@ -36,6 +36,7 @@ export function InvitationBuilder({
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
   const [coverBusy, setCoverBusy] = useState(false);
   // On a phone the preview is a sheet rather than a column beside the fields.
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -90,61 +91,81 @@ export function InvitationBuilder({
     setCoverBusy(false);
   }
 
+  /**
+   * Three writes, one button.
+   *
+   * Everything inside is wrapped: a rejected fetch — a phone stepping between
+   * cells, the container restarting mid-request — used to escape this function
+   * through the rejected Promise.all, leaving `saving` true forever. The button
+   * then read "Saving…" for the rest of the session with nothing to click and
+   * nothing said, which is the worst failure a save can have: it looks like it
+   * is still working.
+   */
   async function save() {
     setSaving(true);
     setError(null);
+    setSaved(false);
 
     const id = source.invitationId;
-    const responses = await Promise.all([
-      fetch(`/api/invitations/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ceremonyType: source.ceremonyType,
-          customCeremonyName: source.customCeremonyName,
-          templateId: source.templateId,
-          accentKey: source.accentKey,
-          fontPairing: source.fontPairing,
-          date: source.date,
-          startTime: source.startTime,
-          endTime: source.endTime,
-          venueName: source.venueName,
-          address: source.address,
-          mapLink: source.mapLink,
-          description: source.description,
+    try {
+      const responses = await Promise.all([
+        fetch(`/api/invitations/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ceremonyType: source.ceremonyType,
+            customCeremonyName: source.customCeremonyName,
+            templateId: source.templateId,
+            accentKey: source.accentKey,
+            fontPairing: source.fontPairing,
+            date: source.date,
+            startTime: source.startTime,
+            endTime: source.endTime,
+            venueName: source.venueName,
+            address: source.address,
+            mapLink: source.mapLink,
+            description: source.description,
+          }),
         }),
-      }),
-      fetch(`/api/invitations/${id}/settings`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(source.settings),
-      }),
-      fetch(`/api/invitations/${id}/schedule`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          // Drop half-typed rows rather than failing the whole save on them.
-          items: source.schedule.filter((item) => item.title.trim() && item.time),
+        fetch(`/api/invitations/${id}/settings`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(source.settings),
         }),
-      }),
-    ]);
+        fetch(`/api/invitations/${id}/schedule`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            // Drop half-typed rows rather than failing the whole save on them.
+            items: source.schedule.filter((item) => item.title.trim() && item.time),
+          }),
+        }),
+      ]);
 
-    const failed = responses.find((res) => !res.ok);
-    if (failed) {
-      const payload = await failed.json().catch(() => ({}));
-      const detail = payload.details
-        ? Object.values(payload.details as Record<string, string[]>)
-            .flat()
-            .join(" ")
-        : null;
-      setError(detail || payload.error || "Some changes could not be saved.");
+      const failed = responses.find((res) => !res.ok);
+      if (failed) {
+        const payload = await failed.json().catch(() => ({}));
+        const detail = payload.details
+          ? Object.values(payload.details as Record<string, string[]>)
+              .flat()
+              .join(" ")
+          : null;
+        setError(detail || payload.error || "Some changes could not be saved.");
+        return;
+      }
+
+      setDirty(false);
+      // Said out loud, and briefly. Without it the save bar simply vanishes on a
+      // phone — the bar only exists while there are unsaved changes — and a
+      // control that disappears is not the same as a job confirmed done.
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2600);
+      router.refresh();
+    } catch {
+      setError("Your changes did not reach us — check your connection and try again. Nothing you typed has been lost.");
+    } finally {
       setSaving(false);
-      return;
     }
-
-    setDirty(false);
-    setSaving(false);
-    router.refresh();
   }
 
   return (
@@ -159,10 +180,12 @@ export function InvitationBuilder({
             <span>/i/{source.slug}</span>
           </div>
         </div>
-        <div className="builder-actions" data-dirty={dirty ? "" : undefined}>
-          {dirty && <span style={{ fontSize: "var(--t-xs)", color: "var(--accent)" }}>Unsaved changes</span>}
+        <div className="builder-actions" data-dirty={dirty || saving || saved || error ? "" : undefined}>
+          <span className="save-state" data-tone={error ? "bad" : saved ? "good" : undefined}>
+            {error ? error : saved ? "Saved" : dirty ? "Unsaved changes" : ""}
+          </span>
           <Button type="button" onClick={save} disabled={saving || !dirty}>
-            {saving ? "Saving…" : "Save changes"}
+            {saving ? "Saving…" : error ? "Try again" : "Save changes"}
           </Button>
         </div>
       </div>

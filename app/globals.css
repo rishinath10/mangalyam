@@ -318,7 +318,20 @@ section[id],header[id]{scroll-margin-top:112px}
   .nav-links{display:none}
   .nav-burger{display:flex}
   .nav-cta-label{display:none}
-  .nav-bar .btn{padding:.62rem .9rem}
+  /* The links carried margin-inline:auto, which is what pushed the buttons to
+     the right edge. Hidden, that spacer goes with them and the two controls
+     bunch up against the wordmark with dead space after them. */
+  .nav-bar .btn{padding:.62rem .9rem;margin-left:auto}
+}
+@media(max-width:560px){
+  /* The tagline is 30 letterspaced characters. At a size anyone can read it is
+     wider than the room left beside the wordmark, the CTA and the burger — so
+     it was either 6px tall or it pushed the burger off the screen. It says
+     nothing the wordmark does not, and it is still in the footer. */
+  .nav-brand .tg{display:none}
+  .nav-bar{gap:.7rem;padding:.45rem .45rem .45rem 1.1rem}
+  .nav-brand .wm{font-size:1.2rem;letter-spacing:.1em}
+  .nav-burger{width:38px;height:38px}
 }
 
 .nav-sheet{
@@ -359,14 +372,24 @@ section[id],header[id]{scroll-margin-top:112px}
 @media(max-width:560px){
   .on-wide{display:none}
   .on-narrow{display:inline}
+  /* One line each, in the same shape. Wrapping put two lines in one pill and
+     one in the other, which read as a mismatched pair rather than a set — and
+     at that height a 100px radius stops looking like a pill and starts looking
+     like an egg. nowrap on both axes is what holds the shape. */
   .hero-stat,.hero-price{
-    flex-direction:row;align-items:center;justify-content:center;
-    gap:.4rem;flex-wrap:wrap;
-    padding:.7rem .85rem;border-radius:100px;text-align:center;
+    flex-direction:row;align-items:baseline;justify-content:center;
+    gap:.34rem;flex-wrap:nowrap;white-space:nowrap;
+    min-height:46px;padding:0 .7rem;border-radius:100px;text-align:center;
   }
-  .hero-stat .hero-fig{font-size:1.25rem;line-height:1.1}
-  .hero-price .hero-fig{font-size:var(--t-xs);letter-spacing:.14em;line-height:1.1}
-  .hero-note{font-size:var(--t-xs);margin:0;line-height:1.2}
+  .hero-stat .hero-fig{font-size:1.12rem;line-height:1}
+  /* The kick's uppercase tracking is what made this half too wide to fit
+     beside its own label; as a serif word it sits at the same weight as the
+     other pill's figure. */
+  .hero-price .hero-fig{
+    font-family:var(--serif);font-weight:400;font-size:1rem;
+    letter-spacing:0;text-transform:none;line-height:1;color:var(--accent-soft);
+  }
+  .hero-note{font-size:.78rem;margin:0;line-height:1}
 }
 
 /* On a phone the nav sits 14px from the top and is 60px tall, so 98px of shell
@@ -1451,3 +1474,11 @@ header:has(> .inv-frame-stage){place-content:center}
   .inv-seal-cta{font-size:.7rem}
   .inv-bar-btn{font-size:.66rem}
 }
+
+/* What the save bar says about itself. On a phone the bar is the only thing on
+   screen when Save is pressed, so the outcome has to appear there — the error
+   banner at the top of the editor is a thousand pixels away by then. */
+.save-state{font-size:var(--t-xs);color:var(--accent);flex:1;min-width:0}
+.save-state[data-tone="bad"]{color:#A83B3B}
+.save-state[data-tone="good"]{color:#1E6B4A}
+.save-state:empty{display:none}

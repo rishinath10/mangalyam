@@ -163,18 +163,21 @@ export default async function HomePage() {
                   colours, {withFigures("3")} letterings and {withFigures("3")} ways to open,
                   before you add a photograph.
                 </span>
-                <span className="on-narrow">distinct looks</span>
+                <span className="on-narrow">designs</span>
               </span>
             </div>
 
             <div className="t t--2 t--lift t--center rv c3 hero-price" data-delay="260">
-              <p className="kick hero-fig">Pay once</p>
+              <p className="kick hero-fig">
+                <span className="on-wide">Pay once</span>
+                <span className="on-narrow">Pay once,</span>
+              </p>
               <span className="muted hero-note">
                 <span className="on-wide">
                   <b className="hero-price-h">No subscription, ever</b>
                   One payment, one invitation.
                 </span>
-                <span className="on-narrow">no subscription</span>
+                <span className="on-narrow">no renewals</span>
               </span>
             </div>
           </div>
