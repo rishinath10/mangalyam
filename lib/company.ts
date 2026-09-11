@@ -6,8 +6,20 @@
  * across a site is worse than one that is absent.
  */
 export const COMPANY = {
-  /** The consumer-facing brand. */
-  brand: "Mangalyam",
+  /**
+   * The platform's name, as it is written in words — page titles, receipts,
+   * policies, anywhere a sentence names the thing.
+   */
+  brand: "Mangalyam.my",
+  /**
+   * What the logo says, which is not the same string.
+   *
+   * The wordmark is letterspaced serif; ".my" set at that spacing reads as
+   * punctuation rather than as part of a domain. A wordmark and a platform
+   * name are allowed to differ, and here they do — deliberately, in one place,
+   * rather than by drift.
+   */
+  wordmark: "Mangalyam",
   site: "mangalyam.my",
   /** The entity that actually trades, and is liable. */
   legalName: "Art Engine My Solutions",

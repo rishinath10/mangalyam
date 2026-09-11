@@ -6,7 +6,7 @@ import { withFigures } from "@/lib/typography";
 export const metadata = {
   title: "Privacy Policy",
   description:
-    "What Mangalyam collects, why, who sees it, and how to have it deleted. Written for the Malaysian Personal Data Protection Act 2010.",
+    "What Mangalyam.my collects, why, who sees it, and how to have it deleted. Written for the Malaysian Personal Data Protection Act 2010.",
 };
 
 export default function PrivacyPage() {

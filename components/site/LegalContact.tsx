@@ -15,7 +15,7 @@ export function LegalContact() {
       <p>
         {COMPANY.legalName} (Registration No. {withFigures(COMPANY.registrationNumber)})
         <br />
-        Trading as {COMPANY.brand} · {COMPANY.site}
+        Trading as {COMPANY.brand}
         <br />
         {COMPANY.country}
       </p>

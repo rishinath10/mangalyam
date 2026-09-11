@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/admin";
 import { SignOutButton } from "@/components/dashboard/SignOutButton";
+import { COMPANY } from "@/lib/company";
 
 export const metadata = {
-  title: "Admin · Mangalyam",
+  title: `Admin · ${COMPANY.brand}`,
   // Belt and braces: this surface should never be indexed even if it somehow
   // became reachable without a session.
   robots: { index: false, follow: false },
@@ -31,7 +32,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <header className="dash-bar">
         <div className="dash-bar-in">
           <Link href="/admin" className="nav-brand">
-            <span className="wm">Mangalyam</span>
+            <span className="wm">{COMPANY.wordmark}</span>
             <span className="tg">Owner</span>
           </Link>
           <nav className="admin-nav">

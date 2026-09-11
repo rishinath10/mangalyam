@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Arrow } from "./Icons";
+import { COMPANY } from "@/lib/company";
 
 const LINKS = [
   { href: "/#top", label: "Home" },
@@ -47,7 +48,7 @@ export function SiteNav({ signedIn }: { signedIn: boolean }) {
           data-stuck={stuck ? "" : undefined}
         >
           <Link href="/#top" className="nav-brand">
-            <span className="wm">Mangalyam</span>
+            <span className="wm">{COMPANY.wordmark}</span>
             <span className="tg">Celebrations that last a lifetime</span>
           </Link>
 

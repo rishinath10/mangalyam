@@ -8,6 +8,7 @@ import {
   Marcellus,
 } from "next/font/google";
 import "./globals.css";
+import { COMPANY } from "@/lib/company";
 
 // Titles. Numerals inside titles are set in EB Garamond instead — see
 // lib/typography.tsx, which wraps digit runs so the substitution is automatic
@@ -61,8 +62,8 @@ const karla = Karla({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: {
-    default: "Mangalyam — e-invitations for every event you hold",
-    template: "%s · Mangalyam",
+    default: `${COMPANY.brand} — e-invitations for every event you hold`,
+    template: `%s · ${COMPANY.brand}`,
   },
   description:
     "E-invitations for Malaysian Indian families — weddings, naming ceremonies, housewarmings, temple consecrations and community celebrations. One link, sent on WhatsApp, with RSVPs included. One flat price, no subscription.",

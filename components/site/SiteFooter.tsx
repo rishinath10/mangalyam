@@ -33,7 +33,7 @@ export function SiteFooter({ designs }: { designs?: TemplateManifest[] }) {
       <div className="foot">
         <div className="about">
           <Link href="/#top" className="nav-brand">
-            <span className="wm">Mangalyam</span>
+            <span className="wm">{COMPANY.wordmark}</span>
             <span className="tg">Celebrations that last a lifetime</span>
           </Link>
           <p>
@@ -62,7 +62,7 @@ export function SiteFooter({ designs }: { designs?: TemplateManifest[] }) {
         </div>
 
         <div>
-          <h4>Mangalyam</h4>
+          <h4>{COMPANY.brand}</h4>
           <ul>
             <li><Link href="/#how">How it works</Link></li>
             <li><Link href="/#pricing">Pricing</Link></li>
@@ -85,7 +85,7 @@ export function SiteFooter({ designs }: { designs?: TemplateManifest[] }) {
 
       <div className="foot-btm">
         <div>
-          <span>© <span className="num">2026</span> Mangalyam · mangalyam.my</span>
+          <span>© <span className="num">2026</span> {COMPANY.brand}</span>
           <span className="r">Made in Malaysia</span>
         </div>
         {/* Quiet, and at the very bottom: a customer is buying an invitation,

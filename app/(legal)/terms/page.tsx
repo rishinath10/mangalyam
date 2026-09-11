@@ -7,7 +7,7 @@ import { withFigures } from "@/lib/typography";
 export const metadata = {
   title: "Terms of Service",
   description:
-    "The agreement between you and Art Engine My Solutions for using Mangalyam.",
+    "The agreement between you and Art Engine My Solutions for using Mangalyam.my.",
 };
 
 export default function TermsPage() {
@@ -15,7 +15,7 @@ export default function TermsPage() {
     <>
       <LegalHead
         title="Terms of Service"
-        summary="The agreement between you and the company behind Mangalyam. Short, and in plain words."
+        summary="The agreement between you and the company behind Mangalyam.my. Short, and in plain words."
       />
 
       <section>
@@ -172,9 +172,9 @@ export default function TermsPage() {
         <h2>The rest</h2>
         <ul>
           <li>
-            <b>Our own work stays ours.</b> The designs, artwork, code and the
-            Mangalyam name belong to us. Buying an invitation does not let you
-            resell a design or run a competing service on it.
+            <b>Our own work stays ours.</b> The designs, artwork, code and the{" "}
+            {COMPANY.brand} name belong to us. Buying an invitation does not
+            let you resell a design or run a competing service on it.
           </li>
           <li>
             <b>Changes.</b> If we change these terms we will change the date at

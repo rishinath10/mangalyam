@@ -7,7 +7,7 @@ import { withFigures } from "@/lib/typography";
 export const metadata = {
   title: "Refund Policy",
   description:
-    "When Mangalyam refunds an invitation, when it does not, and how to ask.",
+    "When Mangalyam.my refunds an invitation, when it does not, and how to ask.",
 };
 
 export default function RefundsPage() {

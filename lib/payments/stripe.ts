@@ -5,6 +5,7 @@ import type {
   PaymentEvent,
   PaymentGateway,
 } from "@/lib/payments/types";
+import { COMPANY } from "@/lib/company";
 
 function required(name: string): string {
   const value = process.env[name];
@@ -36,7 +37,7 @@ export const stripeGateway: PaymentGateway = {
               currency: req.currency,
               unit_amount: req.amountSen,
               product_data: {
-                name: "Mangalyam — one invitation",
+                name: `${COMPANY.brand} — one invitation`,
                 description: "One occasion, one digital invitation, unlimited RSVPs.",
               },
             },

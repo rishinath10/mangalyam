@@ -5,8 +5,9 @@ import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { formatEventDate } from "@/lib/format";
 import { resolveAccentColor } from "@/lib/templates/registry";
 import { getManifest } from "@/lib/templates/registry";
+import { COMPANY } from "@/lib/company";
 
-export const alt = "Mangalyam invitation";
+export const alt = `${COMPANY.brand} invitation`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -38,7 +39,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             background: "#190409", color: "#EBD79B", fontSize: 48,
           }}
         >
-          Mangalyam
+          {COMPANY.wordmark}
         </div>
       ),
       size,

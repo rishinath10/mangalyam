@@ -188,6 +188,24 @@ export async function allManifests(): Promise<TemplateManifest[]> {
   return [...coded, ...custom];
 }
 
+/**
+ * Every manifest, but never throwing.
+ *
+ * For the pages a visitor sees before they have an account — the landing page
+ * and the wizard. Those used to be entirely free of the database, and a
+ * marketing page that returns 500 because Postgres hiccuped is a worse outcome
+ * than one listing only the designs written in code. The admin screens
+ * deliberately do not use this: there, a database that is down must say so.
+ */
+export async function allManifestsOrCoded(): Promise<TemplateManifest[]> {
+  try {
+    return await allManifests();
+  } catch (err) {
+    console.error("Could not read designs; falling back to the code registry:", err);
+    return TEMPLATE_MANIFESTS;
+  }
+}
+
 /** The designs a customer may actually pick for this occasion. */
 export async function manifestsForEvent(eventType: EventType): Promise<TemplateManifest[]> {
   const all = await allManifests();

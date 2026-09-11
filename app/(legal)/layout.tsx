@@ -14,7 +14,7 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
       <header className="wz-bar">
         <div className="wz-bar-in">
           <Link href="/" className="nav-brand">
-            <span className="wm">{COMPANY.brand}</span>
+            <span className="wm">{COMPANY.wordmark}</span>
             <span className="tg">Celebrations that last a lifetime</span>
           </Link>
           <Link href="/create" className="btn btn-line btn-sm wz-bar-alt">

@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { withFigures } from "@/lib/typography";
 import { CEREMONY_LABELS } from "@/lib/ceremonies";
 import { EVENT_TYPES, EVENT_TYPE_BLURBS, EVENT_TYPE_LABELS } from "@/lib/events";
-import { allManifests } from "@/lib/templates/design-store";
+import { allManifestsOrCoded } from "@/lib/templates/design-store";
 import type { TemplateManifest } from "@/lib/templates/types";
 import { EventIcon } from "@/components/site/EventIcon";
 import { TodayPanchangam } from "@/components/site/TodayPanchangam";
@@ -63,6 +63,8 @@ const FAQ = [
   },
   {
     q: "Is this only for weddings?",
+    // "Mangalyam" here is the word, not the platform — it keeps its bare
+    // form on purpose. The whole answer is about what the word means.
     a: "No. Mangalyam means auspicious, not wedding. Housewarmings, naming ceremonies, sixtieth birthdays, temple consecrations, home poojas and open houses all have their own designs.",
   },
   {
@@ -121,7 +123,7 @@ export default async function HomePage() {
   // `auth()` above reads cookies, and it has to remain so: there is no
   // DATABASE_URL during the Docker build, so anything Next tries to
   // prerender here would fail the deploy rather than the request.
-  const designs = (await allManifests()).filter((d) => d.built);
+  const designs = (await allManifestsOrCoded()).filter((d) => d.built);
   const weddingFamily =
     designs.find((d) => d.eventTypes.includes("wedding")) ?? designs[0];
   const generalFamily =
