@@ -366,7 +366,8 @@ section[id],header[id]{scroll-margin-top:112px}
 /* ==========================================================
    SITE FOOTER
    ========================================================== */
-.foot{width:var(--measure);margin-inline:auto;padding-block:clamp(2.4rem,4.5vw,3.4rem);display:grid;grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr));gap:2rem}
+.foot{width:var(--measure);margin-inline:auto;padding-block:clamp(2.4rem,4.5vw,3.4rem);display:grid;grid-template-columns:minmax(0,1.5fr) repeat(4,minmax(0,1fr));gap:2rem}
+@media(max-width:1080px){.foot{grid-template-columns:minmax(0,1.4fr) repeat(2,minmax(0,1fr))}}
 @media(max-width:820px){.foot{grid-template-columns:1fr 1fr}}
 .foot h4{font-family:var(--ui);font-size:var(--t-xs);font-weight:400;letter-spacing:.24em;text-transform:uppercase;color:var(--accent)}
 .foot ul{list-style:none;margin:1rem 0 0;padding:0;display:grid;gap:.5rem}
@@ -1660,7 +1661,7 @@ header:has(> .inv-frame-stage){place-content:center}
 }
 .token>span{display:grid;gap:.1rem;min-width:0}
 .token b{font-size:var(--t-xs);font-weight:500}
-.token .mono{font-size:.68rem;color:var(--muted)}
+.token .mono{font-size:.68rem;color:var(--ink-3)}
 .accent-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
 .accent-row input[type=color]{
   width:38px;height:38px;padding:0;border:1px solid var(--edge);border-radius:8px;
@@ -1668,8 +1669,8 @@ header:has(> .inv-frame-stage){place-content:center}
 }
 .accent-row input[type=text]{flex:1 1 10rem;min-width:8rem}
 .veil{display:grid;gap:.4rem;margin-top:1rem}
-.veil>span{display:flex;justify-content:space-between;gap:1rem;font-size:var(--t-xs);color:var(--muted)}
-.veil b{font-weight:500;color:var(--ink)}
+.veil>span{display:flex;justify-content:space-between;gap:1rem;font-size:var(--t-xs);color:var(--ink-3)}
+.veil b{font-weight:500;color:var(--ink-1)}
 .veil input[type=range]{width:100%;accent-color:var(--accent)}
 .design-preview{display:grid;gap:1.4rem;justify-items:center}
 /* Centred above the phone rather than beside it: a column of chips next to a
@@ -1677,3 +1678,44 @@ header:has(> .inv-frame-stage){place-content:center}
    the thing they change. */
 .design-preview-controls{width:100%;max-width:34rem;text-align:center}
 .design-preview-controls .chiprow{justify-content:center}
+
+/* Who actually trades here. Quiet by design — a customer is buying an
+   invitation, not the company — but exact, because the registration number is
+   what makes the trader identifiable. */
+.foot-entity{
+  width:var(--measure);margin:0 auto;padding-bottom:1.2rem;
+  font-size:var(--t-xs);color:var(--ink-3);opacity:.72;
+}
+
+/* The policy pages: one column, long measure, nothing in the way. */
+.legal{
+  width:min(100% - 2.4rem,46rem);margin-inline:auto;
+  padding-block:clamp(2.6rem,6vw,4.4rem);
+}
+.legal-head{margin-bottom:2.6rem}
+.legal h1{font-size:var(--t-2xl);line-height:1.1}
+.legal-lede{font-size:var(--t-md);color:var(--ink-2);margin-top:1rem;max-width:44ch}
+.legal-date{font-size:var(--t-xs);color:var(--ink-3);margin-top:1.2rem;letter-spacing:.1em;text-transform:uppercase}
+.legal section{margin-bottom:2.4rem}
+.legal h2{
+  font-size:var(--t-lg);margin-bottom:.9rem;
+  padding-top:1.6rem;border-top:1px solid var(--edge);
+}
+.legal-head+section h2:first-child{padding-top:0;border-top:none}
+.legal p{font-size:var(--t-sm);line-height:1.75;color:var(--ink-2);margin-bottom:1rem;max-width:68ch}
+.legal ul{margin:0 0 1.2rem;padding-left:1.1rem;display:grid;gap:.75rem;max-width:68ch}
+.legal li{font-size:var(--t-sm);line-height:1.7;color:var(--ink-2)}
+.legal li b,.legal p b{color:var(--ink-1);font-weight:500}
+.legal a{color:var(--accent-soft);text-decoration:underline;text-underline-offset:3px}
+.legal a:hover{color:var(--accent)}
+.legal .dim{color:var(--ink-3);font-size:var(--t-xs)}
+.legal-contact{
+  margin-top:3rem;padding:1.6rem 1.8rem;
+  border:1px solid var(--edge);border-radius:14px;background:rgba(255,255,255,.02);
+}
+.legal-contact h2{padding-top:0;border-top:none;margin-bottom:.9rem}
+.legal-more{
+  display:flex;flex-wrap:wrap;gap:1.6rem;
+  margin-top:2.6rem;padding-top:1.4rem;border-top:1px solid var(--edge);
+  font-size:var(--t-xs);
+}

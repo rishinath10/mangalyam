@@ -4,7 +4,8 @@ import { auth } from "@/lib/auth";
 import { withFigures } from "@/lib/typography";
 import { CEREMONY_LABELS } from "@/lib/ceremonies";
 import { EVENT_TYPES, EVENT_TYPE_BLURBS, EVENT_TYPE_LABELS } from "@/lib/events";
-import { TEMPLATE_MANIFESTS } from "@/lib/templates/registry";
+import { allManifests } from "@/lib/templates/design-store";
+import type { TemplateManifest } from "@/lib/templates/types";
 import { EventIcon } from "@/components/site/EventIcon";
 import { TodayPanchangam } from "@/components/site/TodayPanchangam";
 import { Constellation } from "@/components/site/Constellation";
@@ -76,20 +77,25 @@ const FAQ = [
 
 const SAMPLE_COUPLE = "Ashwin & Kalyani";
 const SAMPLE_HOST = "The Kumar Family";
-const [weddingFamily, generalFamily] = TEMPLATE_MANIFESTS;
 
 /**
  * Counted, not asserted. This used to be a hardcoded 108 that multiplied
  * families by wedding ceremonies — arithmetic the pivot invalidated and
  * nobody would have noticed. It now counts what a customer actually chooses
- * between: for each family, its own palette times the lettering shortlist,
- * times the openings. Change a palette and the headline follows.
+ * between: for each design, its own palette times the lettering shortlist,
+ * times the openings. Add a design or retune a palette and the headline
+ * follows on its own.
  */
-const DISTINCT_LOOKS =
-  TEMPLATE_MANIFESTS.reduce(
-    (n, family) => n + family.accents.length * family.fontPairings.length,
-    0,
-  ) * OPENING_STYLES.length;
+function distinctLooks(designs: TemplateManifest[]): number {
+  return (
+    designs.reduce((n, d) => n + d.accents.length * d.fontPairings.length, 0) *
+    OPENING_STYLES.length
+  );
+}
+
+/** "Two", "Three" — a gallery heading counts in words, not figures. */
+const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"];
+const countWord = (n: number) => COUNT_WORDS[n] ?? String(n);
 
 /**
  * Custom quotes arrive over WhatsApp, which is where this audience actually
@@ -105,6 +111,21 @@ export default async function HomePage() {
   const session = await auth();
   const price = priceLabel();
   const signedIn = Boolean(session?.user);
+
+  // Everything a customer can actually choose, designs added from the admin
+  // side included — a gallery that advertises only what is written in code
+  // goes stale the first time a design is added through the screen built for
+  // exactly that.
+  //
+  // This read is why the page must stay dynamic. It already is, because
+  // `auth()` above reads cookies, and it has to remain so: there is no
+  // DATABASE_URL during the Docker build, so anything Next tries to
+  // prerender here would fail the deploy rather than the request.
+  const designs = (await allManifests()).filter((d) => d.built);
+  const weddingFamily =
+    designs.find((d) => d.eventTypes.includes("wedding")) ?? designs[0];
+  const generalFamily =
+    designs.find((d) => d.templateId !== weddingFamily?.templateId) ?? weddingFamily;
 
   return (
     <>
@@ -216,12 +237,12 @@ export default async function HomePage() {
           <div className="wrap">
             <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
               <p className="kick">Choose your card</p>
-              <h2>Two families, drawn not decorated</h2>
+              <h2>{countWord(designs.length)} designs, drawn not decorated</h2>
               <p>
-                One for weddings, one for every other occasion. Each recolours to the
-                day — a muhurtham in kumkum, a housewarming in tulsi green, a sixtieth
-                in plum. {withFigures(String(DISTINCT_LOOKS))} distinct looks between
-                them, before you add a photograph.
+                Every one recolours to the day — a muhurtham in kumkum, a
+                housewarming in tulsi green, a sixtieth in plum.{" "}
+                {withFigures(String(distinctLooks(designs)))} distinct looks
+                between them, before you add a photograph.
               </p>
             </div>
             <div className="bento">
@@ -447,7 +468,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <SiteFooter />
+        <SiteFooter designs={designs} />
       </div>
     </>
   );
