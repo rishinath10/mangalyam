@@ -2,23 +2,34 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth/admin";
 import { TEMPLATE_MANIFESTS } from "@/lib/templates/registry";
+import { allCustomDesigns } from "@/lib/templates/design-store";
+import { ButtonLink } from "@/components/ui/Button";
 import { ART_BLURB, ART_COLUMN, ART_PIECES } from "@/lib/templates/art-store";
 import { DesignArt } from "@/components/admin/DesignArt";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Swapping a family's artwork without a deploy.
+ * Designs, in two halves.
  *
- * Only the artwork. A family's palette, type scale and section order stay in
- * lib/templates/registry.ts: those are design decisions that want to be read
- * next to each other, and picking six accent hexes through a web form is worse
- * than picking them in code. What genuinely wants a screen is replacing a
- * border with a better one, which is what this does.
+ * The families that ship with the product keep their palettes and type scales
+ * in lib/templates/registry.ts, where they can be read next to each other —
+ * this screen only swaps their artwork, which is the part that genuinely
+ * wants a form.
+ *
+ * A design the operator made themselves is the other half, and the argument
+ * for keeping colours in code does not reach it: there is no reviewed file
+ * for a card somebody drew in Canva last night, and asking them to open a
+ * pull request to change its gold would mean the design never gets added at
+ * all. So those carry their own palette in the database, and this page links
+ * to where they are made.
  */
 export default async function AdminDesigns() {
   await requireAdmin();
-  const rows = await db.templateArt.findMany();
+  const [rows, custom] = await Promise.all([
+    db.templateArt.findMany(),
+    allCustomDesigns(),
+  ]);
   const byId = new Map(rows.map((r) => [r.templateId, r]));
 
   return (
@@ -27,12 +38,58 @@ export default async function AdminDesigns() {
         <div>
           <h1>Designs</h1>
           <p className="muted">
-            Artwork for the drawn families. Uploads take effect immediately, on
-            every invitation using that design — including ones already
-            published.
+            Artwork takes effect immediately, on every invitation using that
+            design — including ones already published.
           </p>
         </div>
+        <ButtonLink href="/admin/designs/new">Add a design</ButtonLink>
       </div>
+
+      <section style={{ marginBottom: "2.2rem" }}>
+        <h2 className="kick" style={{ marginBottom: ".9rem" }}>Your designs</h2>
+        {custom.length === 0 ? (
+          <div className="t empty" style={{ padding: "1.6rem" }}>
+            <p className="muted" style={{ margin: 0 }}>
+              Nothing yet. A design you made elsewhere — in Canva, or by a
+              designer — goes in here as its artwork, with the names printed
+              live over the middle.
+            </p>
+          </div>
+        ) : (
+          <div className="bento">
+            {custom.map((design) => (
+              <Link
+                key={design.templateId}
+                href={`/admin/designs/${design.templateId}`}
+                className="t t--lift c4"
+              >
+                <p className="kick">{design.built ? "Live" : "Not offered yet"}</p>
+                <h3 style={{ fontSize: "var(--t-md)", marginTop: ".4rem" }}>{design.name}</h3>
+                <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".5rem" }}>
+                  {design.tagline}
+                </p>
+                <span className="swatch-row" style={{ marginTop: ".9rem", display: "flex", gap: 5 }}>
+                  {design.accents.slice(0, 6).map((a) => (
+                    <i
+                      key={a.key}
+                      title={a.name}
+                      style={{
+                        background: a.hex,
+                        width: 14,
+                        height: 14,
+                        borderRadius: "50%",
+                        display: "inline-block",
+                      }}
+                    />
+                  ))}
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <h2 className="kick" style={{ marginBottom: ".9rem" }}>Built in</h2>
 
       <p className="notice notice-bad" style={{ marginBottom: "1.6rem" }}>
         <b>Never upload artwork with names or dates in it.</b> The couple&rsquo;s
@@ -103,11 +160,8 @@ export default async function AdminDesigns() {
       })}
 
       <p className="dim" style={{ fontSize: "var(--t-sm)" }}>
-        Prompts and sizes for producing artwork are in{" "}
-        <span className="mono">docs/TEMPLATE-ART.md</span>. To add a whole new
-        family — its own palette and type — copy a block in{" "}
-        <span className="mono">lib/templates/registry.ts</span>, then upload its
-        art here.{" "}
+        Sizes and generation prompts for artwork are in{" "}
+        <span className="mono">docs/TEMPLATE-ART.md</span>.{" "}
         <Link href="/admin">Back to the overview</Link>
       </p>
     </div>

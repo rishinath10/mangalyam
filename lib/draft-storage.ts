@@ -9,6 +9,7 @@ import { CEREMONY_TYPES } from "@/lib/ceremonies";
 import { EVENT_TYPES } from "@/lib/events";
 import { OPENING_STYLES } from "@/lib/validation";
 import { getManifest, templatesForEvent } from "@/lib/templates/registry";
+import type { TemplateManifest } from "@/lib/templates/types";
 import { isFontPairingKey } from "@/lib/templates/fonts";
 
 /**
@@ -26,7 +27,16 @@ import { isFontPairingKey } from "@/lib/templates/fonts";
  * back to the default — so a bad draft degrades to a blank one instead of
  * crashing the wizard or, worse, reaching the claim route as nonsense.
  */
-function normalise(raw: unknown): InvitationDraft | null {
+function normalise(
+  raw: unknown,
+  /**
+   * The designs to validate the stored templateId against. Without this a
+   * visitor who picked a design added through /admin/designs would come back
+   * to the wizard and find themselves silently moved to the default one,
+   * because this module cannot see past the code registry.
+   */
+  designs?: TemplateManifest[],
+): InvitationDraft | null {
   if (!raw || typeof raw !== "object") return null;
   const input = raw as Record<string, unknown>;
   if (input.version !== 1) return null;
@@ -42,11 +52,14 @@ function normalise(raw: unknown): InvitationDraft | null {
     : base.eventType;
 
   const wedding = eventType === "wedding";
-  const families = templatesForEvent(eventType);
+  const families = designs
+    ? designs.filter((d) => d.built && d.eventTypes.includes(eventType))
+    : templatesForEvent(eventType);
   const templateId = families.some((f) => f.templateId === input.templateId)
     ? (input.templateId as string)
     : base.templateId;
-  const manifest = getManifest(templateId);
+  const manifest =
+    families.find((f) => f.templateId === templateId) ?? getManifest(templateId);
 
   const settings =
     input.settings && typeof input.settings === "object"
@@ -123,10 +136,10 @@ function normalise(raw: unknown): InvitationDraft | null {
   };
 }
 
-export function loadDraft(): InvitationDraft | null {
+export function loadDraft(designs?: TemplateManifest[]): InvitationDraft | null {
   try {
     const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
-    return raw ? normalise(JSON.parse(raw)) : null;
+    return raw ? normalise(JSON.parse(raw), designs) : null;
   } catch {
     return null;
   }

@@ -10,7 +10,7 @@ import {
   type InvitationSource,
 } from "@/lib/invitation/compose";
 import type { InvitationJson } from "@/lib/invitation/types";
-import type { TemplateArt } from "@/lib/templates/types";
+import type { TemplateManifest } from "@/lib/templates/types";
 
 export type InvitationWithRelations = Invitation & {
   event: Event;
@@ -54,9 +54,9 @@ const isoDate = (d: Date | null | undefined) =>
  */
 export function toInvitationSource(
   row: InvitationWithRelations,
-  /** Resolved by the caller through lib/templates/art-store — the pure mapping
-   *  here must stay free of database calls. */
-  art?: TemplateArt,
+  /** Resolved by the caller through lib/templates/design-store — the pure
+   *  mapping here must stay free of database calls. */
+  design?: TemplateManifest,
 ): InvitationSource {
   const s = row.settings;
   return {
@@ -72,7 +72,7 @@ export function toInvitationSource(
     hostNames: row.event.hostNames,
     coverPhotoUrl: row.coverPhotoUrl,
     frameUrl: row.frameUrl,
-    art,
+    design,
     description: row.description,
     date: isoDate(row.date),
     startTime: row.startTime,
@@ -120,7 +120,7 @@ export function toInvitationSource(
 
 export function buildInvitationJson(
   row: InvitationWithRelations,
-  art?: TemplateArt,
+  design?: TemplateManifest,
 ): InvitationJson {
-  return composeInvitationJson(toInvitationSource(row, art));
+  return composeInvitationJson(toInvitationSource(row, design));
 }

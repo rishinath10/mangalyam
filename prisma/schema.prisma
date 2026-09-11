@@ -332,6 +332,51 @@ model TemplateArt {
   @@map("template_art")
 }
 
+/**
+ * A design added from the admin screen rather than written into
+ * lib/templates/registry.ts.
+ *
+ * The registry stays the source of truth for the families that ship with the
+ * product — their palettes and type scales want to be read next to each other.
+ * This is the other half: artwork the operator made themselves, named and
+ * coloured through a form, live without a deploy.
+ *
+ * A row here carries everything about a family EXCEPT its artwork, which lives
+ * in `template_art` under the same `template_id` and reaches the page through
+ * the upload route every other design already uses. Every custom design is
+ * rendered by ArtTemplate — it has no component of its own, which is exactly
+ * what makes it addable without code.
+ *
+ * `tokens` and `accents` are JSON because they are a fixed shape the
+ * application defines, not something to query across; both are validated on
+ * read, so one badly written row degrades to the default design instead of
+ * throwing on every page that lists designs.
+ */
+model CustomDesign {
+  templateId  String      @id @map("template_id")
+  name        String
+  tagline     String
+  /** Which occasions may choose it. Empty means nobody, which is a safe default. */
+  eventTypes  EventType[] @map("event_types")
+  /** AccentSwatch[] — the palette offered in the builder. */
+  accents     Json
+  fontPairing String      @map("font_pairing")
+  /** DesignTokens — surface, ink, rule, brand, gold, radius. */
+  tokens      Json
+  groundFit   String?     @map("ground_fit")
+  groundVeil  Float?      @map("ground_veil")
+  /**
+   * Whether customers can choose it. False is the working state: a design with
+   * no artwork uploaded yet must never reach the picker, because a customer
+   * who picks it gets a blank card.
+   */
+  published   Boolean     @default(false)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@map("custom_designs")
+}
+
 model Quote {
   id        String      @id @default(uuid()) @db.Uuid
   name      String

@@ -1647,3 +1647,33 @@ header:has(> .inv-frame-stage){place-content:center}
 }
 .bless-copy:hover{background:var(--ds-accent);color:var(--ds-surface)}
 .bless-copy:focus-visible{outline:2px solid var(--ds-accent);outline-offset:2px}
+
+/* Admin: building a design. */
+.token-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.7rem}
+.token{
+  display:flex;align-items:center;gap:.7rem;padding:.55rem .7rem;
+  border:1px solid var(--edge);border-radius:10px;cursor:pointer;
+}
+.token input[type=color]{
+  width:34px;height:34px;padding:0;border:1px solid var(--edge);border-radius:8px;
+  background:none;cursor:pointer;flex:0 0 auto;
+}
+.token>span{display:grid;gap:.1rem;min-width:0}
+.token b{font-size:var(--t-xs);font-weight:500}
+.token .mono{font-size:.68rem;color:var(--muted)}
+.accent-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.accent-row input[type=color]{
+  width:38px;height:38px;padding:0;border:1px solid var(--edge);border-radius:8px;
+  background:none;cursor:pointer;flex:0 0 auto;
+}
+.accent-row input[type=text]{flex:1 1 10rem;min-width:8rem}
+.veil{display:grid;gap:.4rem;margin-top:1rem}
+.veil>span{display:flex;justify-content:space-between;gap:1rem;font-size:var(--t-xs);color:var(--muted)}
+.veil b{font-weight:500;color:var(--ink)}
+.veil input[type=range]{width:100%;accent-color:var(--accent)}
+.design-preview{display:grid;gap:1.4rem;justify-items:center}
+/* Centred above the phone rather than beside it: a column of chips next to a
+   card leaves a field of empty panel, and the swatches read as a caption to
+   the thing they change. */
+.design-preview-controls{width:100%;max-width:34rem;text-align:center}
+.design-preview-controls .chiprow{justify-content:center}

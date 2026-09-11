@@ -1,9 +1,9 @@
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { badRequest, handle, parseBody } from "@/lib/api";
+import { isSelectableDesign, resolveDesign } from "@/lib/templates/design-store";
 import { requireInvitation } from "@/lib/auth/ownership";
 import { buildInvitationJson, invitationInclude } from "@/lib/invitation/build";
-import { getManifest, isSelectableTemplate } from "@/lib/templates/registry";
 import { invitationUpdateSchema } from "@/lib/validation";
 
 type Params = { params: Promise<{ invitationId: string }> };
@@ -28,7 +28,7 @@ export async function PATCH(req: Request, { params }: Params) {
     const input = await parseBody(req, invitationUpdateSchema);
 
     const eventType = invitation.event.eventType;
-    if (input.templateId && !isSelectableTemplate(input.templateId, eventType)) {
+    if (input.templateId && !(await isSelectableDesign(input.templateId, eventType))) {
       throw badRequest("That design is not available for this occasion");
     }
 
@@ -37,7 +37,7 @@ export async function PATCH(req: Request, { params }: Params) {
     // request lands — not the one it is on now.
     const templateId = input.templateId ?? invitation.templateId;
     if (input.accentKey) {
-      const manifest = getManifest(templateId);
+      const manifest = await resolveDesign(templateId);
       if (!manifest.accents.some((a) => a.key === input.accentKey)) {
         throw badRequest("That colour is not in this design's palette");
       }

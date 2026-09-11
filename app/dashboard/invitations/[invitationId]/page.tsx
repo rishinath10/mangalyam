@@ -5,7 +5,8 @@ import { ApiError } from "@/lib/api";
 import { isAdmin } from "@/lib/auth/admin";
 import { requireInvitation } from "@/lib/auth/ownership";
 import { invitationInclude, toInvitationSource } from "@/lib/invitation/build";
-import { resolveTemplateArt } from "@/lib/templates/art-store";
+import { allManifests, resolveDesign } from "@/lib/templates/design-store";
+import { DesignsProvider } from "@/components/templates/DesignsProvider";
 import { InvitationBuilder } from "@/components/builder/InvitationBuilder";
 
 type Params = { params: Promise<{ invitationId: string }> };
@@ -28,7 +29,10 @@ export default async function InvitationBuilderPage({ params }: Params) {
 
   // Resolved here so the live preview and the published page show the same
   // artwork — the browser has no way to reach the uploads itself.
-  const art = await resolveTemplateArt(row.templateId);
+  const [design, designs] = await Promise.all([
+    resolveDesign(row.templateId),
+    allManifests(),
+  ]);
 
   return (
     // The customiser is a light workspace inside the dashboard's dark chrome
@@ -42,22 +46,24 @@ export default async function InvitationBuilderPage({ params }: Params) {
 
       {/* The server hands over a plain source object; every edit from here on
           is local state composed into the same JSON the published page uses. */}
-      <InvitationBuilder
-        initialSource={toInvitationSource(row, art)}
-        // Photo ids are not part of the content contract, but the gallery
-        // editor needs them to patch and delete individual photos.
-        initialPhotos={row.photos.map((photo) => ({
-          id: photo.id,
-          url: photo.url,
-          caption: photo.caption,
-          sortOrder: photo.sortOrder,
-        }))}
-        status={row.status}
-        // The same two conditions assertCanPublish checks, so the Share tab can
-        // say why publishing is refused instead of only failing when it is
-        // tried. The server still decides; this only picks the button.
-        canPublish={Boolean(owned.event.entitlement) || (await isAdmin())}
-      />
+      <DesignsProvider designs={designs}>
+        <InvitationBuilder
+          initialSource={toInvitationSource(row, design)}
+          // Photo ids are not part of the content contract, but the gallery
+          // editor needs them to patch and delete individual photos.
+          initialPhotos={row.photos.map((photo) => ({
+            id: photo.id,
+            url: photo.url,
+            caption: photo.caption,
+            sortOrder: photo.sortOrder,
+          }))}
+          status={row.status}
+          // The same two conditions assertCanPublish checks, so the Share tab can
+          // say why publishing is refused instead of only failing when it is
+          // tried. The server still decides; this only picks the button.
+          canPublish={Boolean(owned.event.entitlement) || (await isAdmin())}
+        />
+      </DesignsProvider>
     </div>
   );
 }

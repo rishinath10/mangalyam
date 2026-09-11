@@ -33,7 +33,10 @@ export function InvitationRenderer({
   preview = false,
   live,
 }: TemplateProps & { live?: boolean }) {
-  const manifest = getManifest(invitation.templateId);
+  // From the JSON first. A design added through /admin/designs exists only in
+  // the database, and this runs in a browser — resolving it by id here would
+  // silently render the default family instead.
+  const manifest = invitation.design ?? getManifest(invitation.templateId);
   // A coded family uses its own component; a drawn one needs no component at
   // all, which is what lets a design be a folder of art and a manifest entry.
   const Template =

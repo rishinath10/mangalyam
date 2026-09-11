@@ -3,7 +3,8 @@
 import type { CeremonyType } from "@prisma/client";
 import { Input, Textarea } from "@/components/ui/Field";
 import { CEREMONY_BLURBS, CEREMONY_LABELS, CEREMONY_TYPES } from "@/lib/ceremonies";
-import { resolveAccentColor } from "@/lib/templates/registry";
+import { accentFromManifest } from "@/lib/templates/registry";
+import { useManifest } from "@/components/templates/DesignsProvider";
 import type { InvitationDraft } from "@/lib/draft";
 
 export function StepDetails({
@@ -14,6 +15,9 @@ export function StepDetails({
   onDraft: (draft: InvitationDraft) => void;
 }) {
   const wedding = draft.eventType === "wedding";
+  // The ceremony swatches have to come from the chosen design's own palette,
+  // which for a custom design is not in the registry at all.
+  const manifest = useManifest(draft.templateId);
   const set = (patch: Partial<InvitationDraft>) => onDraft({ ...draft, ...patch });
 
   return (
@@ -41,7 +45,7 @@ export function StepDetails({
               >
                 {/* each day in the colour it is actually dressed in, so the
                     palette is visible while choosing rather than afterwards */}
-                <i style={{ background: resolveAccentColor(draft.templateId, type, null) }} />
+                <i style={{ background: accentFromManifest(manifest, type, null) }} />
                 <b>{CEREMONY_LABELS[type]}</b>
                 <span>{CEREMONY_BLURBS[type]}</span>
               </button>

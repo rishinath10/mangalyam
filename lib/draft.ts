@@ -4,7 +4,7 @@ import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { splitHostNames } from "@/lib/format";
 import type { InvitationSource } from "@/lib/invitation/compose";
 import { slugify } from "@/lib/slugify";
-import type { TemplateArt } from "@/lib/templates/types";
+import type { TemplateManifest } from "@/lib/templates/types";
 import { defaultTemplateFor, templatesForEvent } from "@/lib/templates/registry";
 
 /**
@@ -149,9 +149,15 @@ export function draftHostNames(draft: InvitationDraft): string {
 export function withEventType(
   draft: InvitationDraft,
   eventType: EventType,
+  /**
+   * The designs the new occasion may use. Passed in rather than looked up,
+   * because a design added through /admin/designs is not in the registry this
+   * module can see — without it, switching occasion would silently throw away
+   * a custom design the visitor had already chosen.
+   */
+  families: TemplateManifest[] = templatesForEvent(eventType),
 ): InvitationDraft {
   if (draft.eventType === eventType) return draft;
-  const families = templatesForEvent(eventType);
   const keepsFamily = families.some((f) => f.templateId === draft.templateId);
 
   // Names carry across the switch rather than being retyped: a wedding's two
@@ -201,8 +207,8 @@ export function draftSlug(draft: InvitationDraft): string {
  */
 export function draftToSource(
   draft: InvitationDraft,
-  /** The chosen family's artwork, handed down from the server. */
-  art?: TemplateArt,
+  /** The chosen design, handed down from the server already resolved. */
+  design?: TemplateManifest,
 ): InvitationSource {
   return {
     // Not real ids: nothing is persisted yet. The preview never calls an API
@@ -222,7 +228,7 @@ export function draftToSource(
     // Frame artwork is not part of self-serve any more; it is applied for
     // bespoke work from the admin side.
     frameUrl: null,
-    art,
+    design,
     description: draft.description,
     date: draft.date,
     startTime: draft.startTime,

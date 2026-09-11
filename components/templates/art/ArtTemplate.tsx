@@ -33,9 +33,11 @@ import { Ground } from "./Ground";
  * and the action bar are unchanged.
  */
 export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
-  const manifest = getManifest(invitation.templateId);
   // From the JSON first: the server already merged any admin uploads over the
-  // manifest, and a template must not go looking things up for itself (rule #2).
+  // manifest, and a template must not go looking things up for itself (rule
+  // #2). A custom design is not in the registry at all, so the fallback is
+  // only ever reached by the families written in code.
+  const manifest = invitation.design ?? getManifest(invitation.templateId);
   const art = invitation.art ?? manifest.art ?? {};
   const { couple, event, ceremonyLabel } = invitation;
   const [firstName, secondName] = splitHostNames(couple.hostNames);

@@ -1,11 +1,11 @@
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { badRequest, handle, parseBody } from "@/lib/api";
+import { isSelectableDesign, resolveDesign } from "@/lib/templates/design-store";
 import { requireUserId } from "@/lib/auth/ownership";
 import { ceremonyLabel } from "@/lib/ceremonies";
 import { EVENT_TYPE_LABELS, isWeddingEvent } from "@/lib/events";
 import { uniqueInvitationSlug } from "@/lib/slug";
-import { getManifest, isSelectableTemplate } from "@/lib/templates/registry";
 import { draftClaimSchema } from "@/lib/validation";
 
 /**
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const userId = await requireUserId();
     const input = await parseBody(req, draftClaimSchema);
 
-    if (!isSelectableTemplate(input.templateId, input.eventType)) {
+    if (!(await isSelectableDesign(input.templateId, input.eventType))) {
       throw badRequest("That design is not available for this occasion");
     }
 
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
 
     // A palette key means nothing outside its own family, so it is checked
     // against the family actually being saved.
-    const manifest = getManifest(input.templateId);
+    const manifest = await resolveDesign(input.templateId);
     if (input.accentKey && !manifest.accents.some((a) => a.key === input.accentKey)) {
       throw badRequest("That colour is not in this design's palette");
     }

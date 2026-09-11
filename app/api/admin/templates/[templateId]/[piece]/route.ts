@@ -6,7 +6,7 @@ import {
   ART_PIECES,
   type ArtPiece,
 } from "@/lib/templates/art-store";
-import { TEMPLATE_MANIFESTS } from "@/lib/templates/registry";
+import { designExists } from "@/lib/templates/design-store";
 import {
   ACCEPTED_IMAGE_TYPES,
   MAX_UPLOAD_BYTES,
@@ -31,8 +31,10 @@ async function resolveTarget(params: Params["params"]) {
   await requireAdmin();
   const { templateId, piece } = await params;
 
-  const manifest = TEMPLATE_MANIFESTS.find((t) => t.templateId === templateId);
-  if (!manifest) throw notFound("Design");
+  // Either a family written in code or one added through /admin/designs.
+  // Still checked rather than trusted: without this the id in the path is a
+  // way to write arbitrary template_art rows.
+  if (!(await designExists(templateId))) throw notFound("Design");
   if (!ART_PIECES.includes(piece as ArtPiece)) throw notFound("Artwork");
 
   return { templateId, piece: piece as ArtPiece };

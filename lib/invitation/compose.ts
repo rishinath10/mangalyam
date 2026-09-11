@@ -1,10 +1,10 @@
 import type { CeremonyType, EventType, OpeningStyle } from "@prisma/client";
 import { ceremonyLabel } from "@/lib/ceremonies";
 import { EVENT_TYPE_LABELS } from "@/lib/events";
-import { getManifest, resolveAccentColor } from "@/lib/templates/registry";
+import { accentFromManifest, getManifest } from "@/lib/templates/registry";
 import { isFontPairingKey } from "@/lib/templates/fonts";
 import type { InvitationJson } from "@/lib/invitation/types";
-import type { TemplateArt } from "@/lib/templates/types";
+import type { TemplateManifest } from "@/lib/templates/types";
 
 /**
  * A flat, plain-data description of an invitation: no Prisma types, no Date
@@ -32,11 +32,12 @@ export interface InvitationSource {
   coverPhotoUrl: string | null;
   frameUrl: string | null;
   /**
-   * The family's own artwork, already resolved by the server against any
-   * admin uploads. Absent means "use whatever the manifest ships", which is
-   * what every purely code-defined family does.
+   * The chosen design, already resolved by the server: uploaded artwork merged
+   * over the code manifest, and designs that exist only in the database
+   * included. Absent falls back to the code registry, which is right for every
+   * caller that cannot reach a database — the wizard's own preview included.
    */
-  art?: TemplateArt;
+  design?: TemplateManifest;
   description: string | null;
   date: string | null; // yyyy-mm-dd
   startTime: string | null; // HH:mm
@@ -71,6 +72,11 @@ export interface InvitationSource {
 }
 
 export function composeInvitationJson(source: InvitationSource): InvitationJson {
+  // One lookup, used for the accent, the pairing and the artwork. A design
+  // held only in the database is invisible to `getManifest`, so the resolved
+  // one wins wherever the caller could supply it.
+  const manifest = source.design ?? getManifest(source.templateId);
+
   return {
     invitationId: source.invitationId,
     eventId: source.eventId,
@@ -83,19 +89,16 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
       ? ceremonyLabel(source.ceremonyType, source.customCeremonyName)
       : EVENT_TYPE_LABELS[source.eventType],
     templateId: source.templateId,
-    accentColor: resolveAccentColor(
-      source.templateId,
-      source.ceremonyType,
-      source.accentKey,
-    ),
+    accentColor: accentFromManifest(manifest, source.ceremonyType, source.accentKey),
     // An unknown or absent pairing falls back to the family's own default
     // rather than to a hardcoded face.
     fontPairing:
       source.fontPairing && isFontPairingKey(source.fontPairing)
         ? source.fontPairing
-        : getManifest(source.templateId).defaultFontPairing,
+        : manifest.defaultFontPairing,
     frame: source.frameUrl,
-    art: source.art,
+    art: manifest.art,
+    design: source.design,
     couple: {
       hostNames: source.hostNames,
       coverPhoto: source.coverPhotoUrl,

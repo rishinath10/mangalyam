@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth";
 import { isPurchasable, priceLabel } from "@/lib/pricing";
 import { Particles } from "@/components/site/Particles";
 import { CreateWizard } from "@/components/create/CreateWizard";
-import { allTemplateArt } from "@/lib/templates/art-store";
+import { allManifests } from "@/lib/templates/design-store";
+import { DesignsProvider } from "@/components/templates/DesignsProvider";
 
 export const metadata = {
   title: "Create your invitation",
@@ -18,9 +19,10 @@ export const metadata = {
  */
 export default async function CreatePage() {
   const session = await auth();
-  // Every family's resolved artwork, handed down as data: the wizard previews
-  // whichever design the visitor is trying, and it cannot reach the database.
-  const art = await allTemplateArt();
+  // Every design, resolved: uploaded artwork merged over the code families,
+  // and designs that exist only in the database included. The wizard previews
+  // whichever one the visitor is trying and cannot reach a database itself.
+  const designs = await allManifests();
 
   return (
     <div className="tone-dark wz-shell">
@@ -42,13 +44,14 @@ export default async function CreatePage() {
       </header>
 
       <div className="wz-body-wrap">
-        <CreateWizard
-          art={art}
-          signedIn={Boolean(session?.user)}
-          signedInEmail={session?.user?.email ?? null}
-          purchasable={isPurchasable()}
-          priceLabel={priceLabel()}
-        />
+        <DesignsProvider designs={designs}>
+          <CreateWizard
+            signedIn={Boolean(session?.user)}
+            signedInEmail={session?.user?.email ?? null}
+            purchasable={isPurchasable()}
+            priceLabel={priceLabel()}
+          />
+        </DesignsProvider>
       </div>
     </div>
   );

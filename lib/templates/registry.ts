@@ -238,7 +238,21 @@ export function resolveAccentColor(
   ceremonyType: string | null,
   accentKey?: string | null,
 ): string {
-  const manifest = getManifest(templateId);
+  return accentFromManifest(getManifest(templateId), ceremonyType, accentKey);
+}
+
+/**
+ * The same resolution against a manifest the caller already holds.
+ *
+ * A design that exists only in the database is invisible to `getManifest`, so
+ * anything that has resolved one on the server — the composer above all — must
+ * resolve its accent against that manifest rather than by id.
+ */
+export function accentFromManifest(
+  manifest: TemplateManifest,
+  ceremonyType: string | null,
+  accentKey?: string | null,
+): string {
   const swatch = (key: string | null | undefined) =>
     key ? manifest.accents.find((a) => a.key === key) : undefined;
 

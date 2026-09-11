@@ -6,7 +6,8 @@ import { Input, Textarea } from "@/components/ui/Field";
 import { CEREMONY_LABELS, CEREMONY_TYPES } from "@/lib/ceremonies";
 import { isWeddingEvent } from "@/lib/events";
 import { FONT_PAIRINGS, isFontPairingKey } from "@/lib/templates/fonts";
-import { getManifest, resolveAccentColor, templatesForEvent } from "@/lib/templates/registry";
+import { accentFromManifest } from "@/lib/templates/registry";
+import { useFamilies, useManifest } from "@/components/templates/DesignsProvider";
 import type { InvitationSource } from "@/lib/invitation/compose";
 
 type Patch = Partial<InvitationSource>;
@@ -25,11 +26,11 @@ export function DetailsPanel({
   coverBusy: boolean;
 }) {
   const wedding = isWeddingEvent(source.eventType);
-  const families = templatesForEvent(source.eventType);
-  const manifest = getManifest(source.templateId);
+  const families = useFamilies(source.eventType);
+  const manifest = useManifest(source.templateId);
   // What the accent lands on with nothing chosen: the ceremony's own swatch,
   // else the family default (CLAUDE.md Sections 4.4 and 7).
-  const inherited = resolveAccentColor(source.templateId, source.ceremonyType, null);
+  const inherited = accentFromManifest(manifest, source.ceremonyType, null);
   const pairing =
     source.fontPairing && isFontPairingKey(source.fontPairing)
       ? source.fontPairing
@@ -57,7 +58,7 @@ export function DetailsPanel({
                 >
                   {/* each ceremony in its own accent, so the colour system is
                       visible while choosing rather than a surprise afterwards */}
-                  <i style={{ background: resolveAccentColor(source.templateId, type, null) }} />
+                  <i style={{ background: accentFromManifest(manifest, type, null) }} />
                   {CEREMONY_LABELS[type]}
                 </button>
               ))}

@@ -1,20 +1,54 @@
 # Adding a design
 
-A design is a folder of artwork and one entry in the registry. No component.
+## The usual way: /admin/designs
 
-```
-public/templates/<your-design-id>/
-  frame.svg | frame.png      the border, 3:4, clear centre
-  crest.png                  the ornament above the names
-  divider.png                the rule between sections
-  ground.png                 a seamless texture behind everything
-```
+**Designs → Add a design.** Name it, upload the artwork, let it read the
+colours out of your art, look at the preview, publish. No deploy, no code.
 
-Then copy the `thanga-kolam-01` block in `lib/templates/registry.ts`, change the
-id, name, palette and the four `art` paths. That is the whole job.
+A design added this way is four images and a palette. It has no component of
+its own — `ArtTemplate` lays the pieces out and prints the names over them,
+which is exactly what makes it addable from a form.
 
-Every piece is optional. A design with only a frame still works; a missing file
-falls back to a plain rule or a plain ground rather than to a broken image.
+The order that works:
+
+1. **Add a design** — name and tagline only. Everything else can wait.
+2. **Upload the artwork.** If you have a whole card you made in Canva or had
+   designed, it goes in as the **frame**: 3:4, with the middle empty. See the
+   rule below, which is the part that trips everyone up.
+3. **Read the colours from the artwork.** This samples what you uploaded and
+   fills in the palette. It is a starting point — it cannot know which of your
+   three golds the design is actually about, so correct it.
+4. **Look at the preview.** Sample names, your artwork, the real renderer.
+5. **Publish it.** Until you do, no customer can see it. Publishing is refused
+   while there is no artwork, because that would be a blank card in the picker.
+
+Deleting is refused once any invitation uses the design — unpublish instead. It
+keeps working for the people already on it and disappears from the picker.
+
+## Turning a finished card into a template
+
+If what you have is a finished invitation — names, date and venue already on it
+— it cannot go in as-is, and no amount of cropping fixes that. What you need is
+the same file **exported with the text layers hidden**. In Canva that is a
+minute's work: hide the text, export as PNG with a transparent background if
+the design allows it, upload that as the frame.
+
+If it came from a designer as a flat JPEG with no layers, ask them for the
+source file. Painting text out of a finished card by hand almost never survives
+contact with a real name of a different length.
+
+## The other way: in code
+
+A family that ships with the product lives in `lib/templates/registry.ts` with
+its artwork in `public/templates/<design-id>/`. Copy the `thanga-kolam-01`
+block, change the id, name, palette and the four `art` paths.
+
+Use this for the designs you want reviewed and versioned alongside the code.
+Use the admin screen for everything else.
+
+Every piece is optional either way. A design with only a frame still works; a
+missing file falls back to a plain rule or a plain ground rather than to a
+broken image.
 
 ## The one rule that matters
 

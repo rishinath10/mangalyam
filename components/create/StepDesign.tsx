@@ -1,7 +1,8 @@
 "use client";
 
 import { FONT_PAIRINGS, isFontPairingKey } from "@/lib/templates/fonts";
-import { getManifest, resolveAccentColor, templatesForEvent } from "@/lib/templates/registry";
+import { accentFromManifest } from "@/lib/templates/registry";
+import { useFamilies, useManifest } from "@/components/templates/DesignsProvider";
 import type { InvitationDraft } from "@/lib/draft";
 
 /**
@@ -17,9 +18,9 @@ export function StepDesign({
   draft: InvitationDraft;
   onDraft: (draft: InvitationDraft) => void;
 }) {
-  const families = templatesForEvent(draft.eventType);
-  const manifest = getManifest(draft.templateId);
-  const inherited = resolveAccentColor(draft.templateId, draft.ceremonyType, null);
+  const families = useFamilies(draft.eventType);
+  const manifest = useManifest(draft.templateId);
+  const inherited = accentFromManifest(manifest, draft.ceremonyType, null);
   const pairing =
     draft.fontPairing && isFontPairingKey(draft.fontPairing)
       ? draft.fontPairing

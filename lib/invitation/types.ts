@@ -1,5 +1,5 @@
 import type { CeremonyType, EventType, OpeningStyle } from "@prisma/client";
-import type { TemplateArt } from "@/lib/templates/types";
+import type { TemplateArt, TemplateManifest } from "@/lib/templates/types";
 import type { FontPairingKey } from "@/lib/templates/fonts";
 
 /**
@@ -34,6 +34,16 @@ export interface InvitationJson {
    * without the browser ever touching the database.
    */
   art?: TemplateArt;
+  /**
+   * The whole resolved design, for the same reason and one level up: a design
+   * added through /admin/designs exists only in the database, and the renderer
+   * runs in a browser. Without this the card would fall back to the default
+   * family and quietly show the wrong design.
+   *
+   * Absent means the design is one of the coded families and the registry can
+   * be trusted to describe it.
+   */
+  design?: TemplateManifest;
   couple: {
     /** "Ashwin & Kalyani", "The Kumar Family", or a single name. */
     hostNames: string;

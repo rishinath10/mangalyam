@@ -154,6 +154,55 @@ export const draftClaimSchema = z.object({
   settings: settingsUpdateSchema.default({}),
 });
 
+/**
+ * A design added from the admin screen.
+ *
+ * Colours are hex strings here rather than palette keys, which is the one
+ * place in the product that is true: for the coded families a customer picks
+ * a key so the palette can be retuned later and every invitation follows,
+ * but a design created through a form has nowhere else for its colours to
+ * live. The keys are generated from the names on the way in.
+ */
+const designHex = z
+  .string()
+  .trim()
+  .regex(/^#[0-9a-fA-F]{6}$/, "Use a six-digit hex colour, like #A81A2C");
+
+export const designTokensSchema = z.object({
+  surface: designHex,
+  surfaceAlt: designHex,
+  ink: designHex,
+  inkMuted: designHex,
+  rule: designHex,
+  brand: designHex,
+  brandDeep: designHex,
+  gold: designHex,
+  radius: z.string().trim().max(12),
+  motionIntensity: z.number().min(0).max(2),
+});
+
+export const designCreateSchema = z.object({
+  name: z.string().trim().min(1, "Give the design a name").max(40),
+  tagline: z.string().trim().min(1, "Say what it is, in a few words").max(80),
+  eventTypes: z.array(z.enum(EVENT_TYPES)).min(1, "Choose at least one occasion"),
+  accents: z
+    .array(
+      z.object({
+        name: z.string().trim().min(1).max(40),
+        hex: designHex,
+      }),
+    )
+    .min(1, "A design needs at least one accent colour")
+    .max(8),
+  fontPairing: z.enum(FONT_PAIRING_KEYS),
+  tokens: designTokensSchema,
+  groundFit: z.enum(["tile", "cover"]).optional(),
+  groundVeil: z.number().min(0).max(1).optional(),
+  published: z.boolean().optional(),
+});
+
+export const designUpdateSchema = designCreateSchema.partial();
+
 export const rsvpCreateSchema = z.object({
   guestName: z.string().trim().min(1, "Please tell us your name").max(80),
   attending: z.boolean(),

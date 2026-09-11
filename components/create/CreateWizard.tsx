@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { PreviewPane } from "@/components/builder/PreviewPane";
 import { composeInvitationJson } from "@/lib/invitation/compose";
 import { draftSlug, draftToSource, emptyDraft, type InvitationDraft } from "@/lib/draft";
-import type { TemplateArt } from "@/lib/templates/types";
+import { useDesigns, useManifest } from "@/components/templates/DesignsProvider";
 import { clearDraft, loadDraft, saveDraft } from "@/lib/draft-storage";
 import { STEPS } from "./steps";
 import { StepOccasion } from "./StepOccasion";
@@ -24,14 +24,11 @@ import { CoupleConstellation } from "./CoupleConstellation";
  * watches while answering is the real renderer, not a mock-up of it (rule #3).
  */
 export function CreateWizard({
-  art,
   signedIn,
   signedInEmail,
   purchasable,
   priceLabel,
 }: {
-  /** Resolved template artwork, by templateId. Server-fetched: see art-store. */
-  art: Record<string, TemplateArt>;
   signedIn: boolean;
   signedInEmail: string | null;
   purchasable: boolean;
@@ -59,12 +56,16 @@ export function CreateWizard({
   // picked up on mount. Rendering the empty draft for one frame first is what
   // keeps the markup identical on both sides.
   useEffect(() => {
-    const stored = loadDraft();
+    const stored = loadDraft(designs);
     if (stored) {
       setDraft(stored);
       setResumed(true);
     }
     hydrated.current = true;
+    // designs is deliberately not a dependency: it is a stable server-rendered
+    // list, and re-running this would overwrite whatever has been typed since
+    // with the last thing written to localStorage.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -83,9 +84,11 @@ export function CreateWizard({
     };
   }, [previewOpen]);
 
+  const designs = useDesigns();
+  const design = useManifest(draft.templateId);
   const previewJson = useMemo(
-    () => composeInvitationJson(draftToSource(draft, art[draft.templateId])),
-    [draft, art],
+    () => composeInvitationJson(draftToSource(draft, design)),
+    [draft, design],
   );
   const current = STEPS[step];
   const last = step === STEPS.length - 1;

@@ -5,7 +5,8 @@ import { assertCanAddInvitation } from "@/lib/entitlements";
 import { ceremonyLabel } from "@/lib/ceremonies";
 import { EVENT_TYPE_LABELS, isWeddingEvent } from "@/lib/events";
 import { uniqueInvitationSlug } from "@/lib/slug";
-import { defaultTemplateFor, isSelectableTemplate } from "@/lib/templates/registry";
+import { defaultTemplateFor } from "@/lib/templates/registry";
+import { isSelectableDesign } from "@/lib/templates/design-store";
 import { badRequest } from "@/lib/api";
 import { invitationCreateSchema } from "@/lib/validation";
 
@@ -33,7 +34,7 @@ export async function POST(req: Request, { params }: Params) {
     await assertCanAddInvitation(event.id, event.entitlement);
 
     const templateId = input.templateId ?? defaultTemplateFor(event.eventType);
-    if (!isSelectableTemplate(templateId, event.eventType)) {
+    if (!(await isSelectableDesign(templateId, event.eventType))) {
       throw badRequest("That design is not available for this occasion");
     }
 
