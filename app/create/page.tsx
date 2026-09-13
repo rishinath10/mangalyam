@@ -11,6 +11,7 @@ export const metadata = {
   title: "Create your invitation",
   description:
     "Build your e-invitation for any event — wedding, naming ceremony, housewarming, temple consecration — and see it working before you sign up. Pay only when you are ready to send it.",
+  alternates: { canonical: "/create" },
 };
 
 /**

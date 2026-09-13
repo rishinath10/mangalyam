@@ -53,6 +53,17 @@ export function rateLimit(
 }
 
 /**
+ * Forget a window early.
+ *
+ * Used when the thing being limited succeeds — a correct password says the
+ * caller is the account's owner, and holding their earlier fumbles against
+ * them for another quarter of an hour would punish the wrong person.
+ */
+export function clearRateLimit(key: string): void {
+  buckets.delete(key);
+}
+
+/**
  * Best-effort client address. Behind Coolify's proxy the socket address is the
  * proxy, so the forwarded header is the only signal available — it is
  * spoofable, which is exactly why this limiter is a brake and not a security

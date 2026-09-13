@@ -8,6 +8,7 @@ export const metadata = {
   title: "Terms of Service",
   description:
     "The agreement between you and Art Engine My Solutions for using Mangalyam.my.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

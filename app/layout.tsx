@@ -59,14 +59,43 @@ const karla = Karla({
   display: "swap",
 });
 
+const DESCRIPTION =
+  "E-invitations for Malaysian Indian families — weddings, naming ceremonies, housewarmings, temple consecrations and community celebrations. One link, sent on WhatsApp, with RSVPs included. One flat price, no subscription.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  /**
+   * Every canonical and share URL is resolved against this.
+   *
+   * The fallback is the real domain, not localhost, and that matters more than
+   * it looks: NEXT_PUBLIC_* is inlined at BUILD time, the policy pages are
+   * prerendered at build time, and the Docker build only receives
+   * NEXT_PUBLIC_APP_URL if it is passed as a build argument. Miss that and a
+   * localhost fallback would ship canonical tags pointing at
+   * http://localhost:3000 — visible to Google, invisible to us. Falling back
+   * to the production origin makes the failure harmless.
+   */
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ?? `https://${COMPANY.site}`,
+  ),
   title: {
     default: `${COMPANY.brand} — e-invitations for every event you hold`,
     template: `%s · ${COMPANY.brand}`,
   },
-  description:
-    "E-invitations for Malaysian Indian families — weddings, naming ceremonies, housewarmings, temple consecrations and community celebrations. One link, sent on WhatsApp, with RSVPs included. One flat price, no subscription.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: COMPANY.brand,
+    locale: "en_MY",
+    title: `${COMPANY.brand} — e-invitations for every event you hold`,
+    description: DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${COMPANY.brand} — e-invitations for every event you hold`,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

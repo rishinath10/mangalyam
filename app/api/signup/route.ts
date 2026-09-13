@@ -3,8 +3,27 @@ import bcrypt from "bcryptjs";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { signupSchema } from "@/lib/auth/schemas";
+import { clientKey, rateLimit } from "@/lib/rate-limit";
+
+/**
+ * Five accounts per address per hour.
+ *
+ * Signup is the only unauthenticated write left in the app that creates a
+ * row, and each one costs a bcrypt hash at cost 12. Unthrottled it is both a
+ * way to fill the users table and a cheap way to keep a CPU busy. Five is far
+ * more than a household setting up an account ever needs.
+ */
+const SIGNUP_LIMIT = { limit: 5, windowMs: 60 * 60_000 };
 
 export async function POST(req: Request) {
+  const limited = rateLimit(clientKey(req, "signup"), SIGNUP_LIMIT);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: "Too many accounts created from here. Try again in a little while." },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfterSeconds) } },
+    );
+  }
+
   let body: unknown;
   try {
     body = await req.json();

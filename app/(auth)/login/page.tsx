@@ -2,7 +2,12 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { LoginForm } from "./LoginForm";
 
-export const metadata = { title: "Sign in" };
+export const metadata = {
+  title: "Sign in",
+  alternates: { canonical: "/login" },
+  // Nothing to rank, and a login form in a search result helps nobody.
+  robots: { index: false, follow: true },
+};
 
 export default function LoginPage() {
   return (

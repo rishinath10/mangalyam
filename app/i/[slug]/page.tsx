@@ -59,8 +59,29 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title,
     description: description || json.couple.message || undefined,
+    /**
+     * Never indexed, and this is the instruction that actually binds.
+     *
+     * An invitation is unlisted, not private: the link is meant to travel
+     * through WhatsApp groups. What it must not do is turn up in a search for
+     * someone's name. The page carries the family's names, the date they will
+     * be away from home, their address, whatever their guests wrote, and — if
+     * they switched it on — a bank account number.
+     *
+     * robots.txt asks; a crawler that found the link somewhere else never
+     * reads it. `noimageindex` matters as much as the rest here, because the
+     * gallery is photographs of a family.
+     */
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: { index: false, follow: false, noimageindex: true },
+    },
     // opengraph-image.tsx generates the card; leaving images unset here lets
-    // Next attach it automatically at the right size for every scraper
+    // Next attach it automatically at the right size for every scraper. This
+    // is not indexing — it is the preview WhatsApp draws when the host sends
+    // the link, which is the entire point of the product.
     openGraph: { title, description, type: "website" },
     twitter: { card: "summary_large_image", title, description },
   };

@@ -8,6 +8,7 @@ export const metadata = {
   title: "Refund Policy",
   description:
     "When Mangalyam.my refunds an invitation, when it does not, and how to ask.",
+  alternates: { canonical: "/refunds" },
 };
 
 export default function RefundsPage() {
