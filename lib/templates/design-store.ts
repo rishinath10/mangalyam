@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { z } from "zod";
 import type { EventType } from "@prisma/client";
 import { db } from "@/lib/db";
@@ -167,10 +168,32 @@ export async function allCustomDesigns(): Promise<TemplateManifest[]> {
 }
 
 /**
+ * The cache tag every design read hangs off.
+ *
+ * Exported so the routes that change a design can bust it. Anything that
+ * writes to `custom_designs` or `template_art` must call
+ * `revalidateTag(DESIGNS_TAG)` — an operator who publishes a design and then
+ * cannot find it in the picker will reasonably conclude the feature is broken.
+ */
+export const DESIGNS_TAG = "designs";
+
+/**
  * Every manifest, code and custom, with uploaded artwork merged over the code
  * families the same way `allTemplateArt` does it.
+ *
+ * Cached across requests, because the landing page, the wizard and every
+ * invitation render call this and the answer changes perhaps twice a month.
+ * Without it each of those was two queries per page view. The tag makes it
+ * exact rather than eventually-consistent: a design edit invalidates
+ * immediately, and the five-minute window is only a backstop for a write that
+ * happened somewhere this process never saw.
  */
-export async function allManifests(): Promise<TemplateManifest[]> {
+export const allManifests = unstable_cache(readAllManifests, ["all-manifests"], {
+  tags: [DESIGNS_TAG],
+  revalidate: 300,
+});
+
+async function readAllManifests(): Promise<TemplateManifest[]> {
   const [custom, art] = await Promise.all([allCustomDesigns(), db.templateArt.findMany()]);
   const byId = new Map(art.map((a) => [a.templateId, a]));
 

@@ -1,3 +1,5 @@
+import { revalidateTag } from "next/cache";
+import { DESIGNS_TAG } from "@/lib/templates/design-store";
 import { db } from "@/lib/db";
 import { badRequest, handle, notFound } from "@/lib/api";
 import { requireAdmin } from "@/lib/auth/admin";
@@ -82,6 +84,7 @@ export async function POST(req: Request, { params }: Params) {
     // cost the artwork that is now live.
     if (previous) await deleteImage(previous);
 
+    revalidateTag(DESIGNS_TAG);
     return row;
   });
 }
@@ -100,6 +103,7 @@ export async function DELETE(_req: Request, { params }: Params) {
     });
     await deleteImage(existing[column]!);
 
+    revalidateTag(DESIGNS_TAG);
     // Removing an upload does not remove the design — it falls back to
     // whatever the manifest ships, which is what the customer saw before.
     return row;

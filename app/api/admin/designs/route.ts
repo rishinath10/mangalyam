@@ -1,3 +1,5 @@
+import { revalidateTag } from "next/cache";
+import { DESIGNS_TAG } from "@/lib/templates/design-store";
 import { db } from "@/lib/db";
 import { badRequest, handle, parseBody } from "@/lib/api";
 import { requireAdmin } from "@/lib/auth/admin";
@@ -52,7 +54,7 @@ export async function POST(req: Request) {
       templateId = `${templateId}-${taken.length + 1}`;
     }
 
-    return db.customDesign.create({
+    const created = await db.customDesign.create({
       data: {
         templateId,
         name: input.name,
@@ -72,5 +74,7 @@ export async function POST(req: Request) {
         published: false,
       },
     });
+    revalidateTag(DESIGNS_TAG);
+    return created;
   });
 }

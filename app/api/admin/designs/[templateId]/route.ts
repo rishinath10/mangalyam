@@ -1,3 +1,5 @@
+import { revalidateTag } from "next/cache";
+import { DESIGNS_TAG } from "@/lib/templates/design-store";
 import { db } from "@/lib/db";
 import { badRequest, handle, notFound, parseBody } from "@/lib/api";
 import { requireAdmin } from "@/lib/auth/admin";
@@ -54,7 +56,9 @@ export async function PATCH(req: Request, { params }: Params) {
       data.published = input.published;
     }
 
-    return db.customDesign.update({ where: { templateId }, data });
+    const updated = await db.customDesign.update({ where: { templateId }, data });
+    revalidateTag(DESIGNS_TAG);
+    return updated;
   });
 }
 
@@ -89,6 +93,7 @@ export async function DELETE(_req: Request, { params }: Params) {
         if (url) await deleteImage(url);
       }
     }
+    revalidateTag(DESIGNS_TAG);
     return { templateId, deleted: true };
   });
 }

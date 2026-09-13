@@ -50,12 +50,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ received: true });
   }
 
-  // The amount is re-read from the purchase row, never from the callback:
-  // the entitlement follows what we asked to be charged.
+  /**
+   * A wrong amount does not buy anything.
+   *
+   * This used to log the mismatch and then grant the entitlement anyway, which
+   * made the check decorative: anyone able to complete a session for one sen
+   * would have been given what a full price buys. The signature already proves
+   * the callback came from Stripe, so a mismatch here means the session was
+   * not the one we created — and the safe answer to that is no.
+   *
+   * Acknowledged with 200 rather than refused with a 4xx, because Stripe would
+   * simply redeliver a payload that is never going to become valid. The
+   * purchase stays pending and shows up in the admin list as one to look at.
+   */
   if (event.amountSen !== undefined && event.amountSen !== purchase.amountSen) {
     console.error(
-      `Payment amount mismatch on purchase ${purchase.id}: charged ${event.amountSen}, expected ${purchase.amountSen}`,
+      `Refusing to settle purchase ${purchase.id}: charged ${event.amountSen}, expected ${purchase.amountSen}`,
     );
+    return NextResponse.json({ received: true, settled: false });
   }
 
   await db.$transaction([
