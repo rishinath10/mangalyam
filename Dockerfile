@@ -48,6 +48,16 @@ COPY --from=builder /app/.next ./.next
 # attack surface — nothing here is reachable from a request.
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+# next.config.ts has to be here, not only in the builder.
+#
+# Next reads two kinds of setting out of it. Anything that shapes the build —
+# `headers()` among them — is compiled into .next and survives without the
+# file. Anything read by the running server — `poweredByHeader`, image config,
+# future runtime options — is not, and silently does nothing when the file is
+# absent. That is how production kept sending X-Powered-By while every
+# security header from the same object was applied correctly: the half that is
+# baked in worked, the half that is read at boot never loaded.
+COPY --from=builder /app/next.config.ts ./next.config.ts
 # Migrations and the schema ship with the image so the container can migrate
 # itself on boot rather than depending on someone remembering to run it.
 COPY --from=builder /app/prisma ./prisma
