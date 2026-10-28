@@ -212,7 +212,7 @@ export default async function HomePage() {
                 <div key={type} className="t t--lift rv c4 cer-tile" data-delay={i * 40}>
                   <EventIcon eventType={type} className="cer-ic" />
                   <div>
-                    <b>{EVENT_TYPE_LABELS[type]}</b>
+                    <b>{withFigures(EVENT_TYPE_LABELS[type])}</b>
                     <span>{EVENT_TYPE_BLURBS[type]}</span>
                   </div>
                 </div>

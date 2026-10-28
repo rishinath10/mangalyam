@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/Field";
 import { EventIcon } from "@/components/site/EventIcon";
 import { EVENT_TYPE_BLURBS, EVENT_TYPE_LABELS, EVENT_TYPES } from "@/lib/events";
 import { withEventType, type InvitationDraft } from "@/lib/draft";
+import { withFigures } from "@/lib/typography";
 
 /**
  * The first choice, and the only one that changes what the rest of the wizard
@@ -35,7 +36,7 @@ export function StepOccasion({
               onClick={() => onDraft(withEventType(draft, type))}
             >
               <EventIcon eventType={type} className="occ-ic" />
-              <b>{EVENT_TYPE_LABELS[type]}</b>
+              <b>{withFigures(EVENT_TYPE_LABELS[type])}</b>
               <span>{EVENT_TYPE_BLURBS[type]}</span>
             </button>
           ))}

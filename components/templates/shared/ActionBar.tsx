@@ -41,7 +41,7 @@ function Icon({ path }: { path: string }) {
 const ICONS = {
   phone:
     "M6.5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7 2 2 0 0 1 6.5 3.5Z",
-  chat: "M20.5 12a8.5 8.5 0 1 1-4.2-7.3M20.5 12a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.1-4.4",
+  chat: "M20.5 11.7a8 8 0 0 1-8.2 7.8 8.4 8.4 0 0 1-3.7-.85L3.5 20.5l1.9-4.9a7.7 7.7 0 0 1-1.4-4.4 8 8 0 0 1 8.3-7.7 8 8 0 0 1 8.2 7.7Z",
   pin: "M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11Z M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z",
   reply: "M3.5 6.5h17v11h-17z M3.5 7l8.5 6 8.5-6",
   music: "M9 18V5l10-2v13 M6.5 20.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z M16.5 18.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z",
@@ -61,15 +61,15 @@ export function ActionBar({
 }) {
   const { contact, event, rsvp } = invitation;
   const wa = contact.phone ? whatsappNumber(contact.phone) : null;
-  const who = contact.name ? ` ${contact.name}` : "";
+  const callLabel = contact.name ? `Call ${contact.name}` : "Call";
 
   return (
     <div className="inv-bar">
       <nav className="inv-bar-inner" aria-label="Invitation actions">
         {contact.phone && (
-          <a className="inv-bar-btn" href={`tel:${contact.phone.replace(/\s/g, "")}`}>
+          <a className="inv-bar-btn" aria-label={callLabel} href={`tel:${contact.phone.replace(/\s/g, "")}`}>
             <Icon path={ICONS.phone} />
-            <span>Call{who}</span>
+            <span>Call</span>
           </a>
         )}
         {wa && (
