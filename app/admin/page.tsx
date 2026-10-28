@@ -32,14 +32,21 @@ export default async function AdminOverview() {
         <div className="notice notice-bad" style={{ marginBottom: "1.4rem" }}>
           <b>Image uploads are failing.</b> Cover photos, gallery images and
           template artwork cannot be saved until this is fixed.
+          {storage.diagnosis && <div className="store-fix">{storage.diagnosis}</div>}
           <div className="store-why">{storage.problem}</div>
-          <div className="store-keys">
-            {Object.entries(storage.configured).map(([name, set]) => (
-              <span key={name} data-set={set ? "" : undefined}>
-                {name}
-              </span>
+          {/* Values for everything that is not a credential. A wrong hostname
+              or a swapped pair of URLs is the usual fault, and neither can be
+              spotted from a list that only says which names are set. */}
+          <dl className="store-keys">
+            {storage.settings.map((s) => (
+              <div key={s.name} data-missing={s.present ? undefined : ""}>
+                <dt>{s.name}</dt>
+                <dd>
+                  {!s.present ? <em>not set</em> : s.secret ? <em>set &middot; hidden</em> : s.value}
+                </dd>
+              </div>
             ))}
-          </div>
+          </dl>
         </div>
       )}
 

@@ -1540,13 +1540,29 @@ header:has(> .inv-frame-stage){place-content:center}
   margin-top:.6rem;padding:.55rem .7rem;border-radius:10px;
   background:rgba(0,0,0,.22);color:#F0B4B4;word-break:break-word;
 }
-.store-keys{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
-.store-keys span{
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.68rem;
-  padding:.2rem .5rem;border-radius:100px;
-  border:1px solid rgba(190,70,70,.4);color:#E7A9A9;
+/* The remedy, in plain words, above the raw error. The error is kept because
+   it is what you paste into a search; the sentence is what you act on. */
+.store-fix{
+  margin-top:.7rem;font-size:var(--t-sm);line-height:1.6;color:#F5D9D9;
 }
-.store-keys span[data-set]{border-color:rgba(60,150,110,.4);color:#8FD5B4}
+/* Name and value per row, so a wrong hostname is readable at a glance rather
+   than guessed at from a chip that only says the name is set. */
+.store-keys{display:grid;gap:.3rem;margin-top:.7rem}
+.store-keys>div{
+  display:grid;grid-template-columns:minmax(9rem,auto) 1fr;gap:.2rem .8rem;
+  align-items:baseline;padding:.3rem .55rem;border-radius:8px;
+  background:rgba(0,0,0,.16);
+}
+.store-keys>div[data-missing]{background:rgba(190,70,70,.16)}
+.store-keys dt,.store-keys dd{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.7rem;margin:0;
+}
+.store-keys dt{color:#E7A9A9;letter-spacing:.02em}
+.store-keys dd{color:#F0E3D0;word-break:break-all}
+.store-keys dd em{font-style:normal;opacity:.6}
+@media(max-width:560px){
+  .store-keys>div{grid-template-columns:1fr}
+}
 
 /* ---------- the guest's lightbox ---------- */
 .gal-tile{cursor:zoom-in;background:none;padding:0;transition:opacity .2s}

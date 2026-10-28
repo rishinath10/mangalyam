@@ -184,10 +184,61 @@ export async function deleteImage(url: string): Promise<void> {
 
 export interface StorageHealth {
   ok: boolean;
-  /** Which settings are present. Never the values — this is rendered in a page. */
-  configured: Record<string, boolean>;
+  /**
+   * The settings, with values for the ones that are not secrets.
+   *
+   * Showing the endpoint, bucket, region and public URL is the point: every
+   * realistic storage fault is a wrong hostname, a wrong bucket or the two
+   * URLs swapped, and none of those can be diagnosed from a list of names
+   * that only says "set". They are not secrets either — the public URL is
+   * served to every guest, the bucket name appears inside it, and the
+   * endpoint is an internal hostname. The access key and secret are secrets,
+   * so those are only ever reported as present or missing.
+   */
+  settings: { name: string; value: string | null; secret: boolean; present: boolean }[];
   /** The failure, in the operator's words. Null when everything worked. */
   problem: string | null;
+  /** What that failure usually means, and what to go and change. */
+  diagnosis: string | null;
+}
+
+/**
+ * Turns a storage error into something worth reading.
+ *
+ * "getaddrinfo EAI_AGAIN minio" is accurate and tells an operator nothing.
+ * Each branch here names the thing that is actually wrong and the place to
+ * change it, because the person reading this is trying to get uploads working
+ * again, not to learn what a DNS error code is.
+ */
+function diagnose(err: unknown, endpoint: string | undefined): string {
+  const raw = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+  const host = (() => {
+    try {
+      return endpoint ? new URL(endpoint).hostname : "the storage host";
+    } catch {
+      return "the storage host";
+    }
+  })();
+
+  if (/EAI_AGAIN|ENOTFOUND|getaddrinfo/i.test(raw)) {
+    return `The app cannot resolve the name "${host}". Nothing is wrong with the credentials — the container simply has no idea what that name points at. Either the storage service is not running, or it is not on the same Docker network as this app, or it is running under a different service name. Check the name in S3_ENDPOINT against the storage service's actual name, and that both containers share a network.`;
+  }
+  if (/ECONNREFUSED/i.test(raw)) {
+    return `"${host}" resolves, but nothing is listening on that port. The storage service is probably stopped, or S3_ENDPOINT has the wrong port.`;
+  }
+  if (/ETIMEDOUT|ECONNRESET|socket hang up/i.test(raw)) {
+    return `"${host}" resolves but never answers. That usually means a firewall or a network the app container cannot reach, rather than a storage fault.`;
+  }
+  if (/InvalidAccessKeyId|SignatureDoesNotMatch|AccessDenied|403/i.test(raw)) {
+    return "The storage service answered and rejected the credentials. S3_ACCESS_KEY_ID or S3_SECRET_ACCESS_KEY is wrong, or that key has no write access to this bucket.";
+  }
+  if (/NoSuchBucket|404/i.test(raw)) {
+    return "The storage service answered, but the bucket in S3_BUCKET does not exist on it. Create it, or correct the name.";
+  }
+  if (/certificate|self.signed|CERT_|TLS|SSL/i.test(raw)) {
+    return "TLS failed against the storage host. If this is an internal service over plain HTTP, S3_ENDPOINT should start with http:// rather than https://.";
+  }
+  return "The storage service did not accept a test write. The raw error above is the best clue.";
 }
 
 /**
@@ -202,17 +253,39 @@ export interface StorageHealth {
  * Names which settings are missing, never their values.
  */
 export async function checkStorage(): Promise<StorageHealth> {
-  const names = [
-    "S3_ENDPOINT",
-    "S3_BUCKET",
-    "S3_ACCESS_KEY_ID",
-    "S3_SECRET_ACCESS_KEY",
-    "S3_PUBLIC_URL",
+  // secret: true means the value is never rendered, only whether it is set.
+  const spec: { name: string; secret: boolean }[] = [
+    { name: "S3_ENDPOINT", secret: false },
+    { name: "S3_BUCKET", secret: false },
+    { name: "S3_REGION", secret: false },
+    { name: "S3_PUBLIC_URL", secret: false },
+    { name: "S3_ACCESS_KEY_ID", secret: true },
+    { name: "S3_SECRET_ACCESS_KEY", secret: true },
   ];
-  const configured = Object.fromEntries(names.map((n) => [n, Boolean(process.env[n])]));
-  const missing = names.filter((n) => !process.env[n]);
+  const settings = spec.map(({ name, secret }) => {
+    const present = Boolean(process.env[name]);
+    return {
+      name,
+      secret,
+      present,
+      // A secret that is set still reports present: true with a null value,
+      // so the page can say "set, hidden" rather than leaving the operator
+      // unable to tell a configured credential from a missing one.
+      value: present && !secret ? (process.env[name] as string) : null,
+    };
+  });
+
+  // S3_REGION has a working default, so it is reported but never required.
+  const required_ = spec.filter((x) => x.name !== "S3_REGION").map((x) => x.name);
+  const missing = required_.filter((n) => !process.env[n]);
   if (missing.length) {
-    return { ok: false, configured, problem: `Not set: ${missing.join(", ")}` };
+    return {
+      ok: false,
+      settings,
+      problem: `Not set: ${missing.join(", ")}`,
+      diagnosis:
+        "These have to be present in the container's environment at run time. Set them and restart — none of them is baked into the build.",
+    };
   }
 
   const key = `healthcheck/${randomUUID()}.txt`;
@@ -228,8 +301,9 @@ export async function checkStorage(): Promise<StorageHealth> {
   } catch (err) {
     return {
       ok: false,
-      configured,
+      settings,
       problem: err instanceof Error ? err.message : String(err),
+      diagnosis: diagnose(err, process.env.S3_ENDPOINT),
     };
   }
 
@@ -242,5 +316,5 @@ export async function checkStorage(): Promise<StorageHealth> {
     /* ignore */
   }
 
-  return { ok: true, configured, problem: null };
+  return { ok: true, settings, problem: null, diagnosis: null };
 }
