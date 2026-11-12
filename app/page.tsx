@@ -9,6 +9,7 @@ import type { TemplateManifest } from "@/lib/templates/types";
 import { EventIcon } from "@/components/site/EventIcon";
 import { TodayPanchangam } from "@/components/site/TodayPanchangam";
 import { BirthStarFinder } from "@/components/site/BirthStarFinder";
+import { DesignCard } from "@/components/site/DesignCard";
 import { DesignShowcase } from "@/components/site/DesignShowcase";
 import { Arrow, Tick } from "@/components/site/Icons";
 import { priceLabel } from "@/lib/pricing";
@@ -126,6 +127,14 @@ export default async function HomePage() {
   // DATABASE_URL during the Docker build, so anything Next tries to
   // prerender here would fail the deploy rather than the request.
   const designs = (await allManifestsOrCoded()).filter((d) => d.built);
+  // Three covers for the hero: a dark one between two light ones reads as a
+  // range rather than as three of the same thing.
+  const painted = designs.filter((d) => d.art?.scene);
+  const pick = (id: string) => painted.find((d) => d.templateId === id);
+  const heroCards = [pick("thamarai-01"), pick("kalyana-mandapam-01"), pick("mayil-01")]
+    .filter((d): d is NonNullable<typeof d> => Boolean(d));
+  if (heroCards.length < 3) heroCards.splice(0, heroCards.length, ...painted.slice(0, 3));
+
   // The sample invitation in the showcase is always a couple of months away,
   // so its countdown is running. Decided here so server and browser agree.
   const sampleDate = new Date(Date.now() + 64 * 86_400_000).toISOString().slice(0, 10);
@@ -137,50 +146,56 @@ export default async function HomePage() {
 
       <div className="page-shell">
         {/* ---------- hero ---------- */}
-        <header className="tone-dark" id="top">
-          <div className="wrap bento hero-bento">
-            <div className="t t--lit t--center rv c7 r2 hero-copy">
-              <p className="kick">
-                E-invitations for Malaysian Indian families<span className="dash" />
-              </p>
-              <h1 style={{ fontSize: "var(--t-3xl)", marginTop: "1.3rem" }}>
-                An E-Invitation for
-                <em style={{ display: "block", fontStyle: "italic", color: "var(--accent-soft)" }}>
-                  Every Event You Hold
-                </em>
+        <header className="tone-dark hero" id="top">
+          <div className="wrap hero-in">
+            <div className="hero-copy">
+              {freeUntil && (
+                <p className="hero-flag">
+                  <i aria-hidden="true" />
+                  Free until {freeUntil}
+                </p>
+              )}
+              <h1>
+                An e-invitation for
+                <em>every event you hold</em>
               </h1>
-              <p className="muted" style={{ fontSize: "var(--t-md)", maxWidth: "46ch", marginTop: "1.2rem" }}>
-                From weddings and naming ceremonies to temple consecrations and
-                community open houses — one link, sent on WhatsApp, opening to an
-                invitation drawn for the occasion, with RSVPs that count themselves.
+              <p className="hero-lede">
+                Weddings, naming ceremonies, housewarmings, temple consecrations and
+                open houses. One link, sent on WhatsApp, that opens like a card and
+                counts its own replies.
               </p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: ".7rem", marginTop: "1.8rem" }}>
-                <Link className="btn btn-gold" href="#designs">
-                  See the designs <Arrow />
+              <div className="hero-cta">
+                <Link className="btn btn-gold" href="/create">
+                  Create your invitation <Arrow />
                 </Link>
-                <Link className="btn btn-line" href="#how">
-                  How it works
+                <Link className="hero-more" href="#designs">
+                  See it open
                 </Link>
               </div>
             </div>
 
-            <div className="t t--img t--lift rv c5 r3 hero-media" data-delay="120" style={{ minHeight: 340, position: "relative" }}>
-              <Image
-                src="/img/hero-mangalyam.webp"
-                alt="A garlanded temple entrance at dusk, hung with jasmine and mango leaves and lit by tall brass lamps"
-                fill
-                priority
-                sizes="(max-width: 1000px) 100vw, 40vw"
-                style={{ objectFit: "cover" }}
-              />
+            {/* Three of the real covers, fanned like cards in a hand. Decorative
+                here — the section below is where they can be opened. */}
+            <div className="hero-fan" aria-hidden="true">
+              {heroCards.map((design, i) => (
+                <span key={design.templateId} className="hero-card" data-pos={i}>
+                  <DesignCard
+                    design={design}
+                    coupleLine={design.eventTypes.includes("wedding") ? "Ashwin & Kalyani" : "The Kumar Family"}
+                    ceremonyLabel={
+                      design.eventTypes.includes("wedding")
+                        ? "Muhurtham"
+                        : EVENT_TYPE_LABELS[design.eventTypes.find((t) => t !== "custom") ?? "custom"]
+                    }
+                  />
+                </span>
+              ))}
             </div>
+          </div>
 
-            {/* Where the two reassurance pills were. A count of designs is a
-                fact about us; this is the thing the family checks first. */}
-            <div className="rv c12 hero-aus" data-delay="200">
-              <TodayPanchangam />
-            </div>
-
+          {/* The thing a family checks before fixing a date. */}
+          <div className="wrap hero-aus">
+            <TodayPanchangam />
           </div>
         </header>
 
@@ -204,22 +219,6 @@ export default async function HomePage() {
               )}
               sampleDate={sampleDate}
             />
-          </div>
-        </section>
-
-        {/* ---------- birth star ---------- */}
-        <section className="sec tone-dark" id="stars">
-          <div className="wrap">
-            <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
-              <p className="kick">Before the invitations</p>
-              <h2>Every celebration is timed by the stars</h2>
-              <p>
-                A naming ceremony is held on the baby&rsquo;s star. A sixtieth is
-                celebrated when the birth star returns. Find yours here, drawn as
-                the constellation it belongs to.
-              </p>
-            </div>
-            <BirthStarFinder />
           </div>
         </section>
 
@@ -259,6 +258,25 @@ export default async function HomePage() {
               </Link>
               .
             </p>
+          </div>
+        </section>
+
+        {/* ---------- how ---------- */}
+        <section className="sec tone-dark" id="how">
+          <div className="wrap">
+            <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
+              <p className="kick">How it works</p>
+              <h2>Answer six questions. Send the link.</h2>
+            </div>
+            <div className="bento">
+              {STEPS.map((s, i) => (
+                <div key={s.n} className="t t--lift rv c4 step" data-delay={i * 90}>
+                  <span className="no">{withFigures(s.n)}</span>
+                  <h3>{s.h}</h3>
+                  <p>{s.p}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -327,22 +345,19 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ---------- how ---------- */}
-        <section className="sec tone-dark" id="how">
+        {/* ---------- birth star ---------- */}
+        <section className="sec tone-dark" id="stars">
           <div className="wrap">
             <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
-              <p className="kick">How it works</p>
-              <h2>Answer six questions. Send the link.</h2>
+              <p className="kick">Before the invitations</p>
+              <h2>Every celebration is timed by the stars</h2>
+              <p>
+                A naming ceremony is held on the baby&rsquo;s star. A sixtieth is
+                celebrated when the birth star returns. Find yours here, drawn as
+                the constellation it belongs to.
+              </p>
             </div>
-            <div className="bento">
-              {STEPS.map((s, i) => (
-                <div key={s.n} className="t t--lift rv c4 step" data-delay={i * 90}>
-                  <span className="no">{withFigures(s.n)}</span>
-                  <h3>{s.h}</h3>
-                  <p>{s.p}</p>
-                </div>
-              ))}
-            </div>
+            <BirthStarFinder />
           </div>
         </section>
 

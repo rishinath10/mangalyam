@@ -4,6 +4,8 @@ import { requireUserId } from "@/lib/auth/ownership";
 import { invitationLimitFor } from "@/lib/entitlements";
 import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { withFigures } from "@/lib/typography";
+import { freeUntilLabel } from "@/lib/launch";
+import { CopyLink } from "@/components/share/CopyLink";
 
 export const metadata = { title: "Your events" };
 
@@ -16,8 +18,18 @@ export default async function DashboardPage() {
   const events = await db.event.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
-    include: { entitlement: true, _count: { select: { invitations: true } } },
+    include: {
+      entitlement: true,
+      _count: { select: { invitations: true } },
+      invitations: {
+        where: { status: "published" },
+        select: { slug: true },
+        orderBy: { publishedAt: "asc" },
+      },
+    },
   });
+
+  const freeUntil = freeUntilLabel();
 
   return (
     <>
@@ -51,24 +63,36 @@ export default async function DashboardPage() {
             {events.map((event) => {
               const limit = invitationLimitFor(event.entitlement);
               const used = event._count.invitations;
+              const live = event.invitations[0];
               return (
-                <Link
-                  key={event.id}
-                  href={`/dashboard/events/${event.id}`}
-                  className="t t--lift c4"
-                >
+                // A card with a link in it, not a card that is a link: the
+                // copy button below has to be a button, and a button cannot
+                // live inside an anchor.
+                <div key={event.id} className="t t--lift c4 ev-card">
                   <p className="kick">{EVENT_TYPE_LABELS[event.eventType]}</p>
-                  <h2 style={{ fontSize: "var(--t-xl)", marginTop: ".4rem" }}>{event.hostNames}</h2>
+                  <h2 style={{ fontSize: "var(--t-xl)", marginTop: ".4rem" }}>
+                    <Link href={`/dashboard/events/${event.id}`} className="ev-card-link">
+                      {event.hostNames}
+                    </Link>
+                  </h2>
                   <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".6rem" }}>
                     {withFigures(String(used))} of {withFigures(String(limit))} invitation
                     {used === 1 ? "" : "s"}
                   </p>
-                  {!event.entitlement && (
+                  {live ? (
+                    <div className="ev-card-live">
+                      <span className="pill pill-live">
+                        <i className="live-dot" aria-hidden="true" />
+                        Live
+                      </span>
+                      <CopyLink path={`/i/${live.slug}`} />
+                    </div>
+                  ) : (
                     <span className="pill pill-draft" style={{ marginTop: "1rem" }}>
-                      Purchase pending
+                      {event.entitlement || freeUntil ? "Draft" : "Purchase pending"}
                     </span>
                   )}
-                </Link>
+                </div>
               );
             })}
           </div>

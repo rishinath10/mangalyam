@@ -204,7 +204,7 @@ export function CreateWizard({
             </p>
           )}
 
-          <div className="wz-body">
+          <div className="wz-body" key={current.id}>
             {current.id === "occasion" && <StepOccasion {...stepProps} />}
             {current.id === "design" && <StepDesign {...stepProps} />}
             {current.id === "details" && <StepDetails {...stepProps} />}

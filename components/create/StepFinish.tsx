@@ -6,7 +6,14 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import { Tick } from "@/components/site/Icons";
-import { claimPayload, draftIssues, draftLabel, type InvitationDraft } from "@/lib/draft";
+import { LiveMoment } from "@/components/share/LiveMoment";
+import {
+  claimPayload,
+  draftHostNames,
+  draftIssues,
+  draftLabel,
+  type InvitationDraft,
+} from "@/lib/draft";
 import { clearDraft, coverDataUrlToFile } from "@/lib/draft-storage";
 
 type Saved = { eventId: string; invitationId: string; slug: string };
@@ -56,7 +63,6 @@ export function StepFinish({
   const [saved, setSaved] = useState<Saved | null>(null);
   const [payBusy, setPayBusy] = useState(false);
   const [live, setLive] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const issues = draftIssues(draft);
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -192,53 +198,17 @@ export function StepFinish({
   }
 
   if (saved && live) {
-    const url = `${location.origin}/i/${saved.slug}`;
-    const message = `You are invited — ${draftLabel(draft)}. ${url}`;
-
-    async function copy() {
-      try {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch {
-        setError("Your browser blocked copying. Select the link and copy it manually.");
-      }
-    }
-
     return (
       <div className="wz-fields">
-        <div className="wz-done">
-          <p className="kick">Published</p>
-          <h3>Your invitation is live.</h3>
-          <p className="muted">Anyone with this link can open it and reply.</p>
-        </div>
-
-        {error && (
-          <p role="alert" className="notice notice-bad">
-            {error}
-          </p>
-        )}
-
-        <a className="wz-live-link" href={url} target="_blank" rel="noreferrer">
-          {url.replace(/^https?:\/\//, "")}
-        </a>
-
-        <div className="wz-done-links">
-          <a
-            className="btn btn-gold"
-            href={`https://wa.me/?text=${encodeURIComponent(message)}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Send on WhatsApp
-          </a>
-          <button type="button" className="btn btn-line" onClick={copy}>
-            {copied ? "Copied" : "Copy link"}
-          </button>
+        <LiveMoment
+          url={`${location.origin}/i/${saved.slug}`}
+          title={draftHostNames(draft) || draftLabel(draft)}
+          message={`You are invited — ${draftLabel(draft)}.`}
+        >
           <Link className="btn btn-quiet" href={`/dashboard/invitations/${saved.invitationId}`}>
             Keep editing
           </Link>
-        </div>
+        </LiveMoment>
       </div>
     );
   }

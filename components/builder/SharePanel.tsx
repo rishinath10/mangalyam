@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { InvitationStatus } from "@prisma/client";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
+import { LiveMoment } from "@/components/share/LiveMoment";
 
 export function SharePanel({
   eventId,
@@ -35,21 +36,21 @@ export function SharePanel({
   const [origin, setOrigin] = useState("");
   const [busy, setBusy] = useState<null | "slug" | "publish">(null);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [canShare, setCanShare] = useState(false);
+  // True only for a publish that happened in this sitting, so the seal plays
+  // when someone goes live and not every time they open the tab afterwards.
+  const [justPublished, setJustPublished] = useState(false);
 
   // the real origin is only knowable in the browser, and it differs between
   // local, preview and mangalyam.my
   useEffect(() => {
     setOrigin(location.origin);
-    setCanShare(typeof navigator !== "undefined" && "share" in navigator);
   }, []);
 
   useEffect(() => setDraftSlug(slug), [slug]);
 
   const url = `${origin}/i/${slug}`;
   const published = status === "published";
-  const message = `${coupleLine} invite you to their ${ceremonyLabel}. ${url}`;
+  const message = `${coupleLine} invite you to their ${ceremonyLabel}.`;
 
   async function saveSlug() {
     setBusy("slug");
@@ -82,18 +83,9 @@ export function SharePanel({
       setError(body.error ?? "Could not change the status.");
     } else {
       onStatusChange(body.status);
+      setJustPublished(body.status === "published");
     }
     setBusy(null);
-  }
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setError("Your browser blocked copying. Select the link and copy it manually.");
-    }
   }
 
   return (
@@ -181,47 +173,19 @@ export function SharePanel({
         </div>
       )}
 
-      <div>
-        <span className="field-label">Share</span>
-        <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap" }}>
-          <a
-            className="btn btn-gold btn-sm"
-            href={`https://wa.me/?text=${encodeURIComponent(message)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-disabled={!published}
-            onClick={(e) => !published && e.preventDefault()}
-          >
-            Share on WhatsApp
+      {published && origin ? (
+        <LiveMoment url={url} title={coupleLine} message={message} celebrate={justPublished}>
+          <a className="btn btn-quiet" href={`/i/${slug}`} target="_blank" rel="noopener noreferrer">
+            Open it
           </a>
-          <Button type="button" variant="line" size="sm" onClick={copy}>
-            {copied ? "Copied" : "Copy link"}
-          </Button>
-          {canShare && (
-            <Button
-              type="button"
-              variant="line"
-              size="sm"
-              onClick={() => navigator.share({ title: coupleLine, text: message, url })}
-            >
-              Share…
-            </Button>
-          )}
-          {/* Only once published: while it is a draft the strip above already
-              offers this link, with the explanation that goes with it. */}
-          {published && (
-            <a className="btn btn-quiet btn-sm" href={`/i/${slug}`} target="_blank" rel="noopener noreferrer">
-              Open it
-            </a>
-          )}
-        </div>
-        {!published && (
-          <p className="dim" style={{ fontSize: "var(--t-xs)", marginTop: ".7rem" }}>
-            Publish first — until then this link shows a not-found page to
-            everyone except you.
-          </p>
-        )}
-      </div>
+        </LiveMoment>
+      ) : (
+        <p className="dim" style={{ fontSize: "var(--t-xs)" }}>
+          Publish first — until then this link shows a not-found page to everyone
+          except you. Sharing, the QR code and the WhatsApp button appear here once
+          it is live.
+        </p>
+      )}
     </div>
   );
 }

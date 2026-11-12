@@ -280,58 +280,53 @@ section[id],header[id]{scroll-margin-top:112px}
 /* ==========================================================
    FLOATING NAV
    ========================================================== */
-.nav-bar{
-  width:var(--measure);margin-inline:auto;pointer-events:auto;
-  display:flex;align-items:center;gap:1.4rem;
-  padding:.5rem .5rem .5rem 1.4rem;border-radius:100px;
-  background:#231017;
-  border:1px solid rgba(235,215,155,.18);
-  box-shadow:0 12px 34px -16px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.07);
-  transition:background .35s ease, box-shadow .35s ease, padding .35s ease;
+/* A slim bar with no chrome of its own. Clear at the top of the page, a thin
+   veil once the page has moved under it, and gone on the way down. */
+.nav{
+  position:fixed;inset:0 0 auto 0;z-index:90;
+  transition:transform .4s cubic-bezier(.3,.7,.2,1),background .3s ease,border-color .3s ease;
+  border-bottom:1px solid transparent;
 }
-.nav-bar.is-stuck{
-  background:#1B0810;
-  box-shadow:0 16px 40px -18px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.08);
-  padding-block:.34rem;
+.nav[data-scrolled]{
+  background:rgba(22,6,11,.82);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom-color:rgba(235,215,155,.1);
+}
+.nav[data-hidden]{transform:translateY(-102%)}
+.nav:focus-within{transform:none}
+.nav-in{
+  width:var(--measure);margin-inline:auto;height:60px;
+  display:flex;align-items:center;gap:1.6rem;
 }
 .nav-brand{flex:none;color:#FAF5EA}
-.nav-brand .wm{display:block;font-family:var(--serif);font-size:1.32rem;letter-spacing:.13em;line-height:1}
+.nav-brand .wm{display:block;font-family:var(--serif);font-size:1.3rem;letter-spacing:.13em;line-height:1}
 .nav-brand .tg{display:block;font-size:.42rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-dp);margin-top:.3rem}
-.nav-links{display:flex;gap:.3rem;margin-inline:auto}
-.nav-links a{font-size:var(--t-sm);color:#BFA98B;padding:.5rem .9rem;border-radius:100px;transition:color .2s,background .2s}
-.nav-links a:hover{color:#F2E7D3;background:rgba(255,255,255,.06)}
-.nav-bar .btn{padding:.62rem 1.3rem;flex:none}
-.nav-burger{
-  display:none;width:42px;height:42px;border-radius:50%;flex:none;cursor:pointer;
-  background:rgba(255,255,255,.06);border:1px solid rgba(235,215,155,.2);
-  align-items:center;justify-content:center;
+.nav-links{display:flex;gap:1.7rem;margin-left:auto}
+.nav-links a{font-size:var(--t-sm);color:#B9A58B;padding:.4rem 0;transition:color .2s}
+.nav-links a:hover{color:#F6ECD9}
+.nav-cta{
+  flex:none;font-size:var(--t-sm);font-weight:500;color:var(--gold-lt);
+  padding:.48rem 1.05rem;border-radius:100px;border:1px solid rgba(235,215,155,.38);
+  transition:background .2s,color .2s,border-color .2s;
 }
-.nav-burger span{display:block;width:16px;height:1.4px;background:#EBD79B;position:relative;transition:.25s}
-.nav-burger span::before,.nav-burger span::after{content:"";position:absolute;left:0;width:16px;height:1.4px;background:#EBD79B;transition:.25s}
-.nav-burger span::before{top:-5px}
-.nav-burger span::after{top:5px}
+.nav-cta:hover{background:var(--gold);border-color:var(--gold);color:#1A0A05}
+.nav-burger{
+  display:none;width:40px;height:40px;border-radius:50%;flex:none;cursor:pointer;
+  background:none;border:0;align-items:center;justify-content:center;margin-right:-.5rem;
+}
+.nav-burger span{display:block;width:18px;height:1.4px;background:#EBD79B;position:relative;transition:.25s}
+.nav-burger span::before,.nav-burger span::after{content:"";position:absolute;left:0;width:18px;height:1.4px;background:#EBD79B;transition:.25s}
+.nav-burger span::before{top:-6px}
+.nav-burger span::after{top:6px}
 .nav-burger[data-open] span{background:transparent}
 .nav-burger[data-open] span::before{transform:rotate(45deg);top:0}
 .nav-burger[data-open] span::after{transform:rotate(-45deg);top:0}
-@media(max-width:1040px){
+@media(max-width:860px){
   .nav-links{display:none}
   .nav-burger{display:flex}
-  .nav-cta-label{display:none}
-  /* The links carried margin-inline:auto, which is what pushed the buttons to
-     the right edge. Hidden, that spacer goes with them and the two controls
-     bunch up against the wordmark with dead space after them. */
-  .nav-bar .btn{padding:.62rem .9rem;margin-left:auto}
+  .nav-cta{margin-left:auto}
+  .nav-in{gap:.7rem;height:56px}
 }
-@media(max-width:560px){
-  /* The tagline is 30 letterspaced characters. At a size anyone can read it is
-     wider than the room left beside the wordmark, the CTA and the burger — so
-     it was either 6px tall or it pushed the burger off the screen. It says
-     nothing the wordmark does not, and it is still in the footer. */
-  .nav-brand .tg{display:none}
-  .nav-bar{gap:.7rem;padding:.45rem .45rem .45rem 1.1rem}
-  .nav-brand .wm{font-size:1.2rem;letter-spacing:.1em}
-  .nav-burger{width:38px;height:38px}
-}
+@media (prefers-reduced-motion: reduce){.nav{transition:none}}
 
 .nav-sheet{
   position:fixed;inset:0;z-index:88;display:grid;place-items:center;
@@ -343,8 +338,75 @@ section[id],header[id]{scroll-margin-top:112px}
 .nav-sheet a{font-family:var(--serif);font-size:clamp(1.6rem,6.5vw,2.2rem);color:#F2E7D3;padding:.25rem 1rem}
 .nav-sheet a:hover{color:var(--gold-lt)}
 
-.page-shell{padding-top:98px;position:relative;z-index:1;isolation:isolate}
+.page-shell{padding-top:60px;position:relative;z-index:1;isolation:isolate}
 .hero-bento{padding-block:clamp(1rem,2.5vw,2rem) var(--sec)}
+/* ---------- the hero ----------
+   No boxes: a headline on the night sky, and three real covers beside it. */
+.hero{padding-bottom:clamp(2.4rem,5vw,4rem)}
+.hero-in{
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);align-items:center;
+  gap:clamp(1.5rem,4vw,4rem);min-height:min(78svh,720px);padding-block:clamp(2rem,5vw,4rem);
+}
+.hero-flag{
+  display:inline-flex;align-items:center;gap:.6rem;font-size:var(--t-xs);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold-lt);padding:.42rem .9rem;border-radius:100px;white-space:nowrap;
+  border:1px solid rgba(235,215,155,.26);background:rgba(235,215,155,.06);
+}
+.hero-flag i{width:6px;height:6px;border-radius:50%;background:var(--gold-lt);box-shadow:0 0 10px var(--gold-lt)}
+.hero-flag .num{font-size:1.1em}
+.hero h1{
+  margin-top:1.5rem;font-size:clamp(2.6rem,6.2vw,4.7rem);line-height:1.02;letter-spacing:-.01em;
+}
+.hero h1 em{display:block;font-style:italic;color:var(--gold-lt)}
+.hero-lede{margin-top:1.5rem;max-width:44ch;font-size:var(--t-md);line-height:1.65;color:var(--ink-2)}
+.hero-cta{margin-top:2.1rem;display:flex;flex-wrap:wrap;align-items:center;gap:1.4rem}
+.hero-more{
+  font-size:var(--t-sm);color:var(--ink-1);padding-bottom:.2rem;
+  border-bottom:1px solid rgba(235,215,155,.4);transition:color .2s,border-color .2s;
+}
+.hero-more:hover{color:var(--gold-lt);border-color:var(--gold-lt)}
+
+.hero-fan{position:relative;height:clamp(340px,44vw,560px)}
+.hero-card{
+  /* With units, always: these are used inside calc() below, and a bare 0
+     there is invalid — which silently turned the whole transform off at the
+     animation's midpoint and let the middle card drift out of the fan. */
+  --x:0%;--y:0%;--r:0deg;
+  position:absolute;top:50%;left:50%;width:clamp(150px,19vw,240px);
+  transform:translate(-50%,-50%) translateX(var(--x)) translateY(var(--y)) rotate(var(--r));
+  animation:hero-float 9s ease-in-out infinite;animation-delay:var(--d,0s);
+}
+.hero-card .dsn{border-radius:18px;box-shadow:0 0 0 1px rgba(255,255,255,.12),0 40px 70px -30px rgba(0,0,0,.9)}
+.hero-card .dsn-name{display:none}
+.hero-card .dsn-cn{font-size:clamp(.9rem,1.5vw,1.25rem)}
+.hero-card[data-pos="0"]{--x:-62%;--y:6%;--r:-9deg;--d:-3s;z-index:1}
+.hero-card[data-pos="1"]{z-index:3;width:clamp(170px,21.5vw,272px)}
+.hero-card[data-pos="2"]{--x:62%;--y:6%;--r:9deg;--d:-6s;z-index:2}
+@keyframes hero-float{
+  0%,100%{transform:translate(-50%,-50%) translateX(var(--x)) translateY(var(--y)) rotate(var(--r))}
+  50%{transform:translate(-50%,-50%) translateX(var(--x)) translateY(calc(var(--y) - 2.2%)) rotate(var(--r))}
+}
+/* The page arrives in order: words, then the cards dealt one at a time. */
+.hero-copy > *{animation:hero-in .9s cubic-bezier(.22,.61,.36,1) both}
+.hero-copy > :nth-child(2){animation-delay:.08s}
+.hero-copy > :nth-child(3){animation-delay:.18s}
+.hero-copy > :nth-child(4){animation-delay:.28s}
+@keyframes hero-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.hero-fan{animation:hero-in 1.2s cubic-bezier(.22,.61,.36,1) .3s both}
+@media(max-width:860px){
+  .hero-in{grid-template-columns:1fr;min-height:0;text-align:center;padding-top:1.6rem;gap:1rem}
+  .hero-flag{font-size:.6rem;letter-spacing:.1em}
+  .hero-lede{margin-inline:auto}
+  .hero-cta{justify-content:center}
+  .hero-fan{height:clamp(300px,82vw,420px);order:2}
+  .hero-card{width:clamp(128px,36vw,180px)}
+  .hero-card[data-pos="1"]{width:clamp(142px,40vw,200px)}
+  .hero-card[data-pos="0"]{--x:-58%}
+  .hero-card[data-pos="2"]{--x:58%}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero-card,.hero-copy > *,.hero-fan{animation:none}
+}
 
 /* The short forms only exist for the phone; the long ones only for everywhere
    else. Both are in the markup so the swap is a media query rather than a
@@ -2221,3 +2283,44 @@ header:has(> .inv-frame-stage){place-content:center}
 .starpick-find[open] summary{margin-bottom:.7rem}
 .starpick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.7rem;margin-bottom:.8rem}
 .starpick-hint{font-size:var(--t-xs);line-height:1.5;margin-top:.6rem}
+
+/* ---------- going live ---------- */
+.live{display:grid;gap:1.1rem;padding:1.3rem;border-radius:18px;border:1px solid rgba(212,170,70,.34);background:rgba(212,170,70,.07)}
+.live-head{display:flex;align-items:center;gap:.9rem}
+.live-head h3{font-size:var(--t-xl);margin-top:.2rem}
+.live-seal{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(60,150,110,.16)}
+.live-seal svg{width:34px;height:34px;fill:none;stroke:#7FCBA8;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.tone-cream .live-seal svg{stroke:#1E6B4A}
+.live[data-celebrate] .live-seal{animation:live-pop .6s cubic-bezier(.2,.9,.3,1.5) both}
+.live[data-celebrate] .live-seal circle{stroke-dasharray:1;stroke-dashoffset:1;animation:cst-draw .7s ease .15s both}
+.live[data-celebrate] .live-seal path{stroke-dasharray:1;stroke-dashoffset:1;animation:cst-draw .45s ease .75s both}
+@keyframes live-pop{from{transform:scale(.5);opacity:0}to{transform:none;opacity:1}}
+.live-link{
+  display:block;padding:.95rem 1.1rem;border-radius:12px;text-align:center;word-break:break-all;
+  font-size:var(--t-base);color:var(--head);background:var(--glass-2);border:1px solid var(--edge);
+}
+.live-link:hover{border-color:var(--accent)}
+.live-grid{display:grid;grid-template-columns:1fr auto;gap:1.2rem;align-items:start}
+.live-actions{display:flex;flex-wrap:wrap;gap:.6rem;align-content:flex-start}
+.live-qr{display:grid;justify-items:center;gap:.5rem;max-width:176px;text-align:center}
+.live-qr img,.live-qr-wait{width:160px;height:160px;border-radius:12px;background:#fff;padding:6px;display:block}
+.live-qr-save{font-size:var(--t-xs);color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.live-qr p{font-size:var(--t-xs);line-height:1.45;color:var(--ink-3)}
+@media(max-width:560px){.live-grid{grid-template-columns:1fr;justify-items:center}.live-actions{justify-content:center}}
+@media (prefers-reduced-motion: reduce){
+  .live[data-celebrate] .live-seal,.live[data-celebrate] .live-seal circle,.live[data-celebrate] .live-seal path{animation:none;stroke-dashoffset:0}
+}
+.live-dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 0 currentColor;animation:live-dot 2s ease-out infinite}
+@keyframes live-dot{0%{box-shadow:0 0 0 0 rgba(120,210,170,.6)}100%{box-shadow:0 0 0 7px rgba(120,210,170,0)}}
+@media (prefers-reduced-motion: reduce){.live-dot{animation:none}}
+.ev-card-link{color:inherit;text-decoration:none}
+.ev-card-link::after{content:"";position:absolute;inset:0}
+.ev-card{position:relative}
+.ev-card-live{position:relative;z-index:1;display:flex;align-items:center;gap:.6rem;margin-top:1rem;flex-wrap:wrap}
+.row-wrap{display:flex;align-items:center;gap:.6rem}
+.row-wrap .row-card{flex:1;min-width:0}
+
+/* Each wizard step arrives rather than swaps. */
+.wz-body{animation:wz-step .45s cubic-bezier(.22,.61,.36,1) both}
+@keyframes wz-step{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.wz-body{animation:none}}

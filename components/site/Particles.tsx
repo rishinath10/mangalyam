@@ -114,7 +114,7 @@ export function Particles() {
       ctx.strokeStyle = "#EBD79B";
       ctx.lineWidth = 0.8;
       ctx.lineCap = "round";
-      ctx.globalAlpha = 0.34 * fade;
+      ctx.globalAlpha = 0.22 * fade;
       ctx.beginPath();
       figure.lines.forEach(([a, b], i) => {
         const p = Math.max(0, Math.min(1, progress - i));
@@ -132,11 +132,11 @@ export function Particles() {
         const first = figure.lines.findIndex(([a, b]) => a === i || b === i);
         if (first === -1 || progress < first) return;
         const [x, y] = at(i);
-        ctx.globalAlpha = 0.75 * fade;
+        ctx.globalAlpha = 0.55 * fade;
         ctx.beginPath();
         ctx.arc(x, y, 2.4 - mag * 0.5, 0, 6.283);
         ctx.fill();
-        ctx.globalAlpha = 0.1 * fade;
+        ctx.globalAlpha = 0.07 * fade;
         ctx.beginPath();
         ctx.arc(x, y, (4 - mag) * 2.6, 0, 6.283);
         ctx.fill();

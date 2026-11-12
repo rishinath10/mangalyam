@@ -14,6 +14,7 @@ import { resolveAccentColor } from "@/lib/templates/registry";
 import { withFigures } from "@/lib/typography";
 import { AddInvitationForm } from "@/components/dashboard/AddInvitationForm";
 import { PurchasePanel } from "@/components/dashboard/PurchasePanel";
+import { CopyLink } from "@/components/share/CopyLink";
 
 type Params = {
   params: Promise<{ eventId: string }>;
@@ -130,26 +131,30 @@ export default async function EventPage({ params, searchParams }: Params) {
               .join(" · ");
 
             return (
-              <Link
-                key={invitation.id}
-                href={`/dashboard/invitations/${invitation.id}`}
-                className="t t--lift row-card"
-              >
-                <span className="swatch" style={{ background: accent }} aria-hidden="true" />
-                <span className="body">
-                  <b>{label}</b>
-                  <span>{when || "No date set yet"}</span>
-                </span>
-                {invitation._count.rsvps > 0 && (
-                  <span className="dim" style={{ fontSize: "var(--t-sm)", whiteSpace: "nowrap" }}>
-                    {withFigures(String(invitation._count.rsvps))} repl
-                    {invitation._count.rsvps === 1 ? "y" : "ies"}
+              <div key={invitation.id} className="row-wrap">
+                <Link href={`/dashboard/invitations/${invitation.id}`} className="t t--lift row-card">
+                  <span className="swatch" style={{ background: accent }} aria-hidden="true" />
+                  <span className="body">
+                    <b>{label}</b>
+                    <span>{when || "No date set yet"}</span>
                   </span>
-                )}
-                <span className={`pill ${invitation.status === "published" ? "pill-live" : "pill-draft"}`}>
-                  {invitation.status}
-                </span>
-              </Link>
+                  {invitation._count.rsvps > 0 && (
+                    <span className="dim" style={{ fontSize: "var(--t-sm)", whiteSpace: "nowrap" }}>
+                      {withFigures(String(invitation._count.rsvps))} repl
+                      {invitation._count.rsvps === 1 ? "y" : "ies"}
+                    </span>
+                  )}
+                  {invitation.status === "published" ? (
+                    <span className="pill pill-live">
+                      <i className="live-dot" aria-hidden="true" />
+                      Live
+                    </span>
+                  ) : (
+                    <span className="pill pill-draft">Draft</span>
+                  )}
+                </Link>
+                {invitation.status === "published" && <CopyLink path={`/i/${invitation.slug}`} />}
+              </div>
             );
           })}
         </div>
