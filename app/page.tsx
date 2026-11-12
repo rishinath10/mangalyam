@@ -9,7 +9,7 @@ import type { TemplateManifest } from "@/lib/templates/types";
 import { EventIcon } from "@/components/site/EventIcon";
 import { TodayPanchangam } from "@/components/site/TodayPanchangam";
 import { BirthStarFinder } from "@/components/site/BirthStarFinder";
-import { DesignCard } from "@/components/site/DesignCard";
+import { DesignShowcase } from "@/components/site/DesignShowcase";
 import { Arrow, Tick } from "@/components/site/Icons";
 import { priceLabel } from "@/lib/pricing";
 import { freeUntilLabel, paidFromLabel } from "@/lib/launch";
@@ -78,9 +78,6 @@ const FAQ = [
   },
 ];
 
-const SAMPLE_COUPLE = "Ashwin & Kalyani";
-const SAMPLE_HOST = "The Kumar Family";
-
 /**
  * Counted, not asserted. This used to be a hardcoded 108 that multiplied
  * families by wedding ceremonies — arithmetic the pivot invalidated and
@@ -129,6 +126,9 @@ export default async function HomePage() {
   // DATABASE_URL during the Docker build, so anything Next tries to
   // prerender here would fail the deploy rather than the request.
   const designs = (await allManifestsOrCoded()).filter((d) => d.built);
+  // The sample invitation in the showcase is always a couple of months away,
+  // so its countdown is running. Decided here so server and browser agree.
+  const sampleDate = new Date(Date.now() + 64 * 86_400_000).toISOString().slice(0, 10);
   return (
     <>
       <Particles />
@@ -184,6 +184,29 @@ export default async function HomePage() {
           </div>
         </header>
 
+        {/* ---------- designs ---------- */}
+        <section className="sec tone-dark" id="designs">
+          <div className="wrap">
+            <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
+              <p className="kick">Choose your card</p>
+              <h2>{countWord(designs.length)} designs, painted not decorated</h2>
+              <p>
+                Pick one and open it. Every design recolours to the day — a muhurtham
+                in kumkum, a housewarming in mango-leaf green, a sixtieth in plum —{" "}
+                {withFigures(String(distinctLooks(designs)))} distinct looks between
+                them, before you add a photograph.
+              </p>
+            </div>
+            {/* Painted families lead; anything without a painting follows. */}
+            <DesignShowcase
+              designs={[...designs].sort(
+                (x, y) => Number(Boolean(y.art?.scene)) - Number(Boolean(x.art?.scene)),
+              )}
+              sampleDate={sampleDate}
+            />
+          </div>
+        </section>
+
         {/* ---------- birth star ---------- */}
         <section className="sec tone-dark" id="stars">
           <div className="wrap">
@@ -212,7 +235,7 @@ export default async function HomePage() {
                 own words, its own colour, its own link and its own headcount.
               </p>
             </div>
-            <div className="bento">
+            <div className="bento cer-grid">
               {EVENT_TYPES.map((type, i) => (
                 <div key={type} className="t t--lift rv c4 cer-tile" data-delay={i * 40}>
                   <EventIcon eventType={type} className="cer-ic" />
@@ -236,62 +259,6 @@ export default async function HomePage() {
               </Link>
               .
             </p>
-          </div>
-        </section>
-
-        {/* ---------- designs ---------- */}
-        <section className="sec tone-dark" id="designs">
-          <div className="wrap">
-            <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
-              <p className="kick">Choose your card</p>
-              <h2>{countWord(designs.length)} designs, painted not decorated</h2>
-              <p>
-                Every one recolours to the day — a muhurtham in kumkum, a
-                housewarming in tulsi green, a sixtieth in plum.{" "}
-                {withFigures(String(distinctLooks(designs)))} distinct looks
-                between them, before you add a photograph.
-              </p>
-            </div>
-            {/* Every design a customer can choose, as the covers they are — a
-                shelf to browse sideways on a phone, a row on a desk. Painted
-                families lead; anything without a painting follows. */}
-            <div className="dsn-shelf rv" role="list">
-              {[...designs]
-                .sort((x, y) => Number(Boolean(y.art?.scene)) - Number(Boolean(x.art?.scene)))
-                .map((design) => {
-                  const wedding = design.eventTypes.includes("wedding");
-                  const occasion = design.eventTypes.find((t) => t !== "custom") ?? "custom";
-                  return (
-                    <Link
-                      key={design.templateId}
-                      href="/create"
-                      className="dsn-shelf-item"
-                      role="listitem"
-                      aria-label={`${design.name} — ${design.tagline}`}
-                    >
-                      <DesignCard
-                        design={design}
-                        coupleLine={wedding ? SAMPLE_COUPLE : SAMPLE_HOST}
-                        ceremonyLabel={wedding ? "Muhurtham" : EVENT_TYPE_LABELS[occasion]}
-                      />
-                      <span className="dsn-shelf-cap">
-                        <b>{design.name}</b>
-                        <span>{design.tagline}</span>
-                      </span>
-                    </Link>
-                  );
-                })}
-            </div>
-
-            <div className="bento" style={{ marginTop: "clamp(1.4rem,3vw,2.2rem)" }}>
-              <div className="t t--2 t--center rv c12">
-                <h3 style={{ fontSize: "var(--t-lg)" }}>Your photograph goes on the cover</h3>
-                <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".5rem" }}>
-                  Each design carries your own cover image, your accent colour and your
-                  words — so two families on the same design never recognise each other.
-                </p>
-              </div>
-            </div>
           </div>
         </section>
 
