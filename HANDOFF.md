@@ -233,3 +233,50 @@ Build exactly as CI does before pushing:
 ```bash
 env -u DATABASE_URL npx next build
 ```
+
+---
+
+## 12. November 2026 redesign (added 12 November 2026)
+
+What changed after the sections above were written. Where the two disagree, this section is the current one.
+
+### Launch offer
+
+Publishing is **free until 31 December 2026** (Malaysia time) and paid from 1 January 2027. `lib/launch.ts` owns the date; `FREE_UNTIL` overrides it (`YYYY-MM-DD`, or `off`). Publishing during the offer writes a real entitlement row, so those invitations stay live afterwards. Checkout refuses while the offer runs.
+
+**Before 1 January 2027:** set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. Without them the button reads "Not on sale yet" (it no longer returns a 500) and the admin overview shows a warning.
+
+### Painted designs
+
+Seven families live under `public/templates/<family>/` and are declared in `PAINTED_FAMILIES` in `lib/templates/registry.ts`: Kalyana Mandapam, Malligai, Gopuram, Thamarai, Griha Pravesham, Mayil, Deepa Oli. The last two are on dark grounds (`tokens.dark`).
+
+Each has a `scene` (full-screen cover), `sceneThumb`, `closing`, `crest`, `divider`, a `sceneText` box saying where the painting leaves room for the names, and `particles`.
+
+Adding a design:
+
+1. Paint or generate the art on pure white (or pure black for gold-on-dark ornaments), with the middle of the cover left empty.
+2. Run `scripts/prepare-art.mjs` (usage is in its header). The cover is stained to the design's `surface` colour with `--tint`, so **the surface token and the scene must be changed together**.
+3. Add an entry to `PAINTED_FAMILIES`.
+
+The source paintings were generated with Magnific and are not in the repo; only the processed files are.
+
+### Birth stars
+
+`lib/birthstar.ts` computes natchathiram and raasi from the Moon's sidereal longitude, reusing `lib/panchangam.ts`. Checked against Meeus example 47.a (within 10 arc-seconds) and seven published charts. It names a second candidate when the date has no time and the Moon changed star that day, or when the time is within about an hour of a boundary. Malaysia and Singapore are UTC+7:30 before 1982.
+
+Hosts can show stars on the invitation (Settings tab). Only the star and raasi indices are stored (`star_one`, `raasi_one`, `star_two`, `raasi_two` on `invitation_settings`), never the birthday.
+
+### Other things that moved
+
+- `DEFAULT_TEMPLATE_ID` is now `malligai-01`; each occasion starts on its own design (`STARTING_TEMPLATE`).
+- The landing page's old star-sign gimmick (`lib/starsign.ts`) is gone.
+- The header is `components/site/SiteNav.tsx` with `.nav` styles; the old `.nav-bar` pill is removed.
+- Next.js is 15.5.29. One advisory remains, in `deepmerge-ts` via the Prisma CLI's config loader; clearing it needs Prisma 7, which is a breaking upgrade.
+
+### Gotchas from this round
+
+- **Design manifests are cached for five minutes** (`unstable_cache`). After changing the registry in dev, a stale manifest can make new art fields look missing.
+- **After a migration, restart the dev server.** A running server keeps the old Prisma client and silently drops new columns.
+- **CSS custom properties used inside `calc()` need units.** `calc(0 - 2%)` is invalid and turns the whole declaration off.
+- **`Math.sin` can differ in its last bits between Node and a browser.** Anything derived from it and rendered on both sides must be rounded, or React reports a hydration mismatch.
+- **Screenshot scripts must cancel the invitation's auto-scroll** (send a wheel event) before scrolling, or the page appears blank below the cover.
