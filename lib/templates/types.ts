@@ -102,6 +102,13 @@ export interface TemplateArt {
    * picture of a card, not a card.
    */
   scene?: string;
+  /**
+   * Where the scene leaves room for the names: percentages of the scene from
+   * its top and bottom edges, and the width of the clear space. Each painting
+   * puts its opening somewhere different — an arch has it high, a temple on
+   * the horizon has it higher still — so this travels with the art.
+   */
+  sceneText?: { top: number; bottom: number; width?: number };
   /** Painted along the foot of the invitation, where the page ends. */
   closing?: string;
 }
@@ -124,6 +131,12 @@ export interface DesignTokens {
   radius: string;
   /** Scales every animation's duration; keep low for patchy venue data. */
   motionIntensity: number;
+  /**
+   * True for a family on a dark ground. Nothing reads this to pick colours —
+   * the tokens above already are the colours — but a few things have to know
+   * which way contrast runs: text set on the accent, and shadows.
+   */
+  dark?: boolean;
 }
 
 /** Every template component takes exactly this — the JSON and nothing else. */

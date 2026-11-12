@@ -649,12 +649,12 @@ section[id],header[id]{scroll-margin-top:112px}
 .rsvp-submit{
   font-family:var(--font-ui),sans-serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
   cursor:pointer;padding:.9rem 1.4rem;border:0;border-radius:var(--ds-radius);
-  background:var(--ds-brand);color:#FFF6E4;transition:opacity .2s;
+  background:var(--ds-brand);color:var(--ds-on-brand,#FFF6E4);transition:opacity .2s;
 }
 .rsvp-submit:hover{opacity:.9}
 .rsvp-submit:disabled{opacity:.5;cursor:not-allowed}
 
-.rsvp-error{font-size:.82rem;color:#9E2B2B;background:rgba(158,43,43,.08);border-radius:var(--ds-radius);padding:.6rem .8rem}
+.rsvp-error{font-size:.82rem;color:color-mix(in srgb,#C0392B 70%,var(--ds-ink));background:rgba(190,60,50,.12);border-radius:var(--ds-radius);padding:.6rem .8rem}
 .rsvp-preview-note{font-size:.7rem;color:var(--ds-ink-muted);text-align:center;margin-top:.2rem}
 .rsvp-done{text-align:center;padding:1.6rem 1rem}
 .rsvp-done-h{font-family:var(--font-serif),serif;font-size:1.2rem;color:var(--ds-ink)}
@@ -1793,7 +1793,7 @@ header:has(> .inv-frame-stage){place-content:center}
 .art-scene-text{
   position:absolute;z-index:1;
   top:var(--scene-top,31%);bottom:var(--scene-bottom,35%);
-  left:50%;width:min(62cqw,300px);transform:translateX(-50%);
+  left:50%;width:min(var(--scene-width,62cqw),300px);transform:translateX(-50%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;
 }

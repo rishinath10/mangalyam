@@ -138,7 +138,18 @@ export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
    * where the fractions say it is.
    */
   const sceneCover = art.scene ? (
-    <header className="art-scene">
+    <header
+      className="art-scene"
+      style={
+        art.sceneText
+          ? ({
+              "--scene-top": `${art.sceneText.top}%`,
+              "--scene-bottom": `${art.sceneText.bottom}%`,
+              ...(art.sceneText.width ? { "--scene-width": `${art.sceneText.width}cqw` } : {}),
+            } as React.CSSProperties)
+          : undefined
+      }
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={art.scene} alt="" aria-hidden="true" className="art-scene-img" />
 

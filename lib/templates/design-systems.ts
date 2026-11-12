@@ -30,6 +30,10 @@ export function designSystemStyle(
     "--ds-accent-soft": `color-mix(in srgb, ${accentColor} 14%, transparent)`,
     "--ds-accent-line": `color-mix(in srgb, ${accentColor} 45%, transparent)`,
     "--ds-motion": String(t.motionIntensity),
+    // What text is set in when it sits on the brand colour. On a night ground
+    // the brand is a light gold, so the text on it has to be the dark one.
+    "--ds-on-brand": t.dark ? t.surface : "#FFF6E4",
+    colorScheme: t.dark ? "dark" : "light",
     // Emitted here and nowhere else. These were referenced by every template
     // long before anything defined them, so invitation headings silently fell
     // back to the browser's default serif.
