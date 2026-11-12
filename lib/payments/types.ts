@@ -34,6 +34,11 @@ export interface PaymentEvent {
 
 export interface PaymentGateway {
   readonly name: string;
+  /**
+   * Whether the provider's credentials are present. Says nothing about
+   * whether they are valid — only that a checkout would get as far as asking.
+   */
+  isConfigured(): boolean;
   createCheckout(req: CheckoutRequest): Promise<CheckoutSession>;
   /**
    * Verifies the callback signature and normalises it. Throws if the payload

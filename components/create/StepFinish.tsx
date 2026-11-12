@@ -34,6 +34,7 @@ export function StepFinish({
   signedInEmail,
   purchasable,
   priceLabel,
+  freeUntil,
   onSaved,
 }: {
   draft: InvitationDraft;
@@ -41,6 +42,8 @@ export function StepFinish({
   signedInEmail: string | null;
   purchasable: boolean;
   priceLabel: string | null;
+  /** The launch offer's end date while it runs; publishing is free until then. */
+  freeUntil: string | null;
   /** Told once the draft has become rows, so the wizard can stop offering
    *  a way back into a draft that no longer exists. */
   onSaved: () => void;
@@ -52,6 +55,8 @@ export function StepFinish({
   const [warning, setWarning] = useState<string | null>(null);
   const [saved, setSaved] = useState<Saved | null>(null);
   const [payBusy, setPayBusy] = useState(false);
+  const [live, setLive] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const issues = draftIssues(draft);
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -166,6 +171,78 @@ export function StepFinish({
     location.href = body.url;
   }
 
+  /** During the launch offer there is nothing to pay: this just publishes. */
+  async function publishFree() {
+    if (!saved) return;
+    setPayBusy(true);
+    setError(null);
+
+    const res = await fetch(`/api/invitations/${saved.invitationId}/publish`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ publish: true }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(body.error ?? "Could not publish. Please try again.");
+    } else {
+      setLive(true);
+    }
+    setPayBusy(false);
+  }
+
+  if (saved && live) {
+    const url = `${location.origin}/i/${saved.slug}`;
+    const message = `You are invited — ${draftLabel(draft)}. ${url}`;
+
+    async function copy() {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        setError("Your browser blocked copying. Select the link and copy it manually.");
+      }
+    }
+
+    return (
+      <div className="wz-fields">
+        <div className="wz-done">
+          <p className="kick">Published</p>
+          <h3>Your invitation is live.</h3>
+          <p className="muted">Anyone with this link can open it and reply.</p>
+        </div>
+
+        {error && (
+          <p role="alert" className="notice notice-bad">
+            {error}
+          </p>
+        )}
+
+        <a className="wz-live-link" href={url} target="_blank" rel="noreferrer">
+          {url.replace(/^https?:\/\//, "")}
+        </a>
+
+        <div className="wz-done-links">
+          <a
+            className="btn btn-gold"
+            href={`https://wa.me/?text=${encodeURIComponent(message)}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Send on WhatsApp
+          </a>
+          <button type="button" className="btn btn-line" onClick={copy}>
+            {copied ? "Copied" : "Copy link"}
+          </button>
+          <Link className="btn btn-quiet" href={`/dashboard/invitations/${saved.invitationId}`}>
+            Keep editing
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (saved) {
     return (
       <div className="wz-fields">
@@ -185,27 +262,45 @@ export function StepFinish({
           </p>
         )}
 
-        <div className="t t--2 price-card">
-          <h3>{priceLabel ?? "One invitation"}</h3>
-          <p className="inc">One payment for this event. No subscription.</p>
-          <ul>
-            {INCLUDED.map((item) => (
-              <li key={item}>
-                <Tick />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-          <Button type="button" onClick={pay} disabled={payBusy || !purchasable}>
-            {payBusy ? "Opening checkout…" : purchasable ? "Pay and publish" : "Not on sale yet"}
-          </Button>
-          {!purchasable && (
-            <p className="dim wz-hint">
-              Checkout is not switched on yet. Your invitation is saved and safe —
-              you can keep editing it in the meantime.
-            </p>
-          )}
-        </div>
+        {freeUntil ? (
+          <div className="t t--2 price-card">
+            <h3>Free until {freeUntil}</h3>
+            <p className="inc">Our opening gift. Nothing to pay, and it stays live afterwards.</p>
+            <ul>
+              {INCLUDED.map((item) => (
+                <li key={item}>
+                  <Tick />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <Button type="button" onClick={publishFree} disabled={payBusy}>
+              {payBusy ? "Publishing…" : "Publish now — free"}
+            </Button>
+          </div>
+        ) : (
+          <div className="t t--2 price-card">
+            <h3>{priceLabel ?? "One invitation"}</h3>
+            <p className="inc">One payment for this event. No subscription.</p>
+            <ul>
+              {INCLUDED.map((item) => (
+                <li key={item}>
+                  <Tick />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <Button type="button" onClick={pay} disabled={payBusy || !purchasable}>
+              {payBusy ? "Opening checkout…" : purchasable ? "Pay and publish" : "Not on sale yet"}
+            </Button>
+            {!purchasable && (
+              <p className="dim wz-hint">
+                Checkout is not switched on yet. Your invitation is saved and safe —
+                you can keep editing it in the meantime.
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="wz-done-links">
           <Link className="btn btn-line" href={`/dashboard/invitations/${saved.invitationId}`}>
@@ -304,7 +399,9 @@ export function StepFinish({
       </Button>
 
       <p className="dim wz-hint">
-        Nothing is charged here. You pay when you are ready to publish.
+        {freeUntil
+          ? `Nothing is charged. Publishing is free until ${freeUntil}.`
+          : "Nothing is charged here. You pay when you are ready to publish."}
       </p>
     </div>
   );

@@ -12,6 +12,7 @@ import { Constellation } from "@/components/site/Constellation";
 import { DesignCard } from "@/components/site/DesignCard";
 import { Arrow, Tick } from "@/components/site/Icons";
 import { priceLabel } from "@/lib/pricing";
+import { freeUntilLabel, paidFromLabel } from "@/lib/launch";
 import { OPENING_STYLES } from "@/lib/validation";
 import { Particles } from "@/components/site/Particles";
 import { Reveal } from "@/components/site/Reveal";
@@ -112,6 +113,8 @@ const CONTACT_HREF = process.env.NEXT_PUBLIC_CONTACT_WHATSAPP
 export default async function HomePage() {
   const session = await auth();
   const price = priceLabel();
+  const freeUntil = freeUntilLabel();
+  const paidFrom = paidFromLabel();
   const signedIn = Boolean(session?.user);
 
   // Everything a customer can actually choose, designs added from the admin
@@ -363,12 +366,26 @@ export default async function HomePage() {
         <section className="sec tone-cream" id="pricing">
           <div className="wrap">
             <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
-              <p className="kick">One invitation, one payment</p>
-              <h2>Pay once. No subscription.</h2>
-              <p>
-                One price for one invitation, and everything is in it. No tiers to
-                compare, nothing held back for a bigger plan.
-              </p>
+              {freeUntil ? (
+                <>
+                  <p className="kick">Our opening gift</p>
+                  <h2>Free until {withFigures(freeUntil)}.</h2>
+                  <p>
+                    Publish your invitation before then and it is yours — it stays
+                    live after the offer ends, with everything included. No card
+                    asked for, no subscription.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="kick">One invitation, one payment</p>
+                  <h2>Pay once. No subscription.</h2>
+                  <p>
+                    One price for one invitation, and everything is in it. No tiers to
+                    compare, nothing held back for a bigger plan.
+                  </p>
+                </>
+              )}
             </div>
 
             <div className="bento">
@@ -376,12 +393,24 @@ export default async function HomePage() {
                 {/* priceLabel() returns null until PRICE_STANDARD_SEN is set, so
                     the page stays honest before launch instead of inventing a
                     figure or crashing on a missing variable. */}
-                {price ? (
-                  <b className="price-fig num">{price}</b>
+                {freeUntil ? (
+                  <>
+                    <b className="price-fig num">Free</b>
+                    <p className="inc">
+                      one invitation, yours to keep
+                      {price && paidFrom && <> · {price} from {withFigures(paidFrom)}</>}
+                    </p>
+                  </>
                 ) : (
-                  <b className="price-fig num price-tbc">Price to be confirmed</b>
+                  <>
+                    {price ? (
+                      <b className="price-fig num">{price}</b>
+                    ) : (
+                      <b className="price-fig num price-tbc">Price to be confirmed</b>
+                    )}
+                    <p className="inc">one invitation, yours to keep</p>
+                  </>
                 )}
-                <p className="inc">one invitation, yours to keep</p>
                 <ul>
                   {INCLUDED.map((item) => (
                     <li key={item}>
@@ -459,7 +488,9 @@ export default async function HomePage() {
                   <p>
                     Wedding, naming ceremony, housewarming, temple consecration or an
                     open house — build it free, see it working on your own phone, and
-                    pay only when you are ready to send it.
+                    {freeUntil
+                      ? ` publish it free until ${freeUntil}.`
+                      : " pay only when you are ready to send it."}
                   </p>
                   <Link className="btn btn-gold" href="/create">
                     Create your invitation <Arrow />

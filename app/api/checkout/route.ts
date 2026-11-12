@@ -5,6 +5,7 @@ import { requireEvent } from "@/lib/auth/ownership";
 import { auth } from "@/lib/auth";
 import { paymentGateway } from "@/lib/payments";
 import { CURRENCY, priceSen } from "@/lib/pricing";
+import { freeUntilLabel } from "@/lib/launch";
 
 export const runtime = "nodejs";
 
@@ -21,6 +22,12 @@ export async function POST(req: Request) {
       throw badRequest("This event has already been paid for.");
     }
 
+    // Nobody should be charged for something that is free today.
+    const free = freeUntilLabel();
+    if (free) {
+      throw badRequest(`Publishing is free until ${free}. No payment is needed.`);
+    }
+
     const session = await auth();
     const email = session?.user?.email;
     if (!email) throw badRequest("Your account has no email address.");
@@ -30,6 +37,13 @@ export async function POST(req: Request) {
     try {
       amountSen = priceSen();
     } catch {
+      throw badRequest("Invitations are not on sale yet.");
+    }
+
+    // Same refusal for missing gateway credentials, and before the purchase
+    // row is written: a sale that cannot start should leave nothing behind.
+    const gateway = paymentGateway();
+    if (!gateway.isConfigured()) {
       throw badRequest("Invitations are not on sale yet.");
     }
 
@@ -44,17 +58,26 @@ export async function POST(req: Request) {
     });
 
     const base = process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin;
-    const gateway = paymentGateway();
 
-    const checkout = await gateway.createCheckout({
-      eventId: event.id,
-      purchaseId: purchase.id,
-      amountSen,
-      currency: CURRENCY,
-      customerEmail: email,
-      successUrl: `${base}/dashboard/events/${event.id}?paid=1`,
-      cancelUrl: `${base}/dashboard/events/${event.id}?cancelled=1`,
-    });
+    let checkout;
+    try {
+      checkout = await gateway.createCheckout({
+        eventId: event.id,
+        purchaseId: purchase.id,
+        amountSen,
+        currency: CURRENCY,
+        customerEmail: email,
+        successUrl: `${base}/dashboard/events/${event.id}?paid=1`,
+        cancelUrl: `${base}/dashboard/events/${event.id}?cancelled=1`,
+      });
+    } catch (err) {
+      // The gateway refused or was unreachable. Close the row rather than
+      // leave it pending for ever, then let `handle` report the failure.
+      await db.purchase
+        .update({ where: { id: purchase.id }, data: { status: "failed" } })
+        .catch(() => undefined);
+      throw err;
+    }
 
     await db.purchase.update({
       where: { id: purchase.id },

@@ -28,11 +28,14 @@ export function CreateWizard({
   signedInEmail,
   purchasable,
   priceLabel,
+  freeUntil,
 }: {
   signedIn: boolean;
   signedInEmail: string | null;
   purchasable: boolean;
   priceLabel: string | null;
+  /** "31 December 2026" while the launch offer runs, otherwise null. */
+  freeUntil: string | null;
 }) {
   const [draft, setDraft] = useState<InvitationDraft>(emptyDraft);
   const [step, setStep] = useState(0);
@@ -214,6 +217,7 @@ export function CreateWizard({
                 signedInEmail={signedInEmail}
                 purchasable={purchasable}
                 priceLabel={priceLabel}
+                freeUntil={freeUntil}
                 onSaved={() => setSaved(true)}
               />
             )}

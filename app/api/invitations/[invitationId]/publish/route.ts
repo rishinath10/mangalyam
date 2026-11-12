@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { badRequest, handle, parseBody } from "@/lib/api";
 import { requireInvitation } from "@/lib/auth/ownership";
-import { assertCanPublish } from "@/lib/entitlements";
+import { assertCanPublish, claimLaunchEntitlement } from "@/lib/entitlements";
 import { z } from "zod";
 
 type Params = { params: Promise<{ invitationId: string }> };
@@ -37,7 +37,11 @@ export async function POST(req: Request, { params }: Params) {
     if (!invitation.venueName?.trim()) throw badRequest("Add a venue before publishing.");
 
     if (invitation.status !== "published") {
-      await assertCanPublish(invitation.eventId, invitation.event.entitlement);
+      const entitlement = await claimLaunchEntitlement(
+        invitation.eventId,
+        invitation.event.entitlement,
+      );
+      await assertCanPublish(invitation.eventId, entitlement);
     }
 
     return db.invitation.update({

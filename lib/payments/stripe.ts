@@ -23,6 +23,12 @@ function stripe(): Stripe {
 export const stripeGateway: PaymentGateway = {
   name: "stripe",
 
+  // Both, not just the secret key: a checkout that can take money but cannot
+  // hear that it was paid leaves a customer charged and unpublished.
+  isConfigured() {
+    return Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET);
+  },
+
   async createCheckout(req: CheckoutRequest): Promise<CheckoutSession> {
     const session = await stripe().checkout.sessions.create(
       {

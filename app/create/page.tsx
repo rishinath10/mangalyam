@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { isPurchasable, priceLabel } from "@/lib/pricing";
+import { freeUntilLabel } from "@/lib/launch";
 import { Particles } from "@/components/site/Particles";
 import { CreateWizard } from "@/components/create/CreateWizard";
 import { allManifestsOrCoded } from "@/lib/templates/design-store";
@@ -52,6 +53,7 @@ export default async function CreatePage() {
             signedInEmail={session?.user?.email ?? null}
             purchasable={isPurchasable()}
             priceLabel={priceLabel()}
+            freeUntil={freeUntilLabel()}
           />
         </DesignsProvider>
       </div>

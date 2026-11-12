@@ -1,3 +1,4 @@
+import { isFreePeriod } from "@/lib/launch";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
@@ -58,10 +59,10 @@ export default async function InvitationBuilderPage({ params }: Params) {
             sortOrder: photo.sortOrder,
           }))}
           status={row.status}
-          // The same two conditions assertCanPublish checks, so the Share tab can
+          // The same conditions the publish route checks, so the Share tab can
           // say why publishing is refused instead of only failing when it is
           // tried. The server still decides; this only picks the button.
-          canPublish={Boolean(owned.event.entitlement) || (await isAdmin())}
+          canPublish={Boolean(owned.event.entitlement) || isFreePeriod() || (await isAdmin())}
         />
       </DesignsProvider>
     </div>

@@ -67,8 +67,8 @@ export function PurchasePanel({ eventId, purchasable }: { eventId: string; purch
 
       {!purchasable && (
         <p className="dim" style={{ fontSize: "var(--t-xs)" }}>
-          Checkout shows as not on sale until the price is configured. The price is
-          set in the environment, never in the code.
+          Checkout is not switched on yet. Your invitation is saved and safe — you
+          can keep editing it in the meantime.
         </p>
       )}
     </div>

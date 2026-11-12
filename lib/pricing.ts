@@ -1,3 +1,5 @@
+import { paymentGateway } from "@/lib/payments";
+
 /**
  * One flat price for one invitation, full stop (CLAUDE.md Section 8 pivot) —
  * no public tiers or bundles. Anything beyond the standard single invitation
@@ -47,12 +49,21 @@ export function priceLabel(): string | null {
   }).format(sen / 100);
 }
 
-/** True once a price is actually configured — used to hide checkout otherwise. */
-export function isPurchasable(): boolean {
+/** Why a sale cannot happen right now, or null when it can. */
+export function saleBlocker(): "price" | "gateway" | null {
   try {
     priceSen();
-    return true;
   } catch {
-    return false;
+    return "price";
   }
+  return paymentGateway().isConfigured() ? null : "gateway";
+}
+
+/**
+ * True once an invitation can actually be bought — a price is set *and* the
+ * gateway has its credentials. Checking only the price left "Pay and publish"
+ * enabled on a site that then answered every click with a 500.
+ */
+export function isPurchasable(): boolean {
+  return saleBlocker() === null;
 }

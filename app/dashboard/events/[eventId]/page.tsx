@@ -9,6 +9,7 @@ import { ceremonyLabel } from "@/lib/ceremonies";
 import { EVENT_TYPE_LABELS } from "@/lib/events";
 import { formatShortDate, formatTimeRange } from "@/lib/format";
 import { isPurchasable } from "@/lib/pricing";
+import { freeUntilLabel } from "@/lib/launch";
 import { resolveAccentColor } from "@/lib/templates/registry";
 import { withFigures } from "@/lib/typography";
 import { AddInvitationForm } from "@/components/dashboard/AddInvitationForm";
@@ -42,6 +43,7 @@ export default async function EventPage({ params, searchParams }: Params) {
   });
 
   const canAdd = usage.remaining > 0;
+  const freeUntil = freeUntilLabel();
 
   return (
     <>
@@ -56,7 +58,7 @@ export default async function EventPage({ params, searchParams }: Params) {
           <p>
             {withFigures(String(usage.used))} of {withFigures(String(usage.limit))} invitation
             {usage.used === 1 ? "" : "s"} used
-            {!event.entitlement && " · purchase pending"}
+            {!event.entitlement && (freeUntil ? " · not published yet" : " · purchase pending")}
           </p>
         </div>
       </div>
@@ -73,7 +75,17 @@ export default async function EventPage({ params, searchParams }: Params) {
         </p>
       )}
 
-      {!event.entitlement && (
+      {!event.entitlement && freeUntil && (
+        <section style={{ marginBottom: "2.6rem" }}>
+          <p className="notice notice-good" style={{ maxWidth: "60ch" }}>
+            <b>Publishing is free until {withFigures(freeUntil)}.</b> Open your invitation
+            below and publish it from the Share tab — nothing to pay, and it stays live
+            after the offer ends.
+          </p>
+        </section>
+      )}
+
+      {!event.entitlement && !freeUntil && (
         <section style={{ marginBottom: "2.6rem" }}>
           <h2 style={{ fontSize: "var(--t-md)", marginBottom: "1rem" }}>Pay to publish</h2>
           <p className="muted" style={{ fontSize: "var(--t-sm)", marginBottom: "1.2rem", maxWidth: "56ch" }}>

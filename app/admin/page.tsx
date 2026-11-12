@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { activity, overview, recentPurchases } from "@/lib/admin/queries";
 import { humanise, ringgit, shortDate } from "@/lib/admin/format";
-import { isPurchasable } from "@/lib/pricing";
+import { saleBlocker } from "@/lib/pricing";
+import { paidFromLabel } from "@/lib/launch";
 import { checkStorage } from "@/lib/storage";
 
 // Money and signups must never be served from a cached render.
 export const dynamic = "force-dynamic";
 
 export default async function AdminOverview() {
+  const blocker = saleBlocker();
+  const paidFrom = paidFromLabel();
   const [stats, purchases, days, storage] = await Promise.all([
     overview(),
     recentPurchases(15),
@@ -50,10 +53,19 @@ export default async function AdminOverview() {
         </div>
       )}
 
-      {!isPurchasable() && (
+      {blocker === "price" && (
         <p className="notice notice-bad" style={{ marginBottom: "1.4rem" }}>
           <b>PRICE_STANDARD_SEN is not set.</b> Checkout is disabled until it is, so
           no new purchase can be created.
+        </p>
+      )}
+      {blocker === "gateway" && (
+        <p className={`notice ${paidFrom ? "notice-warn" : "notice-bad"}`} style={{ marginBottom: "1.4rem" }}>
+          <b>Stripe is not connected.</b> Set STRIPE_SECRET_KEY and
+          STRIPE_WEBHOOK_SECRET, then redeploy.{" "}
+          {paidFrom
+            ? `Publishing is free for now, so nothing is blocked today — but from ${paidFrom} nobody will be able to pay.`
+            : "Customers see “Not on sale yet” and nobody can pay."}
         </p>
       )}
 

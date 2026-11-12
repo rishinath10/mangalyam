@@ -2,6 +2,8 @@ import type { Entitlement } from "@prisma/client";
 import { db } from "@/lib/db";
 import { forbidden } from "@/lib/api";
 import { isAdmin } from "@/lib/auth/admin";
+import { isFreePeriod } from "@/lib/launch";
+import { STANDARD_ENTITLEMENT } from "@/lib/pricing";
 
 /**
  * Self-serve is always exactly one invitation (CLAUDE.md Section 8) — there
@@ -36,6 +38,27 @@ export async function assertCanAddInvitation(
   if (used >= limit) {
     throw forbidden(entitlement ? CONTACT_MESSAGE : "Complete your purchase to add an invitation.");
   }
+}
+
+/**
+ * During the launch offer, publishing is what grants the entitlement that
+ * payment grants afterwards.
+ *
+ * It is written as a real row rather than waved through at check time, so an
+ * invitation published for free stays published when the offer ends — a
+ * family's link must not go dark on New Year's Day because a date passed. No
+ * purchase row is written, which is how a free event is told from a paid one.
+ */
+export async function claimLaunchEntitlement(
+  eventId: string,
+  entitlement: Entitlement | null,
+): Promise<Entitlement | null> {
+  if (entitlement || !isFreePeriod()) return entitlement;
+  return db.entitlement.upsert({
+    where: { eventId },
+    update: {},
+    create: { eventId, invitationLimit: STANDARD_ENTITLEMENT.invitationLimit },
+  });
 }
 
 /**
