@@ -14,8 +14,11 @@ export function Crest({ src, className }: { src: string; className?: string }) {
       src={src}
       alt=""
       aria-hidden="true"
-      className={className}
-      style={{ display: "block", width: "100%", height: "auto" }}
+      // Width comes from the class, never from here: an inline 100% beat every
+      // size a caller asked for, which is how a section mark meant to be a
+      // small flourish came out as wide as the page.
+      className={className ?? "w-full"}
+      style={{ display: "block", height: "auto" }}
     />
   );
 }

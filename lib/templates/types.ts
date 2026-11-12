@@ -69,7 +69,7 @@ export interface TemplateManifest {
 }
 
 /**
- * The four pieces a drawn family is made of. Every one is optional: a design
+ * The pieces a drawn family is made of. Every one is optional: a design
  * with only a frame is still a design, and a missing file must degrade to the
  * plain ground rather than to a broken image.
  *
@@ -92,6 +92,18 @@ export interface TemplateArt {
   divider?: string;
   /** 0–1. How far to knock the ground back so text stays readable over it. */
   groundVeil?: number;
+  /**
+   * A painted cover that fills the first screen edge to edge — an arch, a
+   * doorway, hanging garlands — with its middle left clear for the names.
+   *
+   * Portrait, around 9:16, and stained to the family's own `surface` colour so
+   * it has no visible edge against the page (scripts/prepare-art.mjs). When a
+   * family has one it replaces the frame: a border inside a painting is a
+   * picture of a card, not a card.
+   */
+  scene?: string;
+  /** Painted along the foot of the invitation, where the page ends. */
+  closing?: string;
 }
 
 /**

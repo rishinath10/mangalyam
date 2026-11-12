@@ -48,8 +48,17 @@ export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
   const ArtDivider = ({ className }: { className?: string }) => (
     <Divider src={art.divider} className={className} />
   );
-  const ArtMark = ({ className }: { className?: string }) =>
-    art.crest ? <Crest src={art.crest} className={className} /> : null;
+  // Sections size their mark for a stroked glyph (h-9 w-9) and colour it with
+  // the accent. A painted crest has its own proportions and its own colours,
+  // so it keeps the caller's spacing and alignment and drops the rest.
+  const ArtMark = ({ className }: { className?: string }) => {
+    if (!art.crest) return null;
+    const kept = (className ?? "")
+      .split(/\s+/)
+      .filter((c) => c && !/^(h|w|text|opacity)-/.test(c))
+      .join(" ");
+    return <Crest src={art.crest} className={`art-mark ${kept}`} />;
+  };
 
   const shared = {
     invitation,
@@ -59,7 +68,7 @@ export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
     preview,
   };
 
-  const cover = (
+  const frameCover = (
     <header // 84svh, not 92: the frame is 3:4 and a phone is nearer 9:19, so the card
     // can never fill the screen. Asking for the extra height only adds empty
     // ground under a card that has already finished.
@@ -116,6 +125,70 @@ export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
       </CoverFrame>
     </header>
   );
+
+  /**
+   * The painted cover: the family's scene edge to edge, with the invitation
+   * printed in the clear middle the painting leaves for it.
+   *
+   * The text box is placed in fractions of the scene rather than centred on
+   * the screen, because the clear space belongs to the painting — an arch has
+   * its opening where the arch is, not where the viewport's middle happens to
+   * fall. The cover is never shorter than the painting's own 9:16, so the
+   * scene only ever loses its sides to a narrow screen and the opening stays
+   * where the fractions say it is.
+   */
+  const sceneCover = art.scene ? (
+    <header className="art-scene">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={art.scene} alt="" aria-hidden="true" className="art-scene-img" />
+
+      <div className="art-scene-text">
+        {couple.coverPhoto ? (
+          <ScaleIn>
+            <div className="art-scene-photo">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={couple.coverPhoto} alt="" />
+            </div>
+          </ScaleIn>
+        ) : (
+          art.crest && (
+            <ScaleIn>
+              <Crest src={art.crest} className="art-scene-crest" />
+            </ScaleIn>
+          )
+        )}
+
+        <FadeIn delay={0.15}>
+          <p className="art-scene-label">{ceremonyLabel}</p>
+        </FadeIn>
+
+        <FadeIn delay={0.3}>
+          <h1 className="art-scene-names">
+            <span>{firstName}</span>
+            {secondName && (
+              <>
+                <i aria-hidden="true">&amp;</i>
+                <span className="sr-only"> and </span>
+                <span>{secondName}</span>
+              </>
+            )}
+          </h1>
+        </FadeIn>
+
+        {event.date && (
+          <FadeIn delay={0.45}>
+            <ArtDivider className="art-scene-rule" />
+            <p className="art-scene-date">{formatEventDate(event.date)}</p>
+            {event.venueName && <p className="art-scene-venue">{event.venueName}</p>}
+          </FadeIn>
+        )}
+      </div>
+    </header>
+  ) : null;
+
+  // A customer's own frame still wins over a painted scene, for the same
+  // reason it wins over the family's frame.
+  const cover = sceneCover && !customerFrame ? sceneCover : frameCover;
 
   const eventSection = (
     <section className="relative px-6 py-14 text-center">
@@ -181,12 +254,21 @@ export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
           <div key={key}>{sections[key]}</div>
         ))}
 
-        <footer className="px-6 pb-14 pt-4 text-center">
-          <ArtDivider className="opacity-60" />
-          <p className="mt-5 text-[10px] uppercase tracking-[0.3em] text-[var(--ds-ink-muted)]">
-            {couple.hostNames}
-          </p>
-        </footer>
+        {art.closing ? (
+          <footer className="art-closing">
+            <p className="art-closing-thanks">With love</p>
+            <p className="art-closing-names">{couple.hostNames}</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={art.closing} alt="" aria-hidden="true" loading="lazy" />
+          </footer>
+        ) : (
+          <footer className="px-6 pb-14 pt-4 text-center">
+            <ArtDivider className="opacity-60" />
+            <p className="mt-5 text-[10px] uppercase tracking-[0.3em] text-[var(--ds-ink-muted)]">
+              {couple.hostNames}
+            </p>
+          </footer>
+        )}
       </div>
     </div>
   );

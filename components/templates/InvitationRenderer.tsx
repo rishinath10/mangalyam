@@ -44,7 +44,14 @@ export function InvitationRenderer({
     (invitation.art || manifest.art ? ArtTemplate : DeepamTemplate);
 
   return (
-    <div style={designSystemStyle(manifest, invitation.accentColor, invitation.fontPairing)}>
+    <div
+      className="inv-root"
+      // A painted cover is drawn for a phone. On anything wider the invitation
+      // becomes a card in the middle of the screen instead of stretching a
+      // portrait painting across a monitor.
+      data-column={(invitation.art ?? manifest.art)?.scene ? "" : undefined}
+      style={designSystemStyle(manifest, invitation.accentColor, invitation.fontPairing)}
+    >
       <InvitationShell invitation={invitation} preview={preview} live={live}>
         <Template invitation={invitation} preview={preview} />
       </InvitationShell>

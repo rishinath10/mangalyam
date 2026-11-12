@@ -249,6 +249,8 @@ section[id],header[id]{scroll-margin-top:112px}
 .notice{border-radius:12px;padding:.7rem .9rem;font-size:var(--t-sm)}
 .notice-bad{background:rgba(190,70,70,.14);color:#F0B4B4;border:1px solid rgba(190,70,70,.3)}
 .notice-good{background:rgba(60,150,110,.14);color:#A9E0C4;border:1px solid rgba(60,150,110,.3)}
+.notice-warn{background:rgba(212,170,70,.13);color:#EBD79B;border:1px solid rgba(212,170,70,.32)}
+.tone-cream .notice-warn{background:rgba(160,115,20,.1);color:#7A5510;border-color:rgba(160,115,20,.28)}
 .tone-cream .notice-bad{background:rgba(170,50,50,.1);color:#8E2B2B;border-color:rgba(170,50,50,.25)}
 .tone-cream .notice-good{background:rgba(30,120,80,.1);color:#1E6B4A;border-color:rgba(30,120,80,.25)}
 
@@ -1751,3 +1753,90 @@ header:has(> .inv-frame-stage){place-content:center}
    sentence: the auth forms' "Create an account" / "Sign in", and the policy
    footer. Padding brings them to the 24px minimum without moving anything. */
 .auth-alt a,.legal-more a{display:inline-block;padding-block:.3rem}
+
+/* The link, the moment an invitation goes live from the wizard. */
+.wz-live-link{display:block;padding:1rem 1.1rem;border-radius:var(--r-md,14px);border:1px solid rgba(212,170,70,.4);background:rgba(212,170,70,.08);color:var(--gold-lt);font-size:var(--t-sm);word-break:break-all;text-align:center}
+.wz-live-link:hover{background:rgba(212,170,70,.14)}
+
+/* ==========================================================
+   PAINTED FAMILIES
+   A family with a `scene` is a portrait painting with live
+   text printed in the space it leaves. Everything here is
+   sized against the invitation's own width (cqw), never the
+   viewport's, so the builder's phone frame and a real phone
+   lay out identically.
+   ========================================================== */
+.inv-root[data-column]{background:var(--ds-surface-alt);min-height:100dvh}
+.inv-root[data-column] .inv-shell{
+  container-type:inline-size;max-width:480px;margin-inline:auto;
+  background:var(--ds-surface);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--ds-rule) 70%,transparent),0 30px 80px -30px rgba(40,20,10,.35);
+}
+
+.art-scene{
+  position:relative;overflow:hidden;
+  /* Never shorter than the painting (9:16), so it can only be cropped at the
+     sides and the clear middle stays where the fractions below put it. */
+  min-height:max(var(--frame-h,100svh),177.78cqw);
+}
+.art-scene-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center top;
+  pointer-events:none;user-select:none;
+}
+/* The painting's foot melts into the page instead of ending on a line. */
+.art-scene::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:7%;
+  background:linear-gradient(to bottom,transparent,var(--ds-surface));
+  pointer-events:none;
+}
+.art-scene-text{
+  position:absolute;z-index:1;
+  top:var(--scene-top,31%);bottom:var(--scene-bottom,35%);
+  left:50%;width:min(62cqw,300px);transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+}
+.art-scene-crest{width:min(24cqw,104px);margin-inline:auto}
+.art-mark{width:84px}
+.art-scene-photo{
+  width:min(30cqw,132px);aspect-ratio:3/4;margin-inline:auto;overflow:hidden;
+  border-radius:999px 999px 6px 6px;
+  box-shadow:0 0 0 1px var(--ds-gold),0 0 0 5px var(--ds-surface),0 0 0 6px color-mix(in srgb,var(--ds-gold) 60%,transparent);
+}
+.art-scene-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.art-scene-label{
+  margin-top:clamp(.6rem,3.4cqw,1.1rem);
+  font-size:clamp(.58rem,2.5cqw,.7rem);letter-spacing:.42em;text-transform:uppercase;
+  color:var(--ds-ink-muted);padding-left:.42em;
+}
+.art-scene-names{
+  margin-top:clamp(.5rem,2.6cqw,.9rem);
+  font-family:var(--ds-font-display);font-weight:500;
+  font-size:clamp(1.75rem,9.4cqw,2.9rem);line-height:1.04;
+  color:var(--ds-brand-deep);overflow-wrap:anywhere;
+}
+.art-scene-names span{display:block}
+.art-scene-names i{
+  display:block;margin:.12em 0 .16em;font-size:.46em;font-style:italic;
+  color:var(--ds-accent);letter-spacing:.1em;
+}
+.art-scene-rule{margin-top:clamp(.7rem,3.6cqw,1.2rem);width:min(46cqw,210px) !important}
+.art-scene-date{
+  margin-top:clamp(.5rem,2.6cqw,.85rem);
+  font-size:clamp(.72rem,3.1cqw,.86rem);letter-spacing:.14em;color:var(--ds-ink);
+  font-variant-numeric:lining-nums;
+}
+.art-scene-venue{
+  margin-top:.3rem;font-family:var(--ds-font-display);font-style:italic;
+  font-size:clamp(.82rem,3.5cqw,1rem);color:var(--ds-ink-muted);
+}
+
+.art-closing{position:relative;text-align:center;padding-top:3.2rem}
+.art-closing-thanks{
+  font-size:.62rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ds-ink-muted);
+}
+.art-closing-names{
+  margin-top:.7rem;font-family:var(--ds-font-display);font-size:1.5rem;color:var(--ds-brand-deep);
+}
+.art-closing img{display:block;width:100%;height:auto;margin-top:.4rem}

@@ -43,7 +43,82 @@ const THANGA_ACCENTS: AccentSwatch[] = [
   { key: "midnight", name: "Midnight", hex: "#26406B" },
 ];
 
+/** Every section, in the order a guest reads them. */
+const FULL_SECTIONS: TemplateManifest["sections"] = [
+  "cover",
+  "couple",
+  "event",
+  "schedule",
+  "gallery",
+  "greetings",
+  "rsvp",
+  // Last on purpose. Replying is the thing the host actually needs from a
+  // guest; the gift block sits below it so it never competes with that.
+  "blessings",
+];
+
+/**
+ * The painted families.
+ *
+ * Each is a folder of artwork under /public/templates and the entry below —
+ * no component. The paintings are stained to the family's `surface` colour
+ * when they are prepared (scripts/prepare-art.mjs), so the two must be changed
+ * together: a different surface here needs the scene re-stained to match, or
+ * the cover shows as a rectangle on the page.
+ */
+const PAINTED_FAMILIES: TemplateManifest[] = [
+  {
+    templateId: "kalyana-mandapam-01",
+    name: "Kalyana Mandapam",
+    tagline: "A carved arch hung with marigold and jasmine",
+    eventTypes: ["wedding"],
+    sections: FULL_SECTIONS,
+    features: { music: true, countdown: true },
+    accents: [
+      { key: "kumkum", name: "Kumkum", hex: "#A3202E" },
+      { key: "marigold", name: "Marigold", hex: "#C96A12" },
+      { key: "mango-leaf", name: "Mango leaf", hex: "#3F7A3A" },
+      { key: "temple-brass", name: "Temple brass", hex: "#9A7420" },
+      { key: "peacock", name: "Peacock", hex: "#12687E" },
+      { key: "plum", name: "Plum", hex: "#7A2F63" },
+    ],
+    defaultAccentKey: "kumkum",
+    ceremonyAccentKeys: {
+      mehendi: "mango-leaf",
+      haldi: "marigold",
+      sangeet: "plum",
+      muhurtham: "kumkum",
+      nalangu: "marigold",
+      baraat: "kumkum",
+      reception: "peacock",
+      engagement: "temple-brass",
+    },
+    fontPairings: ["classic", "inscribed", "fine"],
+    defaultFontPairing: "classic",
+    tokens: {
+      surface: "#FBF4E6",
+      surfaceAlt: "#F4E8D0",
+      ink: "#2C1B10",
+      inkMuted: "#7B6247",
+      rule: "#E0C79A",
+      brand: "#A3202E",
+      brandDeep: "#74121E",
+      gold: "#B98A2C",
+      radius: "3px",
+      motionIntensity: 1,
+    },
+    art: {
+      scene: "/templates/kalyana-mandapam/scene.webp",
+      closing: "/templates/kalyana-mandapam/closing.webp",
+      crest: "/templates/kalyana-mandapam/crest.webp",
+      divider: "/templates/kalyana-mandapam/divider.webp",
+    },
+    built: true,
+  },
+];
+
 export const TEMPLATE_MANIFESTS: TemplateManifest[] = [
+  ...PAINTED_FAMILIES,
   {
     templateId: "mandapam-01",
     name: "Mandapam",
