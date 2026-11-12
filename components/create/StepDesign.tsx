@@ -50,6 +50,17 @@ export function StepDesign({
                   })
                 }
               >
+                {(family.art?.sceneThumb ?? family.art?.scene) && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    className="fam-art"
+                    src={family.art?.sceneThumb ?? family.art?.scene}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    style={{ background: family.tokens.surface }}
+                  />
+                )}
                 <span className="fam-swatches" aria-hidden="true">
                   {family.accents.slice(0, 4).map((swatch) => (
                     <i key={swatch.key} style={{ background: swatch.hex }} />

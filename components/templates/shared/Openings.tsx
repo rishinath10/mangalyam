@@ -21,6 +21,8 @@ export interface OpeningProps {
 function Seal({ invitation, onOpen, open }: OpeningProps) {
   const { couple, opening } = invitation;
   const [first, second] = splitHostNames(couple.hostNames);
+  // A painted family's own emblem, pressed into the seal like wax.
+  const crest = (invitation.art ?? invitation.design?.art)?.crest;
   return (
     <button
       type="button"
@@ -32,6 +34,8 @@ function Seal({ invitation, onOpen, open }: OpeningProps) {
     >
       <span className="inv-seal-pulse" aria-hidden="true" />
       <span className="inv-seal-face">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {crest && <img className="inv-seal-crest" src={crest} alt="" aria-hidden="true" />}
         <span className="inv-seal-names">
           {first}
           {second && (
@@ -41,7 +45,7 @@ function Seal({ invitation, onOpen, open }: OpeningProps) {
             </>
           )}
         </span>
-        <span className="inv-seal-cta">{opening.text?.trim() || "Open"}</span>
+        <span className="inv-seal-cta">{opening.text?.trim() || "Tap to open"}</span>
       </span>
     </button>
   );
@@ -62,9 +66,11 @@ function Doors(props: OpeningProps) {
     <div className="inv-cover inv-doors" data-open={props.open || undefined}>
       <div className="inv-door inv-door-l" style={leaf} aria-hidden="true">
         <span className="inv-door-scrim" />
+        {!photo && <span className="inv-door-panel" />}
       </div>
       <div className="inv-door inv-door-r" style={leaf} aria-hidden="true">
         <span className="inv-door-scrim" />
+        {!photo && <span className="inv-door-panel" />}
       </div>
       <Seal {...props} />
     </div>

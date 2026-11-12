@@ -50,6 +50,7 @@ export function InvitationRenderer({
       // becomes a card in the middle of the screen instead of stretching a
       // portrait painting across a monitor.
       data-column={(invitation.art ?? manifest.art)?.scene ? "" : undefined}
+      data-dark={manifest.tokens.dark ? "" : undefined}
       style={designSystemStyle(manifest, invitation.accentColor, invitation.fontPairing)}
     >
       <InvitationShell invitation={invitation} preview={preview} live={live}>

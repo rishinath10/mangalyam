@@ -6,7 +6,7 @@ import { Opening } from "@/components/templates/shared/Openings";
 import type { InvitationJson } from "@/lib/invitation/types";
 
 /** How long the longest opening animation runs before the cover is removed. */
-const COVER_LIFETIME_MS = 1600;
+const COVER_LIFETIME_MS = 1750;
 /** Pause after the reveal so the guest sees the cover page before it drifts. */
 const AUTOSCROLL_DELAY_MS = 1800;
 /** Reading pace, in CSS pixels per second. Slow enough to read over. */

@@ -24,6 +24,40 @@ export function DesignCard({
     design.accents.find((a) => a.key === design.defaultAccentKey)?.hex ?? t.brand;
   const display = FONT_PAIRINGS[design.defaultFontPairing].display;
   const centred = design.templateId === "mandapam-01";
+  const scene = design.art?.sceneThumb ?? design.art?.scene;
+
+  // A painted family shows its painting, with the sample names printed in the
+  // space the painting leaves — the same arrangement as the real cover, so the
+  // card is a small version of the invitation rather than a symbol for it.
+  if (scene) {
+    const box = design.art?.sceneText;
+    return (
+      <span
+        className={`dsn dsn-painted ${big ? "dsn--big" : ""}`}
+        style={{ background: t.surface, color: t.ink }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="dsn-scene" src={scene} alt="" loading="lazy" decoding="async" />
+        <span
+          className="dsn-painted-text"
+          style={{ top: `${box?.top ?? 31}%`, bottom: `${box?.bottom ?? 35}%` }}
+        >
+          <span className="dsn-ct" style={{ color: t.inkMuted }}>
+            {ceremonyLabel}
+          </span>
+          <span className="dsn-cn" style={{ fontFamily: display, color: t.brandDeep }}>
+            {coupleLine}
+          </span>
+        </span>
+        <span
+          className="dsn-name"
+          style={{ color: t.ink, borderColor: t.rule, background: t.surface }}
+        >
+          {design.name}
+        </span>
+      </span>
+    );
+  }
 
   return (
     <span

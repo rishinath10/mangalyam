@@ -102,6 +102,8 @@ export interface TemplateArt {
    * picture of a card, not a card.
    */
   scene?: string;
+  /** The same painting at thumbnail size, for the pickers and the gallery. */
+  sceneThumb?: string;
   /**
    * Where the scene leaves room for the names: percentages of the scene from
    * its top and bottom edges, and the width of the clear space. Each painting
@@ -111,6 +113,11 @@ export interface TemplateArt {
   sceneText?: { top: number; bottom: number; width?: number };
   /** Painted along the foot of the invitation, where the page ends. */
   closing?: string;
+  /**
+   * What drifts over the cover as it opens — petals for a daytime design,
+   * sparks for a night one — in the painting's own colours.
+   */
+  particles?: { kind: "petals" | "sparks"; colors: string[] };
 }
 
 /**

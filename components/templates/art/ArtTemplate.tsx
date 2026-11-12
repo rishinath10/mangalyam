@@ -8,10 +8,12 @@ import { Greetings } from "@/components/templates/sections/Greetings";
 import { Rsvp } from "@/components/templates/sections/Rsvp";
 import { Schedule } from "@/components/templates/sections/Schedule";
 import { CoverFrame } from "@/components/templates/shared/CoverFrame";
-import { formatEventDate, formatTimeRange, splitHostNames } from "@/lib/format";
+import { formatEventDate, splitHostNames } from "@/lib/format";
 import { getManifest } from "@/lib/templates/registry";
 import type { TemplateProps } from "@/lib/templates/types";
 import { ArtFrame } from "./ArtFrame";
+import { EventCard } from "./EventCard";
+import { Particles } from "./Particles";
 import { Crest } from "./Crest";
 import { Divider } from "./Divider";
 import { Ground } from "./Ground";
@@ -153,47 +155,44 @@ export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={art.scene} alt="" aria-hidden="true" className="art-scene-img" />
 
+      {art.particles && <Particles particles={art.particles} />}
+
+      {/* No motion components in here: these come in on the guest's tap, not
+          on page load, and the tap is a flag on the shell that only CSS can
+          see from this far down. Each direct child is one beat of the reveal. */}
       <div className="art-scene-text">
         {couple.coverPhoto ? (
-          <ScaleIn>
-            <div className="art-scene-photo">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={couple.coverPhoto} alt="" />
-            </div>
-          </ScaleIn>
+          <div className="art-scene-photo">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={couple.coverPhoto} alt="" />
+          </div>
         ) : (
-          art.crest && (
-            <ScaleIn>
-              <Crest src={art.crest} className="art-scene-crest" />
-            </ScaleIn>
-          )
+          art.crest && <Crest src={art.crest} className="art-scene-crest" />
         )}
 
-        <FadeIn delay={0.15}>
-          <p className="art-scene-label">{ceremonyLabel}</p>
-        </FadeIn>
+        <p className="art-scene-label">{ceremonyLabel}</p>
 
-        <FadeIn delay={0.3}>
-          <h1 className="art-scene-names">
-            <span>{firstName}</span>
-            {secondName && (
-              <>
-                <i aria-hidden="true">&amp;</i>
-                <span className="sr-only"> and </span>
-                <span>{secondName}</span>
-              </>
-            )}
-          </h1>
-        </FadeIn>
+        <h1 className="art-scene-names">
+          <span>{firstName}</span>
+          {secondName && (
+            <>
+              <i aria-hidden="true">&amp;</i>
+              <span className="sr-only"> and </span>
+              <span>{secondName}</span>
+            </>
+          )}
+        </h1>
 
         {event.date && (
-          <FadeIn delay={0.45}>
+          <div className="art-scene-when">
             <ArtDivider className="art-scene-rule" />
             <p className="art-scene-date">{formatEventDate(event.date)}</p>
             {event.venueName && <p className="art-scene-venue">{event.venueName}</p>}
-          </FadeIn>
+          </div>
         )}
       </div>
+
+      <span className="art-scene-cue" aria-hidden="true" />
     </header>
   ) : null;
 
@@ -201,48 +200,7 @@ export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
   // reason it wins over the family's frame.
   const cover = sceneCover && !customerFrame ? sceneCover : frameCover;
 
-  const eventSection = (
-    <section className="relative px-6 py-14 text-center">
-      <FadeIn>
-        <p className="text-[11px] uppercase tracking-[0.36em] text-[var(--ds-accent)]">
-          Where and when
-        </p>
-        <h2 className="mt-3 font-[family-name:var(--ds-font-display)] text-[1.7rem] text-[var(--ds-brand-deep)]">
-          {ceremonyLabel}
-        </h2>
-        <ArtDivider className="my-6" />
-        {event.date && (
-          <p className="text-[1.02rem] text-[var(--ds-ink)]">{formatEventDate(event.date)}</p>
-        )}
-        {formatTimeRange(event.startTime, event.endTime) && (
-          <p className="mt-1 text-[0.86rem] text-[var(--ds-ink-muted)]">
-            {formatTimeRange(event.startTime, event.endTime)}
-          </p>
-        )}
-        {event.venueName && (
-          <p className="mt-5 font-[family-name:var(--ds-font-display)] text-[1.22rem] text-[var(--ds-brand-deep)]">
-            {event.venueName}
-          </p>
-        )}
-        {event.address && (
-          <p className="mx-auto mt-2 max-w-[30ch] whitespace-pre-line text-[0.86rem] leading-relaxed text-[var(--ds-ink-muted)]">
-            {event.address}
-          </p>
-        )}
-        {event.mapLink && (
-          <a
-            href={event.mapLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-block border border-[var(--ds-accent-line)] px-6 py-2.5 text-[0.72rem] uppercase tracking-[0.22em] text-[var(--ds-accent)]"
-            style={{ borderRadius: "var(--ds-radius)" }}
-          >
-            Get directions
-          </a>
-        )}
-      </FadeIn>
-    </section>
-  );
+  const eventSection = <EventCard invitation={invitation} Rule={ArtDivider} preview={preview} />;
 
   const sections = {
     cover,
@@ -260,7 +218,7 @@ export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
       <Ground art={art} />
 
       {/* Above the ground, or the texture sits on top of the words. */}
-      <div className="relative">
+      <div className="art-body relative">
         {manifest.sections.map((key) => (
           <div key={key}>{sections[key]}</div>
         ))}

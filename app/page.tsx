@@ -43,7 +43,7 @@ const STEPS = [
  * beside the price rather than as a bigger box next to it.
  */
 const INCLUDED = [
-  "Both design families, every accent and lettering pairing",
+  "Every design, every accent and lettering pairing",
   "Unlimited RSVPs and a live headcount",
   "Gallery, timeline, countdown and background music",
   "WhatsApp sharing, and edits after you publish",
@@ -97,7 +97,9 @@ function distinctLooks(designs: TemplateManifest[]): number {
 }
 
 /** "Two", "Three" — a gallery heading counts in words, not figures. */
-const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"];
+const COUNT_WORDS = [
+  "No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve",
+];
 const countWord = (n: number) => COUNT_WORDS[n] ?? String(n);
 
 /**
@@ -127,11 +129,6 @@ export default async function HomePage() {
   // DATABASE_URL during the Docker build, so anything Next tries to
   // prerender here would fail the deploy rather than the request.
   const designs = (await allManifestsOrCoded()).filter((d) => d.built);
-  const weddingFamily =
-    designs.find((d) => d.eventTypes.includes("wedding")) ?? designs[0];
-  const generalFamily =
-    designs.find((d) => d.templateId !== weddingFamily?.templateId) ?? weddingFamily;
-
   return (
     <>
       <Particles />
@@ -242,7 +239,7 @@ export default async function HomePage() {
           <div className="wrap">
             <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
               <p className="kick">Choose your card</p>
-              <h2>{countWord(designs.length)} designs, drawn not decorated</h2>
+              <h2>{countWord(designs.length)} designs, painted not decorated</h2>
               <p>
                 Every one recolours to the day — a muhurtham in kumkum, a
                 housewarming in tulsi green, a sixtieth in plum.{" "}
@@ -250,24 +247,39 @@ export default async function HomePage() {
                 between them, before you add a photograph.
               </p>
             </div>
-            <div className="bento">
-              <div className="t t--flush t--img t--lift rv c6 r2">
-                <DesignCard
-                  design={weddingFamily}
-                  coupleLine={SAMPLE_COUPLE}
-                  ceremonyLabel="Muhurtham"
-                  big
-                />
-              </div>
-              <div className="t t--flush t--img t--lift rv c6 r2" data-delay="80">
-                <DesignCard
-                  design={generalFamily}
-                  coupleLine={SAMPLE_HOST}
-                  ceremonyLabel="Housewarming"
-                  big
-                />
-              </div>
-              <div className="t t--2 t--center rv c9">
+            {/* Every design a customer can choose, as the covers they are — a
+                shelf to browse sideways on a phone, a row on a desk. Painted
+                families lead; anything without a painting follows. */}
+            <div className="dsn-shelf rv" role="list">
+              {[...designs]
+                .sort((x, y) => Number(Boolean(y.art?.scene)) - Number(Boolean(x.art?.scene)))
+                .map((design) => {
+                  const wedding = design.eventTypes.includes("wedding");
+                  const occasion = design.eventTypes.find((t) => t !== "custom") ?? "custom";
+                  return (
+                    <Link
+                      key={design.templateId}
+                      href="/create"
+                      className="dsn-shelf-item"
+                      role="listitem"
+                      aria-label={`${design.name} — ${design.tagline}`}
+                    >
+                      <DesignCard
+                        design={design}
+                        coupleLine={wedding ? SAMPLE_COUPLE : SAMPLE_HOST}
+                        ceremonyLabel={wedding ? "Muhurtham" : EVENT_TYPE_LABELS[occasion]}
+                      />
+                      <span className="dsn-shelf-cap">
+                        <b>{design.name}</b>
+                        <span>{design.tagline}</span>
+                      </span>
+                    </Link>
+                  );
+                })}
+            </div>
+
+            <div className="bento" style={{ marginTop: "clamp(1.4rem,3vw,2.2rem)" }}>
+              <div className="t t--2 t--center rv c12">
                 <h3 style={{ fontSize: "var(--t-lg)" }}>Your photograph goes on the cover</h3>
                 <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".5rem" }}>
                   Each design carries your own cover image, your accent colour and your
