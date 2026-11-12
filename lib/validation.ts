@@ -81,6 +81,9 @@ const accountNumber = z
   .max(34)
   .regex(/^[0-9][0-9 -]*$/, "Use digits, spaces and dashes only");
 
+const starIndex = z.number().int().min(0).max(26);
+const raasiIndex = z.number().int().min(0).max(11);
+
 export const settingsUpdateSchema = z.object({
   musicEnabled: z.boolean().optional(),
   musicUrl: httpUrl.nullish(),
@@ -94,6 +97,13 @@ export const settingsUpdateSchema = z.object({
   autoScroll: z.boolean().optional(),
   contactName: z.string().trim().max(60).nullish(),
   contactPhone: phone.nullish(),
+
+  // Birth stars: indices into the 27 natchathiram and the 12 raasi. Whether a
+  // star and a sign belong together is checked where they are saved.
+  starOne: starIndex.nullish(),
+  raasiOne: raasiIndex.nullish(),
+  starTwo: starIndex.nullish(),
+  raasiTwo: raasiIndex.nullish(),
 
   // Gift money. `giftQrUrl` is deliberately not here: the image is written
   // only by the upload route, so no client can aim a public page's <img> at a

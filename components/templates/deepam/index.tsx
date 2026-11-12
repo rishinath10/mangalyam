@@ -9,6 +9,7 @@ import { Blessings } from "@/components/templates/sections/Blessings";
 import { Greetings } from "@/components/templates/sections/Greetings";
 import { Rsvp } from "@/components/templates/sections/Rsvp";
 import { Schedule } from "@/components/templates/sections/Schedule";
+import { Stars } from "@/components/templates/sections/Stars";
 import { Cover } from "./Cover";
 import { Event } from "./Event";
 
@@ -41,7 +42,12 @@ export function DeepamTemplate({ invitation, preview = false }: TemplateProps) {
 
   const sections = {
     cover: <Cover invitation={invitation} />,
-    couple: <Couple {...shared} />,
+    couple: (
+      <>
+        <Couple {...shared} />
+        <Stars {...shared} />
+      </>
+    ),
     event: <Event invitation={invitation} />,
     schedule: <Schedule {...shared} />,
     gallery: <Gallery {...shared} />,

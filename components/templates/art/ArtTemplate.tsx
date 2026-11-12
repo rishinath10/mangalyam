@@ -7,6 +7,7 @@ import { Blessings } from "@/components/templates/sections/Blessings";
 import { Greetings } from "@/components/templates/sections/Greetings";
 import { Rsvp } from "@/components/templates/sections/Rsvp";
 import { Schedule } from "@/components/templates/sections/Schedule";
+import { Stars } from "@/components/templates/sections/Stars";
 import { CoverFrame } from "@/components/templates/shared/CoverFrame";
 import { formatEventDate, splitHostNames } from "@/lib/format";
 import { getManifest } from "@/lib/templates/registry";
@@ -204,7 +205,14 @@ export function ArtTemplate({ invitation, preview = false }: TemplateProps) {
 
   const sections = {
     cover,
-    couple: <Couple {...shared} />,
+    // The stars ride with the couple's own words rather than taking a slot of
+    // their own: no design's section list has to know they exist.
+    couple: (
+      <>
+        <Couple {...shared} />
+        <Stars {...shared} />
+      </>
+    ),
     event: eventSection,
     schedule: <Schedule {...shared} />,
     gallery: <Gallery {...shared} />,

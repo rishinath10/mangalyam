@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { handle, parseBody } from "@/lib/api";
+import { badRequest, handle, parseBody } from "@/lib/api";
+import { raasisOfStar } from "@/lib/birthstar";
 import { requireInvitation } from "@/lib/auth/ownership";
 import { settingsUpdateSchema } from "@/lib/validation";
 import type { OpeningStyle } from "@prisma/client";
@@ -27,6 +28,10 @@ export async function PATCH(req: Request, { params }: Params) {
       autoScroll?: boolean;
       contactName?: string | null;
       contactPhone?: string | null;
+      starOne?: number | null;
+      raasiOne?: number | null;
+      starTwo?: number | null;
+      raasiTwo?: number | null;
       giftsEnabled?: boolean;
       giftNote?: string | null;
       giftBankName?: string | null;
@@ -51,6 +56,26 @@ export async function PATCH(req: Request, { params }: Params) {
     if (input.autoScroll !== undefined) data.autoScroll = input.autoScroll;
     if (input.contactName !== undefined) data.contactName = input.contactName || null;
     if (input.contactPhone !== undefined) data.contactPhone = input.contactPhone || null;
+
+    // Birth stars travel as a pair: a star with a sign it cannot fall in is
+    // refused rather than stored, and clearing the star clears its sign.
+    for (const [starKey, raasiKey] of [
+      ["starOne", "raasiOne"],
+      ["starTwo", "raasiTwo"],
+    ] as const) {
+      const star = input[starKey];
+      if (star === undefined) continue;
+      if (star === null) {
+        data[starKey] = null;
+        data[raasiKey] = null;
+        continue;
+      }
+      const allowed = raasisOfStar(star);
+      const raasi = input[raasiKey] ?? allowed[0];
+      if (!allowed.includes(raasi)) throw badRequest("That star does not fall in that raasi.");
+      data[starKey] = star;
+      data[raasiKey] = raasi;
+    }
 
     // Gift details. giftQrUrl is absent by design — the image is written only
     // by the gift-qr route, which stores the file itself.

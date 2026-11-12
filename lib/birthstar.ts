@@ -201,6 +201,17 @@ export function birthStar(
   return { position, alternative, doubt: alternative ? "near-boundary" : null };
 }
 
+/**
+ * The sign or signs a star can fall in. Most sit inside one; nine straddle a
+ * boundary — Karthigai begins in Mesham and ends in Rishabam — and for those
+ * the quarter of the star decides, so both are offered.
+ */
+export function raasisOfStar(star: number): number[] {
+  const first = Math.floor((star * STAR_SPAN) / 30);
+  const last = Math.floor(((star + 1) * STAR_SPAN - 1e-6) / 30);
+  return first === last ? [first] : [first, last];
+}
+
 /** "Thiruvonam" — and "Shravana" for anyone who knows it by that name. */
 export function starNames(star: number) {
   return { tamil: NAKSHATRAS[star], sanskrit: NAKSHATRAS_SANSKRIT[star] };

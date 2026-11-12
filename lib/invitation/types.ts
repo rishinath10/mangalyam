@@ -10,6 +10,11 @@ import type { FontPairingKey } from "@/lib/templates/fonts";
  * (rule #2). Both the live preview and the published page build this same
  * object and hand it to the same renderer (rule #3).
  */
+export interface BirthStarEntry {
+  star: number;
+  raasi: number;
+}
+
 export interface InvitationJson {
   invitationId: string;
   eventId: string;
@@ -75,6 +80,12 @@ export interface InvitationJson {
   opening: { style: OpeningStyle; text: string | null; autoScroll: boolean };
   /** The person guests ring about this occasion. */
   contact: { name: string | null; phone: string | null };
+  /**
+   * Birth stars the host chose to show: one per name on the invitation, in
+   * the order the names are written, null where none was given. Indices into
+   * the 27 natchathiram and 12 raasi — the birthday itself is never here.
+   */
+  stars?: [BirthStarEntry | null, BirthStarEntry | null];
   /**
    * Where a guest sends gift money, when the host has chosen to show it.
    *

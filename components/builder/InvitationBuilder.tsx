@@ -291,6 +291,7 @@ export function InvitationBuilder({
             {tab === "Settings" && (
               <SettingsPanel
                 settings={source.settings}
+                hostNames={source.hostNames}
                 onChange={(next) =>
                   patch({ settings: { ...source.settings, ...next } })
                 }

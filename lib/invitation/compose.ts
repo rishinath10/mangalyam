@@ -62,6 +62,10 @@ export interface InvitationSource {
     autoScroll: boolean;
     contactName: string | null;
     contactPhone: string | null;
+    starOne?: number | null;
+    raasiOne?: number | null;
+    starTwo?: number | null;
+    raasiTwo?: number | null;
     giftsEnabled: boolean;
     giftNote: string | null;
     giftQrUrl: string | null;
@@ -144,6 +148,10 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
       name: source.settings.contactName,
       phone: source.settings.contactPhone,
     },
+    stars: [
+      birthStarEntry(source.settings.starOne, source.settings.raasiOne),
+      birthStarEntry(source.settings.starTwo, source.settings.raasiTwo),
+    ],
     blessings: {
       enabled: source.settings.giftsEnabled,
       note: source.settings.giftNote,
@@ -153,4 +161,11 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
       accountNumber: source.settings.giftAccountNumber,
     },
   };
+}
+
+/** A star only counts with its sign: half a pair is treated as none. */
+function birthStarEntry(star?: number | null, raasi?: number | null) {
+  if (star == null || raasi == null) return null;
+  if (star < 0 || star > 26 || raasi < 0 || raasi > 11) return null;
+  return { star, raasi };
 }

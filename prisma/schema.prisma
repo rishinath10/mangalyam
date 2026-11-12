@@ -249,6 +249,13 @@ model InvitationSettings {
    */
   autoScroll   Boolean      @default(true) @map("auto_scroll")
 
+  // Birth stars: an index into the 27 natchathiram and the 12 raasi. Only the
+  // result is kept — never the birthday it was worked out from.
+  starOne  Int? @map("star_one") @db.SmallInt
+  raasiOne Int? @map("raasi_one") @db.SmallInt
+  starTwo  Int? @map("star_two") @db.SmallInt
+  raasiTwo Int? @map("raasi_two") @db.SmallInt
+
   // The person guests call about the occasion, shown in the action bar.
   contactName  String? @map("contact_name")
   contactPhone String? @map("contact_phone")

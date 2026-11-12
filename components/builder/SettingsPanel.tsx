@@ -1,6 +1,8 @@
 "use client";
 
 import { Input } from "@/components/ui/Field";
+import { StarPicker } from "@/components/builder/StarPicker";
+import { splitHostNames } from "@/lib/format";
 import type { InvitationSource } from "@/lib/invitation/compose";
 import type { OpeningStyle } from "@prisma/client";
 
@@ -37,11 +39,16 @@ function Toggle({
 
 export function SettingsPanel({
   settings,
+  hostNames,
   onChange,
 }: {
   settings: Settings;
+  /** "Ashwin & Kalyani" or "The Kumar Family" — decides one star field or two. */
+  hostNames: string;
   onChange: (patch: Partial<Settings>) => void;
 }) {
+  const [firstName, secondName] = splitHostNames(hostNames);
+
   return (
     <div style={{ display: "grid", gap: "1rem" }}>
       <fieldset className="opening-pick">
@@ -78,6 +85,30 @@ export function SettingsPanel({
         checked={settings.autoScroll}
         onChange={(autoScroll) => onChange({ autoScroll })}
       />
+
+      <fieldset className="starpick-set">
+        <legend>Birth stars</legend>
+        <p className="dim">
+          Optional. Guests see each natchathiram drawn as its constellation
+          {secondName ? ", and the two joined." : "."}
+        </p>
+        <StarPicker
+          id="starOne"
+          label={secondName ? `${firstName}’s star` : "Birth star"}
+          star={settings.starOne ?? null}
+          raasi={settings.raasiOne ?? null}
+          onChange={({ star, raasi }) => onChange({ starOne: star, raasiOne: raasi })}
+        />
+        {secondName && (
+          <StarPicker
+            id="starTwo"
+            label={`${secondName}’s star`}
+            star={settings.starTwo ?? null}
+            raasi={settings.raasiTwo ?? null}
+            onChange={({ star, raasi }) => onChange({ starTwo: star, raasiTwo: raasi })}
+          />
+        )}
+      </fieldset>
 
       <Input
         id="contactName"

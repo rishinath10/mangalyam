@@ -2128,3 +2128,57 @@ header:has(> .inv-frame-stage){place-content:center}
   .cst-star{opacity:1;transform:none}
   .cst[data-drawn] .cst-line,.cst[data-drawn] .cst-star{animation:none}
 }
+
+/* ---------- birth stars on the invitation ----------
+   Always a night sky, on every design: stars on cream paper are not stars. */
+.inv-stars{padding:1.2rem 1.25rem 3.2rem}
+.inv-stars-sky{
+  position:relative;margin-inline:auto;max-width:27rem;padding:2rem 1.2rem 1.9rem;text-align:center;
+  border-radius:22px;overflow:hidden;color:#EBD79B;
+  background:
+    radial-gradient(1px 1px at 14% 22%,rgba(255,255,255,.7),transparent 60%),
+    radial-gradient(1px 1px at 82% 14%,rgba(255,255,255,.5),transparent 60%),
+    radial-gradient(1.2px 1.2px at 90% 70%,rgba(255,255,255,.55),transparent 60%),
+    radial-gradient(1px 1px at 8% 80%,rgba(255,255,255,.4),transparent 60%),
+    radial-gradient(1px 1px at 50% 8%,rgba(255,255,255,.35),transparent 60%),
+    radial-gradient(1px 1px at 62% 92%,rgba(255,255,255,.4),transparent 60%),
+    radial-gradient(120% 90% at 50% 30%,#1C2545,#0A0E20 72%);
+  box-shadow:0 0 0 1px rgba(235,215,155,.3),0 0 0 6px rgba(235,215,155,.06),0 26px 50px -26px rgba(0,0,0,.6);
+}
+.inv-stars-kicker{
+  font-size:.6rem;letter-spacing:.4em;text-transform:uppercase;color:rgba(235,215,155,.7);padding-left:.4em;
+}
+.inv-stars-row{position:relative;margin-top:1.1rem;display:grid;grid-template-columns:1fr;gap:.6rem;justify-items:center}
+.inv-stars-sky[data-pair] .inv-stars-row{grid-template-columns:1fr 1fr}
+.inv-stars-one{width:100%;max-width:15rem;margin:0}
+.inv-stars-sky[data-pair] .inv-stars-one{max-width:none}
+.inv-stars-one figcaption{margin-top:.5rem;display:grid;gap:.2rem;opacity:0}
+.inv-stars-sky[data-seen] .inv-stars-one figcaption{animation:star-in .8s ease 2.2s both}
+.inv-stars-who{font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(235,215,155,.6)}
+.inv-stars-one b{font-family:var(--ds-font-display);font-weight:500;font-size:1.45rem;line-height:1.1;color:#F6ECCB}
+.inv-stars-raasi{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(235,215,155,.62)}
+.inv-stars-sky[data-pair] .inv-stars-raasi{font-size:.58rem;letter-spacing:.06em;white-space:nowrap}
+/* The thread that joins the two, drawn across after both figures are up. */
+.inv-stars-thread{
+  position:absolute;left:30%;right:30%;top:34%;height:1px;transform:scaleX(0);
+  background:linear-gradient(90deg,transparent,#F6ECCB,transparent);
+  box-shadow:0 0 10px 1px rgba(246,236,203,.5);
+}
+.inv-stars-sky[data-seen] .inv-stars-thread{animation:stars-thread 1.4s cubic-bezier(.4,0,.2,1) 2.6s both}
+@keyframes stars-thread{to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){
+  .inv-stars-one figcaption{opacity:1}
+  .inv-stars-sky[data-seen] .inv-stars-one figcaption,
+  .inv-stars-sky[data-seen] .inv-stars-thread{animation:none}
+  .inv-stars-thread{transform:none}
+}
+
+/* ---------- the star picker in the editor ---------- */
+.starpick-set{border:1px solid var(--edge);border-radius:14px;padding:1rem 1rem 1.1rem;display:grid;gap:.9rem}
+.starpick-set legend{padding:0 .4rem;font-size:var(--t-xs);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+.starpick-set > p{font-size:var(--t-xs);line-height:1.5}
+.starpick{display:grid;gap:.7rem}
+.starpick-find summary{cursor:pointer;font-size:var(--t-xs);color:var(--accent);padding:.2rem 0}
+.starpick-find[open] summary{margin-bottom:.7rem}
+.starpick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.7rem;margin-bottom:.8rem}
+.starpick-hint{font-size:var(--t-xs);line-height:1.5;margin-top:.6rem}
