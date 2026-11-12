@@ -8,7 +8,7 @@ import { allManifestsOrCoded } from "@/lib/templates/design-store";
 import type { TemplateManifest } from "@/lib/templates/types";
 import { EventIcon } from "@/components/site/EventIcon";
 import { TodayPanchangam } from "@/components/site/TodayPanchangam";
-import { Constellation } from "@/components/site/Constellation";
+import { BirthStarFinder } from "@/components/site/BirthStarFinder";
 import { DesignCard } from "@/components/site/DesignCard";
 import { Arrow, Tick } from "@/components/site/Icons";
 import { priceLabel } from "@/lib/pricing";
@@ -184,14 +184,19 @@ export default async function HomePage() {
           </div>
         </header>
 
-        {/* ---------- star-sign gimmick ---------- */}
+        {/* ---------- birth star ---------- */}
         <section className="sec tone-dark" id="stars">
           <div className="wrap">
             <div className="head mid rv" style={{ marginBottom: "clamp(1.8rem,3.5vw,2.8rem)" }}>
-              <p className="kick">A small detour before the ceremonies</p>
-              <h2>Every good celebration starts with a sign</h2>
+              <p className="kick">Before the invitations</p>
+              <h2>Every celebration is timed by the stars</h2>
+              <p>
+                A naming ceremony is held on the baby&rsquo;s star. A sixtieth is
+                celebrated when the birth star returns. Find yours here, drawn as
+                the constellation it belongs to.
+              </p>
             </div>
-            <Constellation />
+            <BirthStarFinder />
           </div>
         </section>
 

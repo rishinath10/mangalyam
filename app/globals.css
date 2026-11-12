@@ -491,19 +491,74 @@ section[id],header[id]{scroll-margin-top:112px}
 .quote-card .muted{margin-top:.9rem;flex:1}
 .quote-card .btn{margin-top:1.5rem;align-self:flex-start}
 
-/* ---------- star-sign gimmick ---------- */
+/* ---------- find your star ---------- */
 .star-form form .field:last-of-type{margin-bottom:0}
-.star-stage{display:flex;align-items:center;gap:clamp(1.2rem,2.4vw,2rem);min-height:260px}
-.star-canvas{
-  flex:none;width:clamp(150px,18vw,210px);height:clamp(150px,18vw,210px);border-radius:50%;
-  background:radial-gradient(circle,rgba(255,255,255,.05),transparent 72%);
-  border:1px solid var(--edge);
+.star-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.star-stage{
+  display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center;
+  gap:clamp(1.2rem,2.6vw,2.2rem);min-height:320px;
 }
-.star-result{flex:1;min-width:0}
-.star-placeholder{font-size:var(--t-sm);max-width:32ch}
+/* A window onto a night sky: the figure sits in a disc of deep blue with a
+   scatter of fixed stars behind it, so the stage is never an empty box. */
+.star-sky{
+  position:relative;aspect-ratio:1;border-radius:50%;padding:11%;
+  background:
+    radial-gradient(1px 1px at 22% 30%,rgba(255,255,255,.7),transparent 60%),
+    radial-gradient(1px 1px at 68% 18%,rgba(255,255,255,.5),transparent 60%),
+    radial-gradient(1.2px 1.2px at 80% 62%,rgba(255,255,255,.6),transparent 60%),
+    radial-gradient(1px 1px at 34% 78%,rgba(255,255,255,.45),transparent 60%),
+    radial-gradient(1px 1px at 52% 46%,rgba(255,255,255,.3),transparent 60%),
+    radial-gradient(1px 1px at 12% 58%,rgba(255,255,255,.4),transparent 60%),
+    radial-gradient(circle at 50% 40%,#1B2440,#0B0F22 70%);
+  border:1px solid rgba(235,215,155,.28);
+  box-shadow:0 0 0 6px rgba(235,215,155,.05),0 30px 60px -30px rgba(0,0,0,.8),inset 0 0 50px rgba(0,0,0,.5);
+}
+.star-sky-name{
+  position:absolute;left:0;right:0;bottom:9%;text-align:center;
+  font-size:.56rem;letter-spacing:.34em;text-transform:uppercase;color:rgba(235,215,155,.55);
+  animation:star-name-in 1.2s ease 1.4s both;
+}
+@keyframes star-name-in{from{opacity:0}to{opacity:1}}
+.star-result{min-width:0}
+.star-placeholder{font-size:var(--t-sm);max-width:34ch;margin-top:.7rem}
+.star-name{margin-top:.5rem;font-size:var(--t-2xl);line-height:1.05}
+.star-name span,.star-raasi span{
+  display:block;margin-top:.35rem;font-family:var(--font-ui),sans-serif;font-size:var(--t-xs);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-variant-numeric:lining-nums;
+}
+.star-raasi{margin-top:1.1rem;font-size:var(--t-md);color:var(--ink-2)}
+.star-raasi b{font-family:var(--serif);font-weight:500;font-size:1.25em;color:var(--head);margin-left:.2em}
+.star-facts{
+  margin-top:1.2rem;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;
+  padding-top:1.1rem;border-top:1px solid var(--edge);
+}
+.star-facts dt{font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-3)}
+.star-facts dd{margin-top:.3rem;font-size:var(--t-sm);color:var(--ink-1);line-height:1.35}
+.star-doubt{
+  margin-top:1.1rem;padding:.75rem .9rem;border-radius:12px;font-size:var(--t-xs);line-height:1.55;
+  background:rgba(212,170,70,.1);border:1px solid rgba(212,170,70,.26);color:var(--ink-2);
+}
+.star-doubt b{color:var(--gold-lt);font-weight:500}
+.star-actions{margin-top:1.3rem;display:flex;flex-wrap:wrap;gap:.6rem}
+/* The result arrives after the figure has had a moment to draw. */
+.star-stage[data-found] .star-result > *{animation:star-in .7s cubic-bezier(.22,.61,.36,1) both}
+.star-stage[data-found] .star-result > :nth-child(1){animation-delay:.9s}
+.star-stage[data-found] .star-result > :nth-child(2){animation-delay:1.05s}
+.star-stage[data-found] .star-result > :nth-child(3){animation-delay:1.25s}
+.star-stage[data-found] .star-result > :nth-child(n+4){animation-delay:1.5s}
+@keyframes star-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media(max-width:640px){
-  .star-stage{flex-direction:column;align-items:flex-start;text-align:left}
+  .star-row{grid-template-columns:1fr}
+  .star-stage{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .star-sky{width:min(72vw,260px)}
+  .star-facts{text-align:center}
+  .star-actions{justify-content:center}
+  .star-placeholder{margin-inline:auto}
 }
+@media (prefers-reduced-motion: reduce){
+  .star-stage[data-found] .star-result > *,.star-sky-name{animation:none}
+}
+
 
 .faq details{border-bottom:1px solid var(--edge)}
 .faq details:last-child{border-bottom:0}
@@ -2041,4 +2096,35 @@ header:has(> .inv-frame-stage){place-content:center}
   .inv-shell[data-open] .art-scene-text > *{animation:none}
   .art-scene-text > *{opacity:1}
   .art-particles,.art-scene-cue{display:none}
+}
+
+/* ==========================================================
+   CONSTELLATIONS
+   A raasi drawn as its stick figure. Each line is a dash pulled
+   back to nothing and released in turn; each star arrives as the
+   line reaches it. `data-drawn` starts it.
+   ========================================================== */
+.cst{display:block;width:100%;height:auto;overflow:visible}
+.cst-line{
+  stroke:currentColor;stroke-width:.55;stroke-linecap:round;opacity:.7;
+  stroke-dasharray:1;stroke-dashoffset:1;
+}
+.cst[data-drawn] .cst-line{
+  animation:cst-draw .55s cubic-bezier(.4,0,.2,1) both;
+  animation-delay:calc(.35s + var(--i) * .2s);
+}
+@keyframes cst-draw{to{stroke-dashoffset:0}}
+.cst-star{opacity:0;transform:scale(.2)}
+.cst[data-drawn] .cst-star{
+  animation:cst-pop .7s cubic-bezier(.2,.9,.3,1.5) both,cst-twinkle 3.6s ease-in-out infinite;
+  animation-delay:calc(.25s + var(--i) * .2s),calc(2.5s + var(--i) * .37s);
+}
+@keyframes cst-pop{to{opacity:1;transform:scale(1)}}
+@keyframes cst-twinkle{0%,100%{opacity:1}50%{opacity:.62}}
+.cst-core{fill:currentColor}
+.cst-halo{fill:currentColor;opacity:.16}
+@media (prefers-reduced-motion: reduce){
+  .cst-line{stroke-dashoffset:0}
+  .cst-star{opacity:1;transform:none}
+  .cst[data-drawn] .cst-line,.cst[data-drawn] .cst-star{animation:none}
 }
