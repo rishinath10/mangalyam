@@ -1,18 +1,12 @@
 "use client";
 
 import { ArtTemplate } from "@/components/templates/art/ArtTemplate";
-import { DeepamTemplate } from "@/components/templates/deepam";
-import { MandapamTemplate } from "@/components/templates/mandapam";
 import { InvitationShell } from "@/components/templates/shared/InvitationShell";
 import { designSystemStyle } from "@/lib/templates/design-systems";
 import { getManifest } from "@/lib/templates/registry";
 import type { InvitationJson } from "@/lib/invitation/types";
 import type { TemplateProps } from "@/lib/templates/types";
 
-const TEMPLATES: Record<string, (props: TemplateProps) => React.ReactNode> = {
-  "mandapam-01": MandapamTemplate,
-  "deepam-01": DeepamTemplate,
-};
 
 /**
  * THE renderer (CLAUDE.md rule #3).
@@ -37,12 +31,6 @@ export function InvitationRenderer({
   // the database, and this runs in a browser — resolving it by id here would
   // silently render the default family instead.
   const manifest = invitation.design ?? getManifest(invitation.templateId);
-  // A coded family uses its own component; a drawn one needs no component at
-  // all, which is what lets a design be a folder of art and a manifest entry.
-  const Template =
-    TEMPLATES[manifest.templateId] ??
-    (invitation.art || manifest.art ? ArtTemplate : DeepamTemplate);
-
   return (
     <div
       className="inv-root"
@@ -54,7 +42,7 @@ export function InvitationRenderer({
       style={designSystemStyle(manifest, invitation.accentColor, invitation.fontPairing)}
     >
       <InvitationShell invitation={invitation} preview={preview} live={live}>
-        <Template invitation={invitation} preview={preview} />
+        <ArtTemplate invitation={invitation} preview={preview} />
       </InvitationShell>
     </div>
   );

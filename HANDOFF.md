@@ -280,3 +280,11 @@ Hosts can show stars on the invitation (Settings tab). Only the star and raasi i
 - **CSS custom properties used inside `calc()` need units.** `calc(0 - 2%)` is invalid and turns the whole declaration off.
 - **`Math.sin` can differ in its last bits between Node and a browser.** Anything derived from it and rendered on both sides must be rounded, or React reports a hydration mismatch.
 - **Screenshot scripts must cancel the invitation's auto-scroll** (send a wheel event) before scrolling, or the page appears blank below the cover.
+
+## 13. Jewel designs and the mascot
+
+- **Jewel designs.** `mandapam-01`, `deepam-01` and `thanga-kolam-01` keep their ids but are now the dark, painted **Neelam** (sapphire), **Maragatham** (emerald) and **Manickam** (ruby), declared as `JEWEL_FAMILIES` in `lib/templates/registry.ts` with art in `public/templates/{neelam,maragatham,manickam}/`. The old hand-coded template components are gone; everything renders through `ArtTemplate`.
+- **Mascot.** Ten transparent poses in `public/mascot/*.webp`, drawn by `components/mascot/Mascot.tsx` (`<Mascot pose="…" swap="…">`). CSS only: a slow bob, an entrance, and a cross-fade between two poses. All motion is off under reduced motion. He is decorative (`aria-hidden`) unless given a `label`.
+- **Where he is.** Home hero, design showcase, star finder, pricing card, create wizard (pose follows the step), the go-live moment, the empty dashboard, dashboard loading, 404 and error pages.
+- **Inside invitations** he appears only when the host turns on "Let Little Aiyer greet your guests" in Settings: column `invitation_settings.greeter` (migration `20261113090000_greeter`, default false), carried as `opening.greeter`. He greets once after the cover opens and stands on the RSVP thank-you.
+- His name is **Little Aiyer**.

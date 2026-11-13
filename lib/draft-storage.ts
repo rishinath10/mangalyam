@@ -122,6 +122,7 @@ function normalise(
         : base.settings.openingStyle,
       openingText: str(settings.openingText, 24),
       autoScroll: bool(settings.autoScroll, base.settings.autoScroll),
+      greeter: bool(settings.greeter, base.settings.greeter),
       contactName: str(settings.contactName, 60),
       contactPhone: str(settings.contactPhone, 24),
     },

@@ -86,6 +86,13 @@ export function SettingsPanel({
         onChange={(autoScroll) => onChange({ autoScroll })}
       />
 
+      <Toggle
+        label="Let Little Aiyer greet your guests"
+        hint="Our mascot pops up with a vanakkam after the opening and cheers when someone replies. Leave it off for a formal invitation."
+        checked={Boolean(settings.greeter)}
+        onChange={(greeter) => onChange({ greeter })}
+      />
+
       <fieldset className="starpick-set">
         <legend>Birth stars</legend>
         <p className="dim">

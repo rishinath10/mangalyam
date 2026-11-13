@@ -2333,3 +2333,77 @@ header:has(> .inv-frame-stage){place-content:center}
   background:var(--gold);color:#1A0A05;font-size:var(--t-sm);font-weight:500;transition:top .15s;
 }
 .skip:focus{top:.6rem}
+
+/* ==========================================================
+   THE MASCOT
+   Still poses, moved by CSS alone: a slow bob, an entrance, and
+   a cross-fade between two poses where a gesture is wanted.
+   ========================================================== */
+.mascot{display:inline-block;position:relative;flex:none;vertical-align:bottom;user-select:none;pointer-events:none}
+.mascot-in{position:absolute;inset:0;animation:mascot-bob 4.6s ease-in-out infinite;transform-origin:50% 100%}
+.mascot[data-flip] .mascot-in{scale:-1 1}
+.mascot-img{
+  position:absolute;left:50%;bottom:0;height:100%;width:auto;max-width:none;translate:-50% 0;
+  filter:drop-shadow(0 14px 14px rgba(0,0,0,.28));
+}
+.mascot[data-enter="pop"]{animation:mascot-pop .7s cubic-bezier(.2,.9,.3,1.4) both}
+.mascot[data-enter="rise"]{animation:mascot-rise .8s cubic-bezier(.22,.61,.36,1) both}
+@keyframes mascot-bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-2.2%) rotate(.6deg)}}
+@keyframes mascot-pop{from{opacity:0;transform:scale(.6) translateY(12%)}to{opacity:1;transform:none}}
+@keyframes mascot-rise{from{opacity:0;transform:translateY(24%)}to{opacity:1;transform:none}}
+/* Two poses, one visible at a time: the first holds, the second takes over
+   for a beat, and back. */
+.mascot[data-swap] .mascot-b{opacity:0;animation:mascot-swap-b 6s steps(1,end) infinite}
+.mascot[data-swap] .mascot-a{animation:mascot-swap-a 6s steps(1,end) infinite}
+@keyframes mascot-swap-a{0%,54%{opacity:1}55%,92%{opacity:0}93%,100%{opacity:1}}
+@keyframes mascot-swap-b{0%,54%{opacity:0}55%,92%{opacity:1}93%,100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){
+  .mascot,.mascot-in,.mascot[data-swap] .mascot-a,.mascot[data-swap] .mascot-b{animation:none}
+}
+
+/* ---- where he stands ---- */
+.hero-fan{position:relative}
+.hero-mascot{position:absolute;left:-2%;bottom:-4%;z-index:6}
+.price-card{position:relative}
+.price-mascot{position:absolute;right:5%;top:16px}
+.show-about{position:relative}
+.show-mascot{float:right;margin:-.4rem 0 .2rem .8rem}
+.star-form{position:relative}
+.star-mascot{float:right;margin:-.6rem -.2rem .2rem .6rem}
+.wz-panel{position:relative}
+.wz-mascot{float:right;margin:-.8rem -.3rem .2rem .8rem}
+.live-head{position:relative}
+.live-mascot{margin-left:auto}
+.live[data-celebrate] .live-mascot .mascot-in{animation:mascot-hop .9s cubic-bezier(.3,.7,.4,1) 3,mascot-bob 4.6s ease-in-out 2.7s infinite}
+@keyframes mascot-hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-14%) rotate(-3deg)}70%{transform:translateY(0) rotate(2deg)}}
+.empty .mascot,.legal > .mascot,.rsvp-done .mascot{display:block;margin:0 auto 1rem}
+.legal > .mascot{margin-left:0}
+.page-loading{display:grid;justify-items:center;gap:1rem;padding:18vh 1rem;text-align:center}
+.mascot-walk .mascot-in{animation:mascot-step .7s ease-in-out infinite}
+@keyframes mascot-step{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4%) rotate(2deg)}}
+
+/* The greeter inside an invitation: up from the corner, a hello, and away. */
+.inv-greeter{
+  position:sticky;bottom:74px;height:0;margin-left:10px;z-index:30;pointer-events:none;
+  display:flex;align-items:flex-end;gap:6px;
+  animation:greeter 6.5s cubic-bezier(.22,.61,.36,1) .9s both;
+}
+.inv-greeter b{
+  font:500 13px/1 var(--font-ui),system-ui,sans-serif;letter-spacing:.02em;
+  background:#fff;color:#3a1d10;padding:9px 12px;border-radius:14px 14px 14px 3px;
+  margin-bottom:84px;box-shadow:0 6px 18px rgba(0,0,0,.25);
+}
+@keyframes greeter{
+  0%{opacity:0;transform:translateY(60%)}
+  10%,86%{opacity:1;transform:none}
+  100%{opacity:0;transform:translateY(60%);visibility:hidden}
+}
+@media (max-width:640px){
+  .hero-mascot{left:0;bottom:-6%}
+  .price-card .price-mascot ~ .inc{padding-right:92px}
+}
+@media (prefers-reduced-motion: reduce){
+  .live[data-celebrate] .live-mascot .mascot-in,.mascot-walk .mascot-in{animation:none}
+  .inv-greeter{animation:greeter-still 6.5s linear .9s both}
+}
+@keyframes greeter-still{0%{opacity:0}8%,90%{opacity:1}100%{opacity:0;visibility:hidden}}

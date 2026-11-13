@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Mascot } from "@/components/mascot/Mascot";
 import { useEffect } from "react";
 
 /**
@@ -26,6 +27,7 @@ export default function Error({
   return (
     <div className="tone-dark">
       <main className="legal" style={{ minHeight: "62vh" }}>
+        <Mascot pose="sorry" height={170} />
         <h1>Something went wrong at our end</h1>
         <p className="legal-lede">
           This is a fault on our side, not something you did. Nothing you had

@@ -248,6 +248,11 @@ model InvitationSettings {
    * Drifts the page down after the opening; a guest touch cancels it.
    */
   autoScroll   Boolean      @default(true) @map("auto_scroll")
+  /**
+   * The mascot greets guests after the opening and cheers a sent reply. Off by
+   * default: a formal invitation should not gain a cartoon unasked.
+   */
+  greeter      Boolean      @default(false)
 
   // Birth stars: an index into the 27 natchathiram and the 12 raasi. Only the
   // result is kept — never the birthday it was worked out from.

@@ -1,3 +1,4 @@
+import { Mascot } from "@/components/mascot/Mascot";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { COMPANY } from "@/lib/company";
@@ -16,6 +17,7 @@ export default function NotFound() {
   return (
     <div className="tone-dark">
       <main className="legal" style={{ minHeight: "62vh" }}>
+        <Mascot pose="sorry" height={170} />
         <h1>This page is not here</h1>
         <p className="legal-lede">
           The link may have a typo in it, or the invitation it pointed to may

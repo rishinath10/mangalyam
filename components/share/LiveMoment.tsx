@@ -1,5 +1,6 @@
 "use client";
 
+import { Mascot } from "@/components/mascot/Mascot";
 import { useEffect, useState } from "react";
 
 /**
@@ -92,6 +93,7 @@ export function LiveMoment({
           <p className="kick">Published</p>
           <h3>Your invitation is live</h3>
         </div>
+        <Mascot pose="cheer" height={96} className="live-mascot" />
       </div>
 
       <a className="live-link" href={url} target="_blank" rel="noopener noreferrer">

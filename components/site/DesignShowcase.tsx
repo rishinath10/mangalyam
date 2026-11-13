@@ -1,5 +1,6 @@
 "use client";
 
+import { Mascot } from "@/components/mascot/Mascot";
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -185,6 +186,7 @@ export function DesignShowcase({
           )}
         </div>
         <div className="show-about">
+          <Mascot pose="point" height={128} flip className="show-mascot" />
           <p className="kick">A real invitation, not a picture of one</p>
           <h3>{design.name}</h3>
           <p className="muted">{design.tagline}. Tap the seal and scroll, exactly as your guests will.</p>

@@ -1,9 +1,9 @@
 import type { EventType } from "@prisma/client";
-import type { AccentSwatch, TemplateManifest } from "@/lib/templates/types";
+import type { TemplateManifest } from "@/lib/templates/types";
 import { EVENT_TYPES } from "@/lib/events";
 
 /**
- * Two template families, and the single source of truth for the marketing
+ * The design families, and the single source of truth for the marketing
  * gallery, the builder's picker and the renderer.
  *
  * Curated, not open (CLAUDE.md Section 5, post-pivot): a family owns its
@@ -12,36 +12,6 @@ import { EVENT_TYPES } from "@/lib/events";
  * words. There is deliberately no route from the builder to an arbitrary hex
  * or an arbitrary typeface.
  */
-
-/** Tamil wedding materials, in the order they appear across the days. */
-const MANDAPAM_ACCENTS: AccentSwatch[] = [
-  { key: "kumkum", name: "Kumkum", hex: "#A81A2C" },
-  { key: "turmeric", name: "Turmeric", hex: "#E0A32E" },
-  { key: "mehendi", name: "Mehendi", hex: "#2F7D32" },
-  { key: "kadamba", name: "Kadamba", hex: "#7B2D8E" },
-  { key: "chandan", name: "Chandan", hex: "#C8622C" },
-  { key: "peacock", name: "Peacock", hex: "#0E6E8C" },
-];
-
-/** Occasion-neutral: nothing here reads as wedding-specific. */
-const DEEPAM_ACCENTS: AccentSwatch[] = [
-  { key: "brass", name: "Brass", hex: "#A8781F" },
-  { key: "vermilion", name: "Vermilion", hex: "#B3402F" },
-  { key: "tulsi", name: "Tulsi", hex: "#3E7A4E" },
-  { key: "indigo", name: "Indigo", hex: "#35507F" },
-  { key: "plum", name: "Plum", hex: "#7A3A63" },
-  { key: "teal", name: "Teal", hex: "#1E6E70" },
-];
-
-/** Deep, saturated colours: this family is a printed card, not a wash. */
-const THANGA_ACCENTS: AccentSwatch[] = [
-  { key: "kumkum", name: "Kumkum", hex: "#9E1B2F" },
-  { key: "turmeric", name: "Turmeric", hex: "#D99A21" },
-  { key: "leaf", name: "Leaf", hex: "#2E6B3C" },
-  { key: "amethyst", name: "Amethyst", hex: "#6B2D74" },
-  { key: "sandal", name: "Sandal", hex: "#B9662B" },
-  { key: "midnight", name: "Midnight", hex: "#26406B" },
-];
 
 /** Every section, in the order a guest reads them. */
 const FULL_SECTIONS: TemplateManifest["sections"] = [
@@ -389,155 +359,151 @@ const PAINTED_FAMILIES: TemplateManifest[] = [
   },
 ];
 
-export const TEMPLATE_MANIFESTS: TemplateManifest[] = [
-  ...PAINTED_FAMILIES,
+/**
+ * The jewel families: gold on a deep ground.
+ *
+ * These three keep the ids of the stroked designs they replaced — Mandapam,
+ * Deepam and Thanga Kolam — on purpose. An invitation stores its design by
+ * id, so every invitation that was on one of the old designs is on its
+ * replacement the moment this ships, with no migration and no link changing.
+ * The ids are history; the names are what a customer sees.
+ *
+ * Accents are light and bright only: on a night ground the accent is what
+ * text is set in, so a deep colour here would be unreadable.
+ */
+const JEWEL_FAMILIES: TemplateManifest[] = [
   {
     templateId: "mandapam-01",
-    name: "Mandapam",
-    tagline: "The pavilion the ceremony happens under",
+    name: "Neelam",
+    tagline: "A gold arch and hanging lamps on royal sapphire",
     eventTypes: ["wedding"],
-    sections: [
-      "cover",
-      "couple",
-      "event",
-      "schedule",
-      "gallery",
-      "greetings",
-      "rsvp",
-      // Last on purpose. Replying is the thing the host actually needs from a
-      // guest; the gift block sits below it so it never competes with that.
-      "blessings",
-    ],
+    sections: FULL_SECTIONS,
     features: { music: true, countdown: true },
-    accents: MANDAPAM_ACCENTS,
-    defaultAccentKey: "kumkum",
-    // Each ceremony opens on the colour that day is actually dressed in.
-    ceremonyAccentKeys: {
-      mehendi: "mehendi",
-      haldi: "turmeric",
-      sangeet: "kadamba",
-      muhurtham: "kumkum",
-      nalangu: "chandan",
-      baraat: "kumkum",
-      reception: "peacock",
-      engagement: "chandan",
-    },
-    fontPairings: ["classic", "inscribed", "fine"],
+    accents: [
+      { key: "gold", name: "Gold", hex: "#E6C77C" },
+      { key: "champagne", name: "Champagne", hex: "#F1DCAC" },
+      { key: "pearl", name: "Pearl", hex: "#F0E9D8" },
+      { key: "rose-gold", name: "Rose gold", hex: "#EBAE93" },
+      { key: "sky", name: "Sky", hex: "#9CC8EE" },
+      { key: "jade", name: "Jade", hex: "#86D3B5" },
+    ],
+    defaultAccentKey: "gold",
+    ceremonyAccentKeys: { sangeet: "sky", reception: "champagne", engagement: "rose-gold" },
+    fontPairings: ["classic", "fine", "inscribed"],
     defaultFontPairing: "classic",
     tokens: {
-      surface: "#FBF6EC",
-      surfaceAlt: "#F3E9D6",
-      ink: "#2A1A12",
-      inkMuted: "#7A6553",
-      rule: "#D9C5A0",
-      brand: "#A81A2C",
-      brandDeep: "#71101D",
-      gold: "#C08A2E",
-      radius: "2px",
+      surface: "#0F2455",
+      surfaceAlt: "#17306B",
+      ink: "#F3ECDD",
+      inkMuted: "#AEB9D6",
+      rule: "#2E4686",
+      brand: "#E6C77C",
+      brandDeep: "#F3DFAA",
+      gold: "#D8B560",
+      radius: "3px",
       motionIntensity: 1,
+      dark: true,
+    },
+    art: {
+      scene: "/templates/neelam/scene.webp",
+      sceneThumb: "/templates/neelam/scene-sm.webp",
+      sceneText: { top: 31, bottom: 31, width: 56 },
+      closing: "/templates/neelam/closing.webp",
+      crest: "/templates/neelam/crest.webp",
+      divider: "/templates/neelam/divider.webp",
+      particles: { kind: "sparks", colors: ["#F3DFAA", "#FFF3CC", "#9CC8EE"] },
     },
     built: true,
   },
   {
     templateId: "deepam-01",
-    name: "Deepam",
-    tagline: "The lamp lit for every auspicious morning",
-    // The general family: everything that is not specifically a wedding, and
-    // weddings too for anyone who wants the quieter of the two.
+    name: "Maragatham",
+    tagline: "Gold leaves and brass lamps on deep emerald",
     eventTypes: [...EVENT_TYPES] as EventType[],
-    sections: [
-      "cover",
-      "couple",
-      "event",
-      "schedule",
-      "gallery",
-      "greetings",
-      "rsvp",
-      // Last on purpose. Replying is the thing the host actually needs from a
-      // guest; the gift block sits below it so it never competes with that.
-      "blessings",
-    ],
+    sections: FULL_SECTIONS,
     features: { music: true, countdown: true },
-    accents: DEEPAM_ACCENTS,
-    defaultAccentKey: "brass",
+    accents: [
+      { key: "gold", name: "Gold", hex: "#E6C77C" },
+      { key: "champagne", name: "Champagne", hex: "#F1DCAC" },
+      { key: "pearl", name: "Pearl", hex: "#F0E9D8" },
+      { key: "rose-gold", name: "Rose gold", hex: "#EBAE93" },
+      { key: "leaf", name: "Leaf", hex: "#9BD9A0" },
+      { key: "marigold", name: "Marigold", hex: "#F4B45C" },
+    ],
+    defaultAccentKey: "gold",
     ceremonyAccentKeys: {},
     fontPairings: ["inscribed", "classic", "fine"],
     defaultFontPairing: "inscribed",
     tokens: {
-      surface: "#FDFBF5",
-      surfaceAlt: "#F4EFE2",
-      ink: "#241E14",
-      inkMuted: "#6F6553",
-      rule: "#DED5C0",
-      brand: "#8A6B14",
-      brandDeep: "#5E480C",
-      gold: "#B8912F",
-      radius: "10px",
-      motionIntensity: 0.9,
+      surface: "#073F2D",
+      surfaceAlt: "#0E5740",
+      ink: "#F2EEDD",
+      inkMuted: "#A9C6B4",
+      rule: "#22684F",
+      brand: "#E6C77C",
+      brandDeep: "#F3DFAA",
+      gold: "#D8B560",
+      radius: "3px",
+      motionIntensity: 1,
+      dark: true,
+    },
+    art: {
+      scene: "/templates/maragatham/scene.webp",
+      sceneThumb: "/templates/maragatham/scene-sm.webp",
+      sceneText: { top: 24, bottom: 36, width: 50 },
+      closing: "/templates/maragatham/closing.webp",
+      crest: "/templates/maragatham/crest.webp",
+      divider: "/templates/maragatham/divider.webp",
+      particles: { kind: "sparks", colors: ["#F3DFAA", "#FFE9B0", "#9BD9A0"] },
     },
     built: true,
   },
   {
     templateId: "thanga-kolam-01",
-    name: "Thanga Kolam",
-    tagline: "A gold border, drawn the way a printed card is",
-    // Offered to everything: a border and a crest carry no wedding in them.
-    eventTypes: [...EVENT_TYPES] as EventType[],
-    sections: [
-      "cover",
-      "couple",
-      "event",
-      "schedule",
-      "gallery",
-      "greetings",
-      "rsvp",
-      // Last on purpose. Replying is the thing the host actually needs from a
-      // guest; the gift block sits below it so it never competes with that.
-      "blessings",
-    ],
+    name: "Manickam",
+    tagline: "A gold kolam border on ruby, like foil on a printed card",
+    eventTypes: ["wedding"],
+    sections: FULL_SECTIONS,
     features: { music: true, countdown: true },
-    accents: THANGA_ACCENTS,
-    defaultAccentKey: "kumkum",
-    ceremonyAccentKeys: {
-      mehendi: "leaf",
-      haldi: "turmeric",
-      sangeet: "amethyst",
-      muhurtham: "kumkum",
-      nalangu: "sandal",
-      baraat: "kumkum",
-      reception: "midnight",
-      engagement: "sandal",
-    },
+    accents: [
+      { key: "gold", name: "Gold", hex: "#E6C77C" },
+      { key: "champagne", name: "Champagne", hex: "#F1DCAC" },
+      { key: "pearl", name: "Pearl", hex: "#F0E9D8" },
+      { key: "rose-gold", name: "Rose gold", hex: "#EBAE93" },
+      { key: "blush", name: "Blush", hex: "#F2B5BE" },
+      { key: "marigold", name: "Marigold", hex: "#F4B45C" },
+    ],
+    defaultAccentKey: "gold",
+    ceremonyAccentKeys: { haldi: "marigold", sangeet: "blush", reception: "champagne", engagement: "rose-gold" },
     fontPairings: ["classic", "inscribed", "fine"],
     defaultFontPairing: "classic",
     tokens: {
-      surface: "#FDF9F0",
-      surfaceAlt: "#F5EDDC",
-      ink: "#2B1F14",
-      inkMuted: "#75634C",
-      rule: "#DCC79C",
-      brand: "#9E1B2F",
-      brandDeep: "#6E1020",
-      gold: "#B8912F",
-      radius: "4px",
+      surface: "#490C1C",
+      surfaceAlt: "#611528",
+      ink: "#F6EBDD",
+      inkMuted: "#D0AEB2",
+      rule: "#7A2A3C",
+      brand: "#E6C77C",
+      brandDeep: "#F3DFAA",
+      gold: "#D8B560",
+      radius: "2px",
       motionIntensity: 1,
+      dark: true,
     },
-    /**
-     * The first family with no component of its own — it is these four files
-     * and the manifest around them. Replacing the artwork replaces the design;
-     * copying this entry with a different folder adds another.
-     */
     art: {
-      ground: "/templates/thanga-kolam/ground.svg",
-      groundFit: "tile",
-      groundVeil: 0.92,
-      frame: "/templates/thanga-kolam/frame.svg",
-      crest: "/templates/thanga-kolam/crest.svg",
-      divider: "/templates/thanga-kolam/divider.svg",
+      scene: "/templates/manickam/scene.webp",
+      sceneThumb: "/templates/manickam/scene-sm.webp",
+      sceneText: { top: 24, bottom: 26, width: 54 },
+      closing: "/templates/manickam/closing.webp",
+      crest: "/templates/manickam/crest.webp",
+      divider: "/templates/manickam/divider.webp",
+      particles: { kind: "sparks", colors: ["#F3DFAA", "#FFE9B0", "#F2B5BE"] },
     },
     built: true,
   },
 ];
+
+export const TEMPLATE_MANIFESTS: TemplateManifest[] = [...PAINTED_FAMILIES, ...JEWEL_FAMILIES];
 
 export const DEFAULT_TEMPLATE_ID = "malligai-01";
 export const WEDDING_TEMPLATE_ID = "kalyana-mandapam-01";

@@ -57,6 +57,7 @@ export interface InvitationDraft {
     openingStyle: OpeningStyle;
     openingText: string | null;
     autoScroll: boolean;
+    greeter: boolean;
     contactName: string | null;
     contactPhone: string | null;
   };
@@ -116,6 +117,7 @@ export function emptyDraft(): InvitationDraft {
       openingStyle: "doors",
       openingText: null,
       autoScroll: true,
+      greeter: false,
       contactName: null,
       contactPhone: null,
     },

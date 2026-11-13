@@ -106,6 +106,7 @@ export function toInvitationSource(
       openingStyle: s?.openingStyle ?? "doors",
       openingText: s?.openingText ?? null,
       autoScroll: s?.autoScroll ?? true,
+      greeter: s?.greeter ?? false,
       contactName: s?.contactName ?? null,
       contactPhone: s?.contactPhone ?? null,
       starOne: s?.starOne ?? null,

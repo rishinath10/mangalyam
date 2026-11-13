@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Mascot } from "@/components/mascot/Mascot";
 import type { InvitationJson } from "@/lib/invitation/types";
 
 type State = "idle" | "sending" | "done" | "error";
@@ -68,6 +69,9 @@ export function RsvpForm({
   if (state === "done") {
     return (
       <div className="rsvp-done" role="status">
+        {invitation.opening.greeter && (
+          <Mascot pose={attending ? "cheer" : "namaste"} height={120} />
+        )}
         <p className="rsvp-done-h">
           {attending ? "Thank you — we can't wait to see you." : "Thank you for letting us know."}
         </p>

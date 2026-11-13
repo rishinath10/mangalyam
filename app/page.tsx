@@ -1,3 +1,4 @@
+import { Mascot } from "@/components/mascot/Mascot";
 import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
@@ -190,6 +191,7 @@ export default async function HomePage() {
                   />
                 </span>
               ))}
+              <Mascot pose="namaste" swap="wave" height={176} enter="rise" className="hero-mascot" />
             </div>
           </div>
 
@@ -394,6 +396,7 @@ export default async function HomePage() {
                     figure or crashing on a missing variable. */}
                 {freeUntil ? (
                   <>
+                    <Mascot pose="card" height={118} className="price-mascot" />
                     <b className="price-fig num">Free</b>
                     <p className="inc">
                       one invitation, yours to keep
