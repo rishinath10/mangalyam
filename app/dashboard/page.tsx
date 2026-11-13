@@ -1,3 +1,4 @@
+import { Mascot } from "@/components/mascot/Mascot";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireUserId } from "@/lib/auth/ownership";
@@ -46,6 +47,7 @@ export default async function DashboardPage() {
           other, and the short one always drifts behind. */}
       {events.length === 0 ? (
         <div className="t empty">
+          <Mascot pose="sleep" height={120} />
           <h2>Nothing here yet</h2>
           <p>
             Build an e-invitation for any event you are holding — see it working

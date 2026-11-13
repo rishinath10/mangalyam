@@ -95,6 +95,7 @@ export const settingsUpdateSchema = z.object({
   openingStyle: z.enum(OPENING_STYLES).optional(),
   openingText: z.string().trim().max(24).nullish(),
   autoScroll: z.boolean().optional(),
+  greeter: z.boolean().optional(),
   contactName: z.string().trim().max(60).nullish(),
   contactPhone: phone.nullish(),
 

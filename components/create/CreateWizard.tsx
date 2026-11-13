@@ -1,5 +1,6 @@
 "use client";
 
+import { Mascot, type MascotPose } from "@/components/mascot/Mascot";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { PreviewPane } from "@/components/builder/PreviewPane";
@@ -23,6 +24,16 @@ import { CoupleConstellation } from "./CoupleConstellation";
  * the same function the published page goes through — so what a visitor
  * watches while answering is the real renderer, not a mock-up of it (rule #3).
  */
+/** What the guide is doing on each step. */
+const GUIDE_POSE: Record<string, MascotPose> = {
+  occasion: "namaste",
+  design: "point",
+  details: "think",
+  moments: "card",
+  replies: "wave",
+  finish: "cheer",
+};
+
 export function CreateWizard({
   signedIn,
   signedInEmail,
@@ -182,6 +193,8 @@ export function CreateWizard({
 
       <div className="wz-grid">
         <div className="t wz-panel" ref={panel}>
+          {/* Keyed by step, so he arrives afresh in a new pose each time. */}
+          <Mascot key={current.id} pose={GUIDE_POSE[current.id]} height={104} className="wz-mascot" />
           <p className="kick">
             Step {step + 1} of {STEPS.length}
           </p>

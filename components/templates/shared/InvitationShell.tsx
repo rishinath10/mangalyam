@@ -1,5 +1,6 @@
 "use client";
 
+import { Mascot } from "@/components/mascot/Mascot";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActionBar } from "@/components/templates/shared/ActionBar";
 import { Opening } from "@/components/templates/shared/Openings";
@@ -172,6 +173,15 @@ export function InvitationShell({
       <div className="inv-stage" inert={!opened}>
         {children}
       </div>
+
+      {/* Only when the host asked for him. He comes up once, says hello and
+          goes; nothing a guest has to dismiss. */}
+      {coverGone && invitation.opening.greeter && (
+        <div className="inv-greeter" aria-hidden="true">
+          <Mascot pose="namaste" swap="wave" height={132} enter="none" />
+          <b>Vanakkam!</b>
+        </div>
+      )}
 
       {coverGone && (
         <ActionBar

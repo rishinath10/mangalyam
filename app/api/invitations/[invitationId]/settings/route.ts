@@ -26,6 +26,7 @@ export async function PATCH(req: Request, { params }: Params) {
       openingStyle?: OpeningStyle;
       openingText?: string | null;
       autoScroll?: boolean;
+      greeter?: boolean;
       contactName?: string | null;
       contactPhone?: string | null;
       starOne?: number | null;
@@ -54,6 +55,7 @@ export async function PATCH(req: Request, { params }: Params) {
     if (input.openingStyle !== undefined) data.openingStyle = input.openingStyle;
     if (input.openingText !== undefined) data.openingText = input.openingText || null;
     if (input.autoScroll !== undefined) data.autoScroll = input.autoScroll;
+    if (input.greeter !== undefined) data.greeter = input.greeter;
     if (input.contactName !== undefined) data.contactName = input.contactName || null;
     if (input.contactPhone !== undefined) data.contactPhone = input.contactPhone || null;
 

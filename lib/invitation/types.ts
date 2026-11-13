@@ -77,7 +77,13 @@ export interface InvitationJson {
   music: { enabled: boolean; url: string | null };
   countdown: { enabled: boolean };
   /** The cover a guest taps before the invitation is revealed. */
-  opening: { style: OpeningStyle; text: string | null; autoScroll: boolean };
+  opening: {
+    style: OpeningStyle;
+    text: string | null;
+    autoScroll: boolean;
+    /** The host asked for the mascot to greet guests. Absent means no. */
+    greeter?: boolean;
+  };
   /** The person guests ring about this occasion. */
   contact: { name: string | null; phone: string | null };
   /**

@@ -60,6 +60,7 @@ export interface InvitationSource {
     openingStyle: OpeningStyle;
     openingText: string | null;
     autoScroll: boolean;
+    greeter?: boolean;
     contactName: string | null;
     contactPhone: string | null;
     starOne?: number | null;
@@ -143,6 +144,7 @@ export function composeInvitationJson(source: InvitationSource): InvitationJson 
       style: source.settings.openingStyle,
       text: source.settings.openingText,
       autoScroll: source.settings.autoScroll,
+      greeter: source.settings.greeter ?? false,
     },
     contact: {
       name: source.settings.contactName,
