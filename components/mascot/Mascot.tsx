@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 /**
- * The site's mascot, in one of his poses.
+ * Little Aiyer, the site's mascot, in one of his poses.
  *
  * He is a set of still pictures and some CSS — no script, so he can be dropped
  * into a server-rendered page for free. Every pose breathes with a slow bob;

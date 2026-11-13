@@ -87,8 +87,8 @@ export function SettingsPanel({
       />
 
       <Toggle
-        label="Let our little priest greet your guests"
-        hint="He pops up with a vanakkam after the opening and cheers when someone replies. Leave it off for a formal invitation."
+        label="Let Little Aiyer greet your guests"
+        hint="Our mascot pops up with a vanakkam after the opening and cheers when someone replies. Leave it off for a formal invitation."
         checked={Boolean(settings.greeter)}
         onChange={(greeter) => onChange({ greeter })}
       />
