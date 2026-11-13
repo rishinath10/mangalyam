@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { COMPANY } from "@/lib/company";
 
 /** Four destinations. Everything else is reachable by scrolling. */
@@ -15,27 +15,17 @@ const LINKS = [
 /**
  * The site's header: a wordmark, four links and one way in.
  *
- * It is meant to be forgotten. At the top of the page it has no background at
- * all, so the hero reads as the page rather than as something under a toolbar.
- * Scrolling down, it slides away and gives the screen back; the first move
- * upward brings it back, which is the moment someone actually wants it.
+ * It stays put. At the top of the page it has no background at all, so the
+ * hero reads as the page rather than as something under a toolbar; once the
+ * page has moved beneath it, it takes a thin veil so the links stay legible
+ * over whatever is passing behind.
  */
 export function SiteNav({ signedIn }: { signedIn: boolean }) {
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [menu, setMenu] = useState(false);
-  const last = useRef(0);
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = scrollY;
-      setScrolled(y > 12);
-      // A few pixels of slack either way, so a thumb resting on the screen
-      // does not make the bar flicker in and out.
-      if (y > last.current + 6 && y > 140) setHidden(true);
-      else if (y < last.current - 6 || y <= 140) setHidden(false);
-      last.current = y;
-    };
+    const onScroll = () => setScrolled(scrollY > 12);
     addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => removeEventListener("scroll", onScroll);
@@ -58,11 +48,12 @@ export function SiteNav({ signedIn }: { signedIn: boolean }) {
 
   return (
     <>
+      <a className="skip" href="#main">
+        Skip to content
+      </a>
       <header
         className="nav"
         data-scrolled={scrolled ? "" : undefined}
-        // Never hidden while the menu is open, or by keyboard focus inside it.
-        data-hidden={hidden && !menu ? "" : undefined}
       >
         <div className="nav-in">
           <Link href="/#top" className="nav-brand" aria-label={`${COMPANY.brand} — home`}>

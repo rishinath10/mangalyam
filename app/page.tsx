@@ -144,7 +144,7 @@ export default async function HomePage() {
       <Reveal />
       <SiteNav signedIn={signedIn} />
 
-      <div className="page-shell">
+      <div className="page-shell" id="main" tabIndex={-1}>
         {/* ---------- hero ---------- */}
         <header className="tone-dark hero" id="top">
           <div className="wrap hero-in">
