@@ -805,6 +805,8 @@ section[id],header[id]{scroll-margin-top:112px}
   box-shadow:0 24px 60px -26px rgba(0,0,0,.85);
 }
 .phone-scroll{--frame-h:min(70svh,640px);height:var(--frame-h);overflow-y:auto;overscroll-behavior:contain;background:#fff}
+/* Until the cover is opened there is nothing below it to scroll to. */
+.phone-scroll:has(.inv-shell:not([data-revealed])){overflow:hidden}
 .phone-cap{text-align:center;font-size:var(--t-xs);color:var(--ink-3);margin-top:.7rem;word-break:break-all}
 
 /* ==========================================================
