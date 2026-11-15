@@ -206,7 +206,6 @@ export function DesignShowcase({
             flip
             height={170}
             className="show-guide"
-            say="Paarunga! Tap the gold seal to open it."
           />
           <Link className="btn btn-gold" href="/create">
             Start with {design.name}

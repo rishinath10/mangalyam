@@ -174,12 +174,11 @@ export function InvitationShell({
         {children}
       </div>
 
-      {/* Only when the host asked for him. He comes up once, says hello and
+      {/* Only when the host asked for him. He comes up once, greets and
           goes; nothing a guest has to dismiss. */}
       {coverGone && invitation.opening.greeter && (
         <div className="inv-greeter" aria-hidden="true">
           <Mascot pose="namaste" swap="wave" height={132} enter="none" />
-          <b>Vanakkam!</b>
         </div>
       )}
 

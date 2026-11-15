@@ -93,7 +93,6 @@ export function BirthStarFinder() {
           pose="think"
           height={140}
           className="star-guide"
-          say="Put in your birth date and I will find your star."
         />
         <p className="kick">Natchathiram and raasi</p>
         <h3 style={{ marginTop: ".5rem" }}>Which star were you born under?</h3>

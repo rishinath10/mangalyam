@@ -86,7 +86,6 @@ export function LiveMoment({
         pose="cheer"
         height={130}
         className="live-guide"
-        say="Vaazhthukkal! Now send the link on WhatsApp."
       />
       <div className="live-head">
         <span className="live-seal" aria-hidden="true">

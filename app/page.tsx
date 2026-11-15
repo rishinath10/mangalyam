@@ -178,7 +178,6 @@ export default async function HomePage() {
                 swap="wave"
                 height={190}
                 className="hero-guide"
-                say="Vanakkam! Tap Create and I will walk you through it."
               />
             </div>
 
@@ -404,7 +403,6 @@ export default async function HomePage() {
               pose="card"
               height={170}
               className="price-guide rv"
-              say={freeUntil ? "It is free for now. Vaanga, make yours!" : "One price, everything in it. Vaanga!"}
             />
             <div className="bento">
               <div className="t t--2 t--lit rv c6 price-card">

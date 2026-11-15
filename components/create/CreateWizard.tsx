@@ -27,14 +27,14 @@ import { CoupleConstellation } from "./CoupleConstellation";
  * the same function the published page goes through — so what a visitor
  * watches while answering is the real renderer, not a mock-up of it (rule #3).
  */
-/** What the guide is doing, and saying, on each step. */
-const GUIDE: Record<string, { pose: MascotPose; say: string }> = {
-  occasion: { pose: "namaste", say: "Vanakkam! Tap the occasion, then type the names." },
-  design: { pose: "point", say: "Tap any design. The preview changes as you choose." },
-  details: { pose: "think", say: "When and where? Guests get a map from this." },
-  moments: { pose: "card", say: "Photos and a schedule, if you like. You can skip this." },
-  replies: { pose: "wave", say: "Choose what guests are asked when they reply." },
-  finish: { pose: "cheer", say: "Romba nalla irukku! One last step to keep it." },
+/** What the guide is doing on each step. */
+const GUIDE: Record<string, { pose: MascotPose }> = {
+  occasion: { pose: "namaste" },
+  design: { pose: "point" },
+  details: { pose: "think" },
+  moments: { pose: "card" },
+  replies: { pose: "wave" },
+  finish: { pose: "cheer" },
 };
 
 export function CreateWizard({
@@ -210,7 +210,6 @@ export function CreateWizard({
           <Mascot
             key={current.id}
             pose={GUIDE[current.id].pose}
-            say={GUIDE[current.id].say}
             height={130}
             className="wz-guide"
           />

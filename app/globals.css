@@ -2461,3 +2461,11 @@ a.cer-tile::after{content:"Start →";font-size:.72rem;letter-spacing:.08em;colo
 .nav-burger{width:44px;height:44px}
 .crumb{min-height:44px}
 [role="tab"]{min-height:44px}
+
+/* Without a bubble he is a lone figure; these keep him centred where the
+   layout around him is. */
+.price-guide{display:block}
+.empty .mascot,.legal > .mascot{display:block;margin:0 auto 1rem}
+.legal > .mascot{margin-left:0}
+.live-guide{display:block}
+@media(max-width:860px){.hero-guide,.show-guide{display:block}}
