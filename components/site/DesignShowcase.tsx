@@ -172,6 +172,10 @@ export function DesignShowcase({
         })}
       </div>
 
+      <p className="show-hint">
+        Swipe to see them all, and <b>tap a design</b> to try it on the phone below.
+      </p>
+
       <div className="show-stage">
         <div className="show-phone">
           {near ? (
@@ -186,7 +190,6 @@ export function DesignShowcase({
           )}
         </div>
         <div className="show-about">
-          <Mascot pose="point" height={128} flip className="show-mascot" />
           <p className="kick">A real invitation, not a picture of one</p>
           <h3>{design.name}</h3>
           <p className="muted">{design.tagline}. Tap the seal and scroll, exactly as your guests will.</p>
@@ -198,6 +201,13 @@ export function DesignShowcase({
               </li>
             ))}
           </ul>
+          <Mascot
+            pose="point"
+            flip
+            height={170}
+            className="show-guide"
+            say="Paarunga! Tap the gold seal to open it."
+          />
           <Link className="btn btn-gold" href="/create">
             Start with {design.name}
           </Link>

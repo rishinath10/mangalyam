@@ -89,7 +89,12 @@ export function BirthStarFinder() {
   return (
     <div className="bento">
       <div className="t t--lift rv c5 star-form">
-        <Mascot pose="think" height={112} className="star-mascot" />
+        <Mascot
+          pose="think"
+          height={140}
+          className="star-guide"
+          say="Put in your birth date and I will find your star."
+        />
         <p className="kick">Natchathiram and raasi</p>
         <h3 style={{ marginTop: ".5rem" }}>Which star were you born under?</h3>
         <p className="muted" style={{ fontSize: "var(--t-sm)", marginTop: ".5rem" }}>

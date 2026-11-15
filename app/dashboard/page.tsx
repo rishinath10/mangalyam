@@ -47,7 +47,7 @@ export default async function DashboardPage() {
           other, and the short one always drifts behind. */}
       {events.length === 0 ? (
         <div className="t empty">
-          <Mascot pose="sleep" height={120} />
+          <Mascot pose="sleep" height={140} say="Nothing here yet. Tap the gold button to begin." />
           <h2>Nothing here yet</h2>
           <p>
             Build an e-invitation for any event you are holding — see it working

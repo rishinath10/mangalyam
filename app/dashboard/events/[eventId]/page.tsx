@@ -167,8 +167,12 @@ export default async function EventPage({ params, searchParams }: Params) {
             <AddInvitationForm eventId={event.id} eventType={event.eventType} />
           </div>
         ) : (
-          <p className="notice notice-bad" style={{ marginTop: "1rem" }}>
-            {event.entitlement ? CONTACT_MESSAGE : "Complete your purchase to add an invitation."}
+          <p className={`notice ${event.entitlement || !freeUntil ? "notice-bad" : "notice-warn"}`} style={{ marginTop: "1rem" }}>
+            {event.entitlement
+              ? CONTACT_MESSAGE
+              : freeUntil
+                ? "Your invitation is listed above — tap it to edit. Publish it first, and more can be added to this event after that."
+                : "Complete your purchase to add an invitation."}
           </p>
         )}
       </div>

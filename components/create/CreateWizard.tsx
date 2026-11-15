@@ -5,7 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { PreviewPane } from "@/components/builder/PreviewPane";
 import { composeInvitationJson } from "@/lib/invitation/compose";
-import { draftSlug, draftToSource, emptyDraft, type InvitationDraft } from "@/lib/draft";
+import { draftSlug, draftToSource, emptyDraft, withEventType, type InvitationDraft } from "@/lib/draft";
+import { EVENT_TYPES } from "@/lib/events";
+
+type EventType = (typeof EVENT_TYPES)[number];
 import { useDesigns, useManifest } from "@/components/templates/DesignsProvider";
 import { clearDraft, loadDraft, saveDraft } from "@/lib/draft-storage";
 import { STEPS } from "./steps";
@@ -24,14 +27,14 @@ import { CoupleConstellation } from "./CoupleConstellation";
  * the same function the published page goes through — so what a visitor
  * watches while answering is the real renderer, not a mock-up of it (rule #3).
  */
-/** What the guide is doing on each step. */
-const GUIDE_POSE: Record<string, MascotPose> = {
-  occasion: "namaste",
-  design: "point",
-  details: "think",
-  moments: "card",
-  replies: "wave",
-  finish: "cheer",
+/** What the guide is doing, and saying, on each step. */
+const GUIDE: Record<string, { pose: MascotPose; say: string }> = {
+  occasion: { pose: "namaste", say: "Vanakkam! Tap the occasion, then type the names." },
+  design: { pose: "point", say: "Tap any design. The preview changes as you choose." },
+  details: { pose: "think", say: "When and where? Guests get a map from this." },
+  moments: { pose: "card", say: "Photos and a schedule, if you like. You can skip this." },
+  replies: { pose: "wave", say: "Choose what guests are asked when they reply." },
+  finish: { pose: "cheer", say: "Romba nalla irukku! One last step to keep it." },
 };
 
 export function CreateWizard({
@@ -74,6 +77,11 @@ export function CreateWizard({
     if (stored) {
       setDraft(stored);
       setResumed(true);
+    }
+    // A home page tile links here with its occasion already chosen.
+    const asked = new URLSearchParams(window.location.search).get("occasion");
+    if (asked && (EVENT_TYPES as readonly string[]).includes(asked)) {
+      setDraft((d) => withEventType(d, asked as EventType));
     }
     hydrated.current = true;
     // designs is deliberately not a dependency: it is a stable server-rendered
@@ -135,6 +143,11 @@ export function CreateWizard({
     const problem = current.blocker(draft);
     if (problem) {
       setBlocker(problem);
+      // The button may be the one pinned to the screen's edge, far from where
+      // the message appears, so the message is brought to the reader.
+      requestAnimationFrame(() =>
+        document.querySelector(".wz-blocker")?.scrollIntoView({ behavior: "smooth", block: "center" }),
+      );
       return;
     }
     if (last) return;
@@ -194,7 +207,13 @@ export function CreateWizard({
       <div className="wz-grid">
         <div className="t wz-panel" ref={panel}>
           {/* Keyed by step, so he arrives afresh in a new pose each time. */}
-          <Mascot key={current.id} pose={GUIDE_POSE[current.id]} height={104} className="wz-mascot" />
+          <Mascot
+            key={current.id}
+            pose={GUIDE[current.id].pose}
+            say={GUIDE[current.id].say}
+            height={130}
+            className="wz-guide"
+          />
           <p className="kick">
             Step {step + 1} of {STEPS.length}
           </p>
@@ -303,14 +322,32 @@ export function CreateWizard({
 
       {/* On a phone the preview cannot sit beside the questions, so it becomes
           a sheet the visitor pulls up whenever they want to look. */}
-      <button
-        type="button"
-        className="wz-peek"
-        onClick={() => setPreviewOpen((open) => !open)}
-        aria-expanded={previewOpen}
-      >
-        <span>{previewOpen ? "Back to the questions" : "Preview my invitation"}</span>
-      </button>
+      <div className="wz-dock">
+        {!previewOpen && !saved && (
+          <button
+            type="button"
+            className="wz-dock-back"
+            onClick={() => go(step - 1)}
+            disabled={step === 0}
+            aria-label="Back"
+          >
+            ←
+          </button>
+        )}
+        <button
+          type="button"
+          className="wz-peek"
+          onClick={() => setPreviewOpen((open) => !open)}
+          aria-expanded={previewOpen}
+        >
+          <span>{previewOpen ? "Back to the questions" : "Preview"}</span>
+        </button>
+        {!previewOpen && !last && (
+          <button type="button" className="btn btn-gold wz-dock-next" onClick={next}>
+            Continue →
+          </button>
+        )}
+      </div>
     </div>
   );
 }

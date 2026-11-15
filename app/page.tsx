@@ -173,6 +173,13 @@ export default async function HomePage() {
                   See it open
                 </Link>
               </div>
+              <Mascot
+                pose="namaste"
+                swap="wave"
+                height={190}
+                className="hero-guide"
+                say="Vanakkam! Tap Create and I will walk you through it."
+              />
             </div>
 
             {/* Three of the real covers, fanned like cards in a hand. Decorative
@@ -191,7 +198,6 @@ export default async function HomePage() {
                   />
                 </span>
               ))}
-              <Mascot pose="namaste" swap="wave" height={176} enter="rise" className="hero-mascot" />
             </div>
           </div>
 
@@ -238,13 +244,18 @@ export default async function HomePage() {
             </div>
             <div className="bento cer-grid">
               {EVENT_TYPES.map((type, i) => (
-                <div key={type} className="t t--lift rv c4 cer-tile" data-delay={i * 40}>
+                <Link
+                  key={type}
+                  href={`/create?occasion=${type}`}
+                  className="t t--lift rv c4 cer-tile"
+                  data-delay={i * 40}
+                >
                   <EventIcon eventType={type} className="cer-ic" />
                   <div>
                     <b>{withFigures(EVENT_TYPE_LABELS[type])}</b>
                     <span>{EVENT_TYPE_BLURBS[type]}</span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
             {/* The wedding case is the reason the product exists, and it is the
@@ -255,7 +266,7 @@ export default async function HomePage() {
               {CEREMONY_LABELS.muhurtham}, {CEREMONY_LABELS.nalangu} and{" "}
               {CEREMONY_LABELS.reception}. Each can have its own invitation and its own
               guest list.{" "}
-              <Link href="#pricing" style={{ textDecoration: "underline", textUnderlineOffset: 3 }}>
+              <Link href="#pricing" className="inline-link">
                 Ask us for a quote
               </Link>
               .
@@ -389,6 +400,12 @@ export default async function HomePage() {
               )}
             </div>
 
+            <Mascot
+              pose="card"
+              height={170}
+              className="price-guide rv"
+              say={freeUntil ? "It is free for now. Vaanga, make yours!" : "One price, everything in it. Vaanga!"}
+            />
             <div className="bento">
               <div className="t t--2 t--lit rv c6 price-card">
                 {/* priceLabel() returns null until PRICE_STANDARD_SEN is set, so
@@ -396,7 +413,6 @@ export default async function HomePage() {
                     figure or crashing on a missing variable. */}
                 {freeUntil ? (
                   <>
-                    <Mascot pose="card" height={118} className="price-mascot" />
                     <b className="price-fig num">Free</b>
                     <p className="inc">
                       one invitation, yours to keep

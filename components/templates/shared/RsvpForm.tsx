@@ -70,7 +70,7 @@ export function RsvpForm({
     return (
       <div className="rsvp-done" role="status">
         {invitation.opening.greeter && (
-          <Mascot pose={attending ? "cheer" : "namaste"} height={120} />
+          <Mascot pose={attending ? "cheer" : "namaste"} height={140} say="Nandri!" />
         )}
         <p className="rsvp-done-h">
           {attending ? "Thank you — we can't wait to see you." : "Thank you for letting us know."}

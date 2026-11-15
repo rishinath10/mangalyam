@@ -17,7 +17,7 @@ export default function NotFound() {
   return (
     <div className="tone-dark">
       <main className="legal" style={{ minHeight: "62vh" }}>
-        <Mascot pose="sorry" height={170} />
+        <Mascot pose="sorry" height={200} say="Aiyo! This link does not lead anywhere." />
         <h1>This page is not here</h1>
         <p className="legal-lede">
           The link may have a typo in it, or the invitation it pointed to may

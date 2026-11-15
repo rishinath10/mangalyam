@@ -35,6 +35,8 @@ export function Mascot({
   enter = "pop",
   flip = false,
   label,
+  say,
+  side = "right",
   className,
 }: {
   pose: MascotPose;
@@ -47,10 +49,16 @@ export function Mascot({
   /** Mirror him, so a pointing pose can point the other way. */
   flip?: boolean;
   label?: string;
+  /**
+   * Something for him to say, in a bubble beside him. This is real text, read
+   * out like any other, so use it for a hint the page does not already give.
+   */
+  say?: string;
+  /** Which side of him the bubble sits on. */
+  side?: "left" | "right";
   className?: string;
 }) {
   const [w, h] = MASCOT_POSES[pose];
-  const width = Math.round((w / h) * height);
 
   const img = (name: MascotPose, layer: "a" | "b") => {
     const [pw, ph] = MASCOT_POSES[name];
@@ -68,13 +76,14 @@ export function Mascot({
     );
   };
 
-  return (
+  const figure = (
     <span
-      className={`mascot ${className ?? ""}`}
+      className={`mascot ${say ? "" : (className ?? "")}`}
       data-enter={enter}
       data-swap={swap ? "" : undefined}
       data-flip={flip || undefined}
-      style={{ width, height }}
+      // --ms lets a page scale him for a narrow screen without a second prop.
+      style={{ "--mh": `${height}px`, aspectRatio: `${w} / ${h}` } as React.CSSProperties}
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
@@ -83,6 +92,14 @@ export function Mascot({
         {img(pose, "a")}
         {swap && img(swap, "b")}
       </span>
+    </span>
+  );
+
+  if (!say) return figure;
+  return (
+    <span className={`guide ${className ?? ""}`} data-side={side}>
+      {figure}
+      <span className="guide-say">{say}</span>
     </span>
   );
 }

@@ -27,7 +27,7 @@ export default function Error({
   return (
     <div className="tone-dark">
       <main className="legal" style={{ minHeight: "62vh" }}>
-        <Mascot pose="sorry" height={170} />
+        <Mascot pose="sorry" height={200} say="Aiyo! That was our mistake, not yours." />
         <h1>Something went wrong at our end</h1>
         <p className="legal-lede">
           This is a fault on our side, not something you did. Nothing you had

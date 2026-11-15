@@ -2341,7 +2341,7 @@ header:has(> .inv-frame-stage){place-content:center}
    Still poses, moved by CSS alone: a slow bob, an entrance, and
    a cross-fade between two poses where a gesture is wanted.
    ========================================================== */
-.mascot{display:inline-block;position:relative;flex:none;vertical-align:bottom;user-select:none;pointer-events:none}
+.mascot{display:inline-block;position:relative;flex:none;vertical-align:bottom;user-select:none;pointer-events:none;height:calc(var(--mh) * var(--ms,1))}
 .mascot-in{position:absolute;inset:0;animation:mascot-bob 4.6s ease-in-out infinite;transform-origin:50% 100%}
 .mascot[data-flip] .mascot-in{scale:-1 1}
 .mascot-img{
@@ -2363,26 +2363,74 @@ header:has(> .inv-frame-stage){place-content:center}
   .mascot,.mascot-in,.mascot[data-swap] .mascot-a,.mascot[data-swap] .mascot-b{animation:none}
 }
 
-/* ---- where he stands ---- */
-.hero-fan{position:relative}
-.hero-mascot{position:absolute;left:-2%;bottom:-4%;z-index:6}
-.price-card{position:relative}
-.price-mascot{position:absolute;right:5%;top:16px}
-.show-about{position:relative}
-.show-mascot{float:right;margin:-.4rem 0 .2rem .8rem}
-.star-form{position:relative}
-.star-mascot{float:right;margin:-.6rem -.2rem .2rem .6rem}
-.wz-panel{position:relative}
-.wz-mascot{float:right;margin:-.8rem -.3rem .2rem .8rem}
-.live-head{position:relative}
-.live-mascot{margin-left:auto}
-.live[data-celebrate] .live-mascot .mascot-in{animation:mascot-hop .9s cubic-bezier(.3,.7,.4,1) 3,mascot-bob 4.6s ease-in-out 2.7s infinite}
+/* ---- where he stands ----
+   Always in a row of his own with what he is saying beside him, never laid
+   over a card or floated into a paragraph. */
+.guide{display:flex;align-items:flex-end;gap:.5rem;width:fit-content;max-width:100%}
+.guide[data-side="left"]{flex-direction:row-reverse}
+.guide-say{
+  position:relative;align-self:center;margin-bottom:14%;
+  font:500 .9rem/1.35 var(--font-ui),system-ui,sans-serif;text-align:left;
+  background:#FFFBF2;color:#3A1D10;padding:.65rem .9rem;max-width:22ch;
+  border-radius:16px 16px 16px 4px;box-shadow:0 10px 24px -10px rgba(0,0,0,.45),0 0 0 1px rgba(60,30,10,.08);
+  animation:guide-say .5s cubic-bezier(.2,.9,.3,1.3) .45s both;
+}
+.guide[data-side="left"] .guide-say{border-radius:16px 16px 4px 16px}
+@keyframes guide-say{from{opacity:0;transform:scale(.8) translateY(6px)}to{opacity:1;transform:none}}
+.hero-guide{margin-top:1.4rem}
+.show-guide{margin-top:1.6rem}
+.star-guide{margin-bottom:1rem}
+.price-guide{margin:1.6rem auto 0}
+.wz-guide{margin:-.4rem 0 1rem}
+.live-guide{margin:0 0 1rem}
+.live[data-celebrate] .live-guide .mascot-in{animation:mascot-hop .9s cubic-bezier(.3,.7,.4,1) 3,mascot-bob 4.6s ease-in-out 2.7s infinite}
 @keyframes mascot-hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-14%) rotate(-3deg)}70%{transform:translateY(0) rotate(2deg)}}
-.empty .mascot,.legal > .mascot,.rsvp-done .mascot{display:block;margin:0 auto 1rem}
-.legal > .mascot{margin-left:0}
+.empty .guide,.rsvp-done .guide{margin:0 auto 1rem}
+.rsvp-done .mascot{display:block;margin:0 auto 1rem}
+.legal > .guide{margin-bottom:1.2rem}
 .page-loading{display:grid;justify-items:center;gap:1rem;padding:18vh 1rem;text-align:center}
 .mascot-walk .mascot-in{animation:mascot-step .7s ease-in-out infinite}
 @keyframes mascot-step{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4%) rotate(2deg)}}
+@media(max-width:860px){
+  .hero-guide,.show-guide{margin-inline:auto}
+  .hero-guide{--ms:.82}
+}
+
+/* ---- knowing what to tap ---- */
+/* The shelf scrolls sideways; a fading edge and a line of words say so. */
+.show-hint{text-align:center;font-size:var(--t-sm);color:var(--ink-3);margin-top:-.6rem}
+.show-hint b{color:var(--gold-lt);font-weight:500}
+@media(max-width:860px){
+  .show-shelf{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}
+}
+.show-pick[aria-checked="true"] .show-pick-cap b{color:var(--gold-lt)}
+/* An occasion tile is a way in, and looks like one. */
+a.cer-tile{text-decoration:none;color:inherit;cursor:pointer;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s}
+a.cer-tile:hover{transform:translateY(-3px)}
+a.cer-tile::after{content:"Start →";font-size:.72rem;letter-spacing:.08em;color:var(--accent);margin-top:auto}
+/* Thumb-sized: nothing tappable under 44px. */
+.foot a{display:inline-flex;align-items:center;min-height:44px;padding-block:0}
+.foot ul{gap:0}
+.inline-link{display:inline-block;padding-block:.8rem;margin-block:-.8rem;text-decoration:underline;text-underline-offset:3px}
+/* On a phone the wizard's way forward is pinned to the bottom edge. */
+.wz-dock-back,.wz-dock-next{display:none}
+@media(max-width:1080px){
+  .wz-dock{
+    position:fixed;inset:auto 0 0;z-index:90;display:flex;align-items:center;gap:.6rem;
+    height:calc(68px + env(safe-area-inset-bottom));
+    padding:0 .9rem env(safe-area-inset-bottom);
+    background:rgba(22,5,11,.94);border-top:1px solid var(--edge);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  }
+  .wz-dock .wz-peek{position:static;height:48px;padding:0;background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;flex:1}
+  .wz-dock-back{
+    display:inline-flex;align-items:center;justify-content:center;flex:none;width:48px;height:48px;border-radius:50%;
+    border:1px solid var(--edge-hi);background:none;color:var(--ink-1);font-size:1.1rem;cursor:pointer;
+  }
+  .wz-dock-back:disabled{opacity:.3}
+  .wz-dock-next{display:inline-flex;flex:none;min-height:48px;padding-inline:1.5rem}
+  .wz-panel > .wz-nav{display:none}
+}
 
 /* The greeter inside an invitation: up from the corner, a hello, and away. */
 .inv-greeter{
@@ -2401,11 +2449,15 @@ header:has(> .inv-frame-stage){place-content:center}
   100%{opacity:0;transform:translateY(60%);visibility:hidden}
 }
 @media (max-width:640px){
-  .hero-mascot{left:0;bottom:-6%}
-  .price-card .price-mascot ~ .inc{padding-right:92px}
 }
 @media (prefers-reduced-motion: reduce){
-  .live[data-celebrate] .live-mascot .mascot-in,.mascot-walk .mascot-in{animation:none}
+  .live[data-celebrate] .live-guide .mascot-in,.mascot-walk .mascot-in,.guide-say{animation:none}
   .inv-greeter{animation:greeter-still 6.5s linear .9s both}
 }
 @keyframes greeter-still{0%{opacity:0}8%,90%{opacity:1}100%{opacity:0;visibility:hidden}}
+
+/* Signed-in screens: the same 44px floor for anything tapped. */
+.nav-cta{min-height:44px;display:inline-flex;align-items:center}
+.nav-burger{width:44px;height:44px}
+.crumb{min-height:44px}
+[role="tab"]{min-height:44px}
