@@ -122,3 +122,39 @@ Keep the paper card for the altar. Send this one to everybody else. mangalyam.my
 - **"Do guests need an app?"** No. It opens in the browser from the WhatsApp link.
 - **"Can I change details later?"** Yes, any time, and the link stays the same.
 - **"Can I add my photo?"** Yes, and a gallery, a schedule, a countdown and music.
+
+---
+
+## Promo videos
+
+Files are in `marketing/videos/` (not kept in git; rebuild with the three scripts in `marketing/src/`). Each has a version with music and a `-silent` version for adding a trending track in the app.
+
+### 1-the-opening
+This is how your guests will open it. 🙏
+
+One tap on the seal, the doors part, and your invitation is there: date, venue, directions and reply, all in one link.
+
+Free until 31 December 2026 at mangalyam.my
+
+### 2-ten-designs
+Ten designs, each one painted. Tap any of them and it opens like a real card.
+
+Which one is yours? Tell us in the comments.
+
+mangalyam.my
+
+### 3-how-it-works
+Six questions. Send the link.
+
+1. Tell us who is celebrating.
+2. Pick a design.
+3. Share it on WhatsApp.
+
+Free until 31 December 2026 at mangalyam.my
+
+### 4-free-until-31-dec
+Our opening gift. 🎁
+
+Make and publish your invitation before 31 December 2026 and it is yours to keep. No card details asked.
+
+Vaanga: mangalyam.my
