@@ -2492,10 +2492,6 @@ a.cer-tile::after{content:"Start →";font-size:.72rem;letter-spacing:.08em;colo
    the page at either end, and on a phone it is short enough to leave page
    showing above and below it to swipe on. */
 .show-phone .phone-scroll{overscroll-behavior:auto}
-@media (max-width:860px){
-  .show-phone .phone-scroll{--frame-h:min(58svh,520px)}
-  .show-phone{width:min(300px,100%);margin-inline:auto}
-}
 
 /* Cormorant's numbers are old-style by default (they drop below the line);
    every serif number on the site is set at full height instead. */
