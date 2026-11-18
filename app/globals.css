@@ -2508,3 +2508,7 @@ h1,h2,h3,h4,.dsn,.inv-root{font-variant-numeric:lining-nums}
 span.num,.cer-tile b .num,.occ b .num,.pillars .n .num{display:inline;margin:0;font-size:inherit;letter-spacing:inherit;text-transform:none;color:inherit}
 /* The 01/02/03 beside each pillar match the line they number. */
 .pillars .n{font-size:inherit}
+
+/* Preview phones scroll like a real phone: no desktop scrollbar down the side. */
+.phone-scroll{scrollbar-width:none}
+.phone-scroll::-webkit-scrollbar{display:none}
