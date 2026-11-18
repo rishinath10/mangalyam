@@ -2469,3 +2469,19 @@ a.cer-tile::after{content:"Start →";font-size:.72rem;letter-spacing:.08em;colo
 .legal > .mascot{margin-left:0}
 .live-guide{display:block}
 @media(max-width:860px){.hero-guide,.show-guide{display:block}}
+
+/* The design shelf scrolls without a visible scrollbar; arrows do the job
+   for a mouse, a finger just swipes. */
+.show-shelf{scrollbar-width:none}
+.show-shelf::-webkit-scrollbar{display:none}
+.show-rail{position:relative;min-width:0}
+.show-arrow{
+  position:absolute;top:42%;z-index:3;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;
+  display:none;align-items:center;justify-content:center;cursor:pointer;
+  font:300 30px/1 var(--serif),serif;color:#1A0A05;background:var(--gold-lt);border:0;
+  box-shadow:0 10px 24px -10px rgba(0,0,0,.7);transition:transform .2s,background .2s;
+}
+.show-arrow:hover{background:var(--gold)}
+.show-arrow[data-dir="prev"]{left:-14px}
+.show-arrow[data-dir="next"]{right:-14px}
+@media (hover:hover) and (pointer:fine){.show-arrow{display:inline-flex}}

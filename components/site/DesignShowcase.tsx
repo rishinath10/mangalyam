@@ -114,6 +114,10 @@ export function DesignShowcase({
   sampleDate: string;
 }) {
   const [chosen, setChosen] = useState(designs[0]?.templateId ?? "");
+  // The shelf hides its scrollbar, so a mouse needs these to move along it.
+  const shelf = useRef<HTMLDivElement>(null);
+  const slide = (dir: number) =>
+    shelf.current?.scrollBy({ left: dir * shelf.current.clientWidth * 0.8, behavior: "smooth" });
   const [near, setNear] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -146,7 +150,14 @@ export function DesignShowcase({
 
   return (
     <div className="show" ref={ref}>
-      <div className="show-shelf" role="radiogroup" aria-label="Designs">
+      <div className="show-rail">
+      <button type="button" className="show-arrow" data-dir="prev" onClick={() => slide(-1)} aria-label="Previous designs">
+        ‹
+      </button>
+      <button type="button" className="show-arrow" data-dir="next" onClick={() => slide(1)} aria-label="More designs">
+        ›
+      </button>
+      <div className="show-shelf" ref={shelf} role="radiogroup" aria-label="Designs">
         {designs.map((d) => {
           const wedding = d.eventTypes.includes("wedding");
           const occasion = d.eventTypes.find((t) => t !== "custom") ?? "custom";
@@ -170,6 +181,7 @@ export function DesignShowcase({
             </button>
           );
         })}
+      </div>
       </div>
 
       <p className="show-hint">
